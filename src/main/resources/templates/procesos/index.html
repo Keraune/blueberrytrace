@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Uniformización y formalización</title>
+    <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
+</head>
+
+<body class="app-body">
+    <div class="app-shell">
+        <div th:replace="~{fragments/app-shell :: sidebar('procesos')}"></div>
+        <main class="main-content">
+            <div
+                th:replace="~{fragments/app-shell :: topbar('Uniformización y formalización', 'Seguimiento visual de procesos internos')}">
+            </div>
+            <section class="content-grid equal-grid">
+                <article class="panel-card">
+                    <div class="panel-head">
+                        <h3>Uniformización</h3><span>Formulario</span>
+                    </div>
+                    <form class="form-grid">
+                        <div class="form-group"><label>Lote</label><select>
+                                <option>LOT-001</option>
+                            </select></div>
+                        <div class="form-group"><label>Fecha</label><input type="date"></div>
+                        <div class="form-group full-span"><label>Detalle</label><textarea
+                                placeholder="Detalle de uniformización"></textarea></div><button
+                            class="primary-btn full-width full-span" type="button">Guardar</button>
+                    </form>
+                </article>
+                <article class="panel-card">
+                    <div class="panel-head">
+                        <h3>Formalización</h3><span>Formulario</span>
+                    </div>
+                    <form class="form-grid">
+                        <div class="form-group"><label>Lote</label><select>
+                                <option>LOT-001</option>
+                            </select></div>
+                        <div class="form-group"><label>Fecha</label><input type="date"></div>
+                        <div class="form-group full-span"><label>Detalle</label><textarea
+                                placeholder="Detalle de formalización"></textarea></div><button
+                            class="primary-btn full-width full-span" type="button">Guardar</button>
+                    </form>
+                </article>
+            </section>
+        </main>
+    </div>
+    <script src="../../static/js/app.js" th:src="@{/js/app.js}"></script>
+</body>
+
+</html>

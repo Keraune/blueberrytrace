@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/css/style.css" th:href="@{/css/style.css}">
+    <title>Login</title>
+</head>
+
+<body class="auth-clean-body">
+    <div class="auth-clean-shell">
+        <section class="auth-clean-visual auth-visual-login">
+            <div class="auth-clean-overlay">
+                <span class="auth-clean-chip">Vivero Los Viñedos</span>
+                <h1>Bienvenido al sistema interno de control de arándano</h1>
+                <p>Plataforma operativa para registrar lotes, camas, siembra, clasificación y despacho del área de
+                    frutales.</p>
+
+                <div class="auth-clean-feature-list">
+                    <div class="auth-clean-feature"><strong>Trazabilidad</strong><span>Seguimiento del proceso por
+                            etapas</span></div>
+                    <div class="auth-clean-feature"><strong>Control</strong><span>Gestión organizada por módulos</span>
+                    </div>
+                    <div class="auth-clean-feature"><strong>Reportes</strong><span>Base preparada para exportación
+                            futura</span></div>
+                </div>
+            </div>
+        </section>
+
+        <section class="auth-clean-form-side">
+            <div class="auth-clean-card">
+                <a class="auth-clean-back" th:href="@{/}">← Ir al inicio</a>
+                <h2>Iniciar sesión</h2>
+                <p class="auth-clean-muted">Pantalla visual lista para integrarse después con autenticación real.</p>
+
+                <form class="auth-clean-form">
+                    <label>Usuario</label>
+                    <input type="text" placeholder="Ingresa tu usuario">
+
+                    <label>Contraseña</label>
+                    <input type="password" placeholder="Ingresa tu contraseña">
+
+                    <div class="auth-clean-row">
+                        <label class="auth-clean-check"><input type="checkbox"><span>Recordarme</span></label>
+                        <a href="#">¿Olvidaste tu contraseña?</a>
+                    </div>
+
+                    <button class="primary-btn full-width" type="button">Ingresar</button>
+                </form>
+
+                <div class="auth-clean-footer">
+                    <span>¿No tienes una cuenta?</span>
+                    <a th:href="@{/auth/register}">Registrar usuario</a>
+                </div>
+            </div>
+        </section>
+    </div>
+</body>
+
+</html>

@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clasificación</title>
+    <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
+</head>
+
+<body class="app-body">
+    <div class="app-shell">
+        <div th:replace="~{fragments/app-shell :: sidebar('clasificacion')}"></div>
+        <main class="main-content">
+            <div
+                th:replace="~{fragments/app-shell :: topbar('Clasificación', 'Clasificación visual por estado, tamaño o condición')}">
+            </div>
+            <section class="panel-card">
+                <div class="panel-head">
+                    <h3>Registro de clasificación</h3><span>Vista demo</span>
+                </div>
+                <form class="form-grid three-columns">
+                    <div class="form-group"><label>Lote</label><select>
+                            <option>LOT-001</option>
+                        </select></div>
+                    <div class="form-group"><label>Estado</label><select>
+                            <option>Óptimo</option>
+                            <option>Regular</option>
+                            <option>Observado</option>
+                        </select></div>
+                    <div class="form-group"><label>Tamaño</label><select>
+                            <option>Grande</option>
+                            <option>Mediano</option>
+                            <option>Pequeño</option>
+                        </select></div>
+                    <div class="form-group full-span"><label>Condición / observación</label><textarea
+                            placeholder="Describe la condición de la planta"></textarea></div>
+                    <button class="primary-btn full-width full-span" type="button">Guardar clasificación</button>
+                </form>
+            </section>
+        </main>
+    </div>
+    <script src="../../static/js/app.js" th:src="@{/js/app.js}"></script>
+</body>
+
+</html>

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Despacho</title>
+    <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
+</head>
+
+<body class="app-body">
+    <div class="app-shell">
+        <div th:replace="~{fragments/app-shell :: sidebar('despacho')}"></div>
+        <main class="main-content">
+            <div
+                th:replace="~{fragments/app-shell :: topbar('Despacho', 'Registro visual de despacho en jabas o bins')}">
+            </div>
+            <section class="content-grid two-one">
+                <article class="panel-card">
+                    <div class="panel-head">
+                        <h3>Nuevo despacho</h3><span>Formulario</span>
+                    </div>
+                    <form class="form-grid two-columns">
+                        <div class="form-group"><label>Lote</label><select>
+                                <option>LOT-001</option>
+                            </select></div>
+                        <div class="form-group"><label>Modalidad</label><select>
+                                <option>Jabas comunes</option>
+                                <option>Bins / madera</option>
+                            </select></div>
+                        <div class="form-group"><label>Fecha</label><input type="date"></div>
+                        <div class="form-group"><label>Cantidad</label><input type="number" placeholder="Cantidad">
+                        </div>
+                        <div class="form-group full-span"><label>Validación de control de calidad</label><textarea
+                                placeholder="Observación previa a carga"></textarea></div>
+                        <button class="primary-btn full-width full-span" type="button">Guardar despacho</button>
+                    </form>
+                </article>
+                <article class="panel-card">
+                    <div class="panel-head">
+                        <h3>Historial reciente</h3><span>Demo</span>
+                    </div>
+                    <ul class="feature-list simple">
+                        <li>Despacho LOT-001 en jabas</li>
+                        <li>Despacho LOT-002 en bins</li>
+                    </ul>
+                </article>
+            </section>
+        </main>
+    </div>
+    <script src="../../static/js/app.js" th:src="@{/js/app.js}"></script>
+</body>
+
+</html>

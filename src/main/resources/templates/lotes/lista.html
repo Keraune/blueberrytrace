@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lotes</title>
+    <link rel="stylesheet" href="/css/style.css" th:href="@{/css/style.css}">
+</head>
+
+<body class="app-body">
+    <div class="app-shell">
+        <div th:replace="~{fragments/app-shell :: sidebar('lotes')}"></div>
+
+        <main class="main-content">
+            <div
+                th:replace="~{fragments/app-shell :: topbar('Gestión de lotes', 'Registro y consulta de lotes de arándano')}">
+            </div>
+
+            <section class="dashboard-grid bottom-grid">
+                <article class="panel-card">
+                    <div class="panel-head">
+                        <h3>Listado de lotes</h3>
+                        <span>Vista actual</span>
+                    </div>
+
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Descripción</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>LOT-001</td>
+                                <td>Lote principal campaña abril</td>
+                                <td>2026-04-13</td>
+                                <td><span class="badge success">Activo</span></td>
+                                <td><a href="#">Ver detalle</a></td>
+                            </tr>
+                            <tr>
+                                <td>LOT-002</td>
+                                <td>Lote zona B en control</td>
+                                <td>2026-04-12</td>
+                                <td><span class="badge warning">Pendiente</span></td>
+                                <td><a href="#">Ver detalle</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </article>
+
+                <article class="panel-card">
+                    <div class="panel-head">
+                        <h3>Nuevo lote</h3>
+                        <span>Formulario</span>
+                    </div>
+
+                    <form class="form-grid">
+                        <div class="form-group">
+                            <label>Código</label>
+                            <input type="text" placeholder="LOT-001">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Fecha de registro</label>
+                            <input type="date">
+                        </div>
+
+                        <div class="form-group full-span">
+                            <label>Descripción</label>
+                            <input type="text" placeholder="Describe el lote">
+                        </div>
+
+                        <div class="form-group full-span">
+                            <label>Observación</label>
+                            <textarea placeholder="Observaciones del lote"></textarea>
+                        </div>
+
+                        <button class="primary-btn full-width full-span" type="button">Guardar lote</button>
+                    </form>
+                </article>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>

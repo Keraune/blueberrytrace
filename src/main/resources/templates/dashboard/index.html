@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link rel="stylesheet" href="/css/style.css" th:href="@{/css/style.css}">
+</head>
+
+<body class="app-body">
+    <div class="app-shell">
+        <div th:replace="~{fragments/app-shell :: sidebar('dashboard')}"></div>
+
+        <main class="main-content">
+            <div
+                th:replace="~{fragments/app-shell :: topbar('Dashboard operativo', 'Resumen visual del proceso del área de arándano')}">
+            </div>
+
+            <section class="stats-grid">
+                <article class="metric-card metric-primary">
+                    <span class="metric-label">Lotes activos</span>
+                    <strong>128</strong>
+                    <small>Seguimiento del día</small>
+                </article>
+                <article class="metric-card">
+                    <span class="metric-label">Camas operativas</span>
+                    <strong>42</strong>
+                    <small>Disponibles en área</small>
+                </article>
+                <article class="metric-card">
+                    <span class="metric-label">Clasificaciones</span>
+                    <strong>316</strong>
+                    <small>Registradas esta semana</small>
+                </article>
+                <article class="metric-card metric-warning">
+                    <span class="metric-label">Despachos pendientes</span>
+                    <strong>09</strong>
+                    <small>Por validar</small>
+                </article>
+            </section>
+
+            <section class="dashboard-grid">
+                <article class="panel-card chart-panel">
+                    <div class="panel-head">
+                        <h3>Flujo del proceso</h3>
+                        <span>Siembra a despacho</span>
+                    </div>
+
+                    <div class="bar-chart">
+                        <div class="bar-col">
+                            <div class="bar-track"><span style="height:55%"></span></div><label>Siembra</label>
+                        </div>
+                        <div class="bar-col">
+                            <div class="bar-track"><span style="height:72%"></span></div><label>Camas</label>
+                        </div>
+                        <div class="bar-col">
+                            <div class="bar-track"><span style="height:67%"></span></div><label>Uniformización</label>
+                        </div>
+                        <div class="bar-col">
+                            <div class="bar-track"><span style="height:60%"></span></div><label>Formalización</label>
+                        </div>
+                        <div class="bar-col">
+                            <div class="bar-track"><span style="height:82%"></span></div><label>Clasificación</label>
+                        </div>
+                        <div class="bar-col">
+                            <div class="bar-track"><span style="height:45%"></span></div><label>Despacho</label>
+                        </div>
+                    </div>
+                </article>
+
+                <article class="panel-card donut-panel">
+                    <div class="panel-head">
+                        <h3>Estado general</h3>
+                        <span>Producción</span>
+                    </div>
+
+                    <div class="donut-box">
+                        <div class="donut-chart"><span>78%</span></div>
+                        <ul class="legend">
+                            <li><i class="dot dot-blue"></i> Procesado</li>
+                            <li><i class="dot dot-orange"></i> En curso</li>
+                            <li><i class="dot dot-gray"></i> Pendiente</li>
+                        </ul>
+                    </div>
+                </article>
+            </section>
+
+            <section class="dashboard-grid bottom-grid">
+                <article class="panel-card">
+                    <div class="panel-head">
+                        <h3>Accesos rápidos</h3>
+                        <span>Navegación</span>
+                    </div>
+                    <div class="quick-grid">
+                        <a th:href="@{/lotes}">Ir a lotes</a>
+                        <a th:href="@{/camas}">Ir a camas</a>
+                        <a th:href="@{/siembra}">Registrar siembra</a>
+                        <a th:href="@{/procesos}">Ver procesos</a>
+                        <a th:href="@{/clasificacion}">Clasificación</a>
+                        <a th:href="@{/despacho}">Despacho</a>
+                    </div>
+                </article>
+
+                <article class="panel-card">
+                    <div class="panel-head">
+                        <h3>Actividad reciente</h3>
+                        <span>Últimos movimientos</span>
+                    </div>
+                    <ul class="activity-list">
+                        <li><strong>LOT-001</strong><span>Registrado en CAM-004</span></li>
+                        <li><strong>Clasificación</strong><span>Tamaño actualizado en LOT-003</span></li>
+                        <li><strong>Despacho</strong><span>Bin preparado para validación</span></li>
+                        <li><strong>Usuario</strong><span>Nuevo operario pendiente</span></li>
+                    </ul>
+                </article>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>

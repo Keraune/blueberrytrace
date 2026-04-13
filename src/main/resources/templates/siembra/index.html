@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Siembra y ubicación</title>
+    <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
+</head>
+
+<body class="app-body">
+    <div class="app-shell">
+        <div th:replace="~{fragments/app-shell :: sidebar('siembra')}"></div>
+        <main class="main-content">
+            <div
+                th:replace="~{fragments/app-shell :: topbar('Siembra y ubicación', 'Registro visual de siembra y colocación en camas')}">
+            </div>
+            <section class="content-grid two-one">
+                <article class="panel-card">
+                    <div class="panel-head">
+                        <h3>Registro de siembra</h3><span>Formulario visual</span>
+                    </div>
+                    <form class="form-grid two-columns">
+                        <div class="form-group"><label>Lote</label><select>
+                                <option>LOT-001</option>
+                            </select></div>
+                        <div class="form-group"><label>Cama</label><select>
+                                <option>CAM-001</option>
+                            </select></div>
+                        <div class="form-group"><label>Fecha de siembra</label><input type="date"></div>
+                        <div class="form-group"><label>Cantidad registrada</label><input type="number"
+                                placeholder="Cantidad"></div>
+                        <div class="form-group full-span"><label>Observación</label><textarea
+                                placeholder="Observaciones de la siembra"></textarea></div>
+                        <button class="primary-btn full-width full-span" type="button">Guardar registro</button>
+                    </form>
+                </article>
+                <article class="panel-card">
+                    <div class="panel-head">
+                        <h3>Notas</h3><span>Proceso</span>
+                    </div>
+                    <p>Esta vista se dejará lista para enlazar lote, cama, cantidad y usuario registrador cuando
+                        activemos backend y base de datos.</p>
+                </article>
+            </section>
+        </main>
+    </div>
+    <script src="../../static/js/app.js" th:src="@{/js/app.js}"></script>
+</body>
+
+</html>

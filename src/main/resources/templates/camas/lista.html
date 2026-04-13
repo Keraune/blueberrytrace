@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Camas</title>
+    <link rel="stylesheet" href="/css/style.css" th:href="@{/css/style.css}">
+</head>
+
+<body class="app-body">
+    <div class="app-shell">
+        <div th:replace="~{fragments/app-shell :: sidebar('camas')}"></div>
+
+        <main class="main-content">
+            <div
+                th:replace="~{fragments/app-shell :: topbar('Gestión de camas', 'Control visual de camas de producción')}">
+            </div>
+
+            <section class="dashboard-grid bottom-grid">
+                <article class="panel-card">
+                    <div class="panel-head">
+                        <h3>Listado de camas</h3>
+                        <span>Vista actual</span>
+                    </div>
+
+                    <table class="custom-table">
+                        <thead>
+                            <tr>
+                                <th>Código</th>
+                                <th>Descripción</th>
+                                <th>Capacidad</th>
+                                <th>Estado</th>
+                                <th>Acción</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>CAM-001</td>
+                                <td>Cama sector 1</td>
+                                <td>1200</td>
+                                <td><span class="badge success">Activa</span></td>
+                                <td><a href="#">Ver detalle</a></td>
+                            </tr>
+                            <tr>
+                                <td>CAM-002</td>
+                                <td>Cama sector 2</td>
+                                <td>1000</td>
+                                <td><span class="badge neutral">Disponible</span></td>
+                                <td><a href="#">Ver detalle</a></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </article>
+
+                <article class="panel-card">
+                    <div class="panel-head">
+                        <h3>Nueva cama</h3>
+                        <span>Formulario</span>
+                    </div>
+
+                    <form class="form-grid">
+                        <div class="form-group">
+                            <label>Código</label>
+                            <input type="text" placeholder="CAM-001">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Capacidad referencial</label>
+                            <input type="number" placeholder="1200">
+                        </div>
+
+                        <div class="form-group full-span">
+                            <label>Descripción</label>
+                            <input type="text" placeholder="Descripción de la cama">
+                        </div>
+
+                        <button class="primary-btn full-width full-span" type="button">Guardar cama</button>
+                    </form>
+                </article>
+            </section>
+        </main>
+    </div>
+</body>
+
+</html>
