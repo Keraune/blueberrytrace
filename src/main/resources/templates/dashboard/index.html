@@ -4,8 +4,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../static/css/style.css" th:href="@{/css/style.css}">
     <title>Dashboard</title>
-    <link rel="stylesheet" href="/css/style.css" th:href="@{/css/style.css}">
 </head>
 
 <body class="app-body">
@@ -17,36 +17,23 @@
                 th:replace="~{fragments/app-shell :: topbar('Dashboard operativo', 'Resumen visual del proceso del área de arándano')}">
             </div>
 
-            <section class="stats-grid">
-                <article class="metric-card metric-primary">
-                    <span class="metric-label">Lotes activos</span>
-                    <strong>128</strong>
-                    <small>Seguimiento del día</small>
-                </article>
-                <article class="metric-card">
-                    <span class="metric-label">Camas operativas</span>
-                    <strong>42</strong>
-                    <small>Disponibles en área</small>
-                </article>
-                <article class="metric-card">
-                    <span class="metric-label">Clasificaciones</span>
-                    <strong>316</strong>
-                    <small>Registradas esta semana</small>
-                </article>
-                <article class="metric-card metric-warning">
-                    <span class="metric-label">Despachos pendientes</span>
-                    <strong>09</strong>
-                    <small>Por validar</small>
-                </article>
+            <section class="stats-grid premium-stats">
+                <article class="metric-card metric-primary"><span class="metric-label">Lotes
+                        activos</span><strong>128</strong><small>Seguimiento del día</small></article>
+                <article class="metric-card soft-card"><span class="metric-label">Camas
+                        operativas</span><strong>42</strong><small>Disponibles en área</small></article>
+                <article class="metric-card soft-card"><span
+                        class="metric-label">Clasificaciones</span><strong>316</strong><small>Registradas esta
+                        semana</small></article>
+                <article class="metric-card metric-warning"><span class="metric-label">Despachos
+                        pendientes</span><strong>09</strong><small>Por validar</small></article>
             </section>
 
             <section class="dashboard-grid">
-                <article class="panel-card chart-panel">
+                <article class="panel-card premium-panel">
                     <div class="panel-head">
-                        <h3>Flujo del proceso</h3>
-                        <span>Siembra a despacho</span>
+                        <h3>Flujo del proceso</h3><span>Siembra a despacho</span>
                     </div>
-
                     <div class="bar-chart">
                         <div class="bar-col">
                             <div class="bar-track"><span style="height:55%"></span></div><label>Siembra</label>
@@ -69,12 +56,10 @@
                     </div>
                 </article>
 
-                <article class="panel-card donut-panel">
+                <article class="panel-card premium-panel">
                     <div class="panel-head">
-                        <h3>Estado general</h3>
-                        <span>Producción</span>
+                        <h3>Estado general</h3><span>Producción</span>
                     </div>
-
                     <div class="donut-box">
                         <div class="donut-chart"><span>78%</span></div>
                         <ul class="legend">
@@ -87,12 +72,11 @@
             </section>
 
             <section class="dashboard-grid bottom-grid">
-                <article class="panel-card">
+                <article class="panel-card premium-panel">
                     <div class="panel-head">
-                        <h3>Accesos rápidos</h3>
-                        <span>Navegación</span>
+                        <h3>Accesos rápidos</h3><span>Navegación</span>
                     </div>
-                    <div class="quick-grid">
+                    <div class="quick-grid premium-quick-grid">
                         <a th:href="@{/lotes}">Ir a lotes</a>
                         <a th:href="@{/camas}">Ir a camas</a>
                         <a th:href="@{/siembra}">Registrar siembra</a>
@@ -102,17 +86,18 @@
                     </div>
                 </article>
 
-                <article class="panel-card">
+                <article class="panel-card premium-panel">
                     <div class="panel-head">
-                        <h3>Actividad reciente</h3>
-                        <span>Últimos movimientos</span>
+                        <h3>Actividad reciente</h3><span>Últimos movimientos</span>
                     </div>
-                    <ul class="activity-list">
-                        <li><strong>LOT-001</strong><span>Registrado en CAM-004</span></li>
-                        <li><strong>Clasificación</strong><span>Tamaño actualizado en LOT-003</span></li>
-                        <li><strong>Despacho</strong><span>Bin preparado para validación</span></li>
-                        <li><strong>Usuario</strong><span>Nuevo operario pendiente</span></li>
-                    </ul>
+                    <div class="activity-feed">
+                        <div class="activity-card"><strong>LOT-001</strong><span>Registrado en CAM-004</span></div>
+                        <div class="activity-card"><strong>Clasificación</strong><span>Tamaño actualizado en
+                                LOT-003</span></div>
+                        <div class="activity-card"><strong>Despacho</strong><span>Bin preparado para validación</span>
+                        </div>
+                        <div class="activity-card"><strong>Usuario</strong><span>Nuevo operario pendiente</span></div>
+                    </div>
                 </article>
             </section>
         </main>

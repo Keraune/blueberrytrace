@@ -1737,42 +1737,190 @@ body {
 }
 
 /* UI Pack 12 icons inline + darker auth + footer blur */
-.nav-svg,.action-svg{display:inline-flex;align-items:center;justify-content:center;width:18px;height:18px;flex-shrink:0}
-.nav-svg svg,.action-svg svg{width:18px;height:18px}
-.sidebar-search .nav-svg{color:#decff4}
-.auth-clean-body{
-    min-height:100vh;
-    background:linear-gradient(135deg,#120b1d,#0b1020);
+.nav-svg,
+.action-svg {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0
 }
-.auth-clean-form-side{
-    background:linear-gradient(160deg,#0f1630 0%,#151b36 42%,#1b1230 100%);
+
+.nav-svg svg,
+.action-svg svg {
+    width: 18px;
+    height: 18px
 }
-.auth-clean-card{
-    background:rgba(15,18,36,.62);
-    border:1px solid rgba(255,255,255,.12);
-    backdrop-filter:blur(18px);
-    -webkit-backdrop-filter:blur(18px);
-    color:#fff;
+
+.sidebar-search .nav-svg {
+    color: #decff4
 }
-.auth-clean-muted{color:rgba(255,255,255,.72)}
-.auth-clean-form label{color:#edf0ff}
-.auth-clean-form input,.auth-clean-form select{
-    background:rgba(255,255,255,.08);
-    border:1px solid rgba(255,255,255,.12);
-    color:#fff;
+
+.auth-clean-body {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #120b1d, #0b1020);
 }
-.auth-clean-form input::placeholder{color:rgba(255,255,255,.58)}
-.auth-clean-form select option{background:#1a2141;color:#fff}
-.auth-clean-row,.auth-clean-footer,.auth-clean-check{color:rgba(255,255,255,.8)}
-.auth-clean-row a,.auth-clean-footer a,.auth-clean-back{color:#b48cff}
-.landing-footer-dark{
-    background:rgba(255,255,255,.03);
-    backdrop-filter:blur(16px);
-    -webkit-backdrop-filter:blur(16px);
-    border:1px solid rgba(255,255,255,.06);
-    border-radius:26px;
+
+.auth-clean-form-side {
+    background: linear-gradient(160deg, #0f1630 0%, #151b36 42%, #1b1230 100%);
 }
-body.landing-dark-body{padding-bottom:24px}
-@media (max-width:1200px){
-  .auth-clean-shell,.auth-clean-shell-reverse{grid-template-columns:1fr}
+
+.auth-clean-card {
+    background: rgba(15, 18, 36, .62);
+    border: 1px solid rgba(255, 255, 255, .12);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    color: #fff;
+}
+
+.auth-clean-muted {
+    color: rgba(255, 255, 255, .72)
+}
+
+.auth-clean-form label {
+    color: #edf0ff
+}
+
+.auth-clean-form input,
+.auth-clean-form select {
+    background: rgba(255, 255, 255, .08);
+    border: 1px solid rgba(255, 255, 255, .12);
+    color: #fff;
+}
+
+.auth-clean-form input::placeholder {
+    color: rgba(255, 255, 255, .58)
+}
+
+.auth-clean-form select option {
+    background: #1a2141;
+    color: #fff
+}
+
+.auth-clean-row,
+.auth-clean-footer,
+.auth-clean-check {
+    color: rgba(255, 255, 255, .8)
+}
+
+.auth-clean-row a,
+.auth-clean-footer a,
+.auth-clean-back {
+    color: #b48cff
+}
+
+.landing-footer-dark {
+    background: rgba(255, 255, 255, .03);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, .06);
+    border-radius: 26px;
+}
+
+body.landing-dark-body {
+    padding-bottom: 24px
+}
+
+@media (max-width:1200px) {
+
+    .auth-clean-shell,
+    .auth-clean-shell-reverse {
+        grid-template-columns: 1fr
+    }
+}
+
+/* UI Pack 13 purple auth + premium dashboard */
+.auth-clean-form-side {
+    background: linear-gradient(160deg, #121329 0%, #171833 48%, #24153f 100%);
+}
+
+.dark-auth-card {
+    background: rgba(14, 15, 31, .62);
+    border: 1px solid rgba(255, 255, 255, .10);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    color: #fff;
+}
+
+.auth-light-muted {
+    color: rgba(255, 255, 255, .72)
+}
+
+.dark-auth-card .auth-clean-form label {
+    color: #eef0ff
+}
+
+.dark-auth-card .auth-clean-form input,
+.dark-auth-card .auth-clean-form select {
+    background: rgba(255, 255, 255, .08);
+    border: 1px solid rgba(255, 255, 255, .12);
+    color: #fff;
+}
+
+.dark-auth-card .auth-clean-form input::placeholder {
+    color: rgba(255, 255, 255, .58)
+}
+
+.dark-auth-card .auth-clean-form select option {
+    background: #1a2141;
+    color: #fff
+}
+
+.dark-auth-card .auth-clean-row,
+.dark-auth-card .auth-clean-footer,
+.dark-auth-card .auth-clean-check {
+    color: rgba(255, 255, 255, .82)
+}
+
+.dark-auth-card .auth-clean-row a,
+.dark-auth-card .auth-clean-footer a,
+.dark-auth-card .auth-clean-back {
+    color: #b48cff
+}
+
+.soft-card {
+    background: linear-gradient(180deg, #ffffff, #fbf7ff);
+    border: 1px solid #eadff4;
+}
+
+.premium-panel {
+    background: linear-gradient(180deg, #ffffff, #fcf9ff);
+    border: 1px solid #eadff4;
+}
+
+.bar-track {
+    background: linear-gradient(180deg, #eef2f9, #e1e7f0);
+}
+
+.bar-track span {
+    background: linear-gradient(180deg, #6da7ff, #2f73e1);
+}
+
+.premium-quick-grid a {
+    background: linear-gradient(180deg, #ffffff, #faf7fd);
+    border: 1px solid #eadff4;
+    border-radius: 16px;
+    padding: 20px;
+}
+
+.activity-feed {
+    display: grid;
+    gap: 14px;
+}
+
+.activity-card {
+    padding: 18px 18px;
+    border-radius: 16px;
+    border: 1px solid #eadff4;
+    background: linear-gradient(180deg, #ffffff, #faf7fd);
+}
+
+.activity-card strong {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.activity-card span {
+    color: #7b6f90;
 }
