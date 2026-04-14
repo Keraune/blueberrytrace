@@ -1,155 +1,177 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
     <link rel="stylesheet" href="../static/css/style.css" th:href="@{/css/style.css}">
-    <title>VLV Blueberry System</title>
+    <title>Blueberry Trace | Vivero Los Viñedos</title>
 </head>
-
-<body class="landing-dark-body">
-    <header class="landing-topbar">
-        <div class="landing-brand">
-            <div class="landing-logo"><iconify-icon icon="mdi:fruit-grapes"></iconify-icon></div>
-            <div>
-                <strong>Blueberry System</strong>
-                <span>Vivero Los Viñedos</span>
-            </div>
+<body class="landing-dark-body blueberry-landing-body">
+<header class="landing-topbar blueberry-landing-topbar">
+    <div class="landing-brand">
+        <div class="landing-logo"><iconify-icon icon="mdi:fruit-blueberry"></iconify-icon></div>
+        <div>
+            <strong>Blueberry Trace</strong>
+            <span>Vivero Los Viñedos · Área interna de arándanos</span>
         </div>
+    </div>
 
-        <nav class="landing-menu">
-            <a href="#proceso">Proceso</a>
-            <a href="#modulos">Módulos</a>
-            <a href="#informacion">Información</a>
-            <a class="primary-btn" th:href="@{/auth/login}"><iconify-icon icon="mdi:login"></iconify-icon><span>Iniciar
-                    sesión</span></a>
-        </nav>
-    </header>
+    <nav class="landing-menu">
+        <a href="#proceso">Proceso</a>
+        <a href="#modulos">Módulos</a>
+        <a href="#informacion">Información</a>
+        <a class="primary-btn" th:href="@{/auth/login}">
+            <iconify-icon icon="mdi:login"></iconify-icon>
+            <span>Iniciar sesión</span>
+        </a>
+    </nav>
+</header>
 
-    <section class="landing-hero-dark">
-        <div class="landing-hero-copy">
-            <span class="landing-chip">Sistema interno · Área de arándano</span>
-            <h1>El sistema para el control y trazabilidad de plantas de arándano</h1>
-            <p>
-                Plataforma web interna orientada al registro y seguimiento del proceso operativo,
-                desde la siembra hasta el despacho dentro del área de frutales.
-            </p>
-
-            <div class="landing-actions">
-                <a class="primary-btn" th:href="@{/auth/login}"><iconify-icon
-                        icon="mdi:login"></iconify-icon><span>Acceder al sistema</span></a>
-                <a class="ghost-btn dark-ghost" href="#modulos"><iconify-icon
-                        icon="mdi:view-grid-outline"></iconify-icon><span>Ver módulos</span></a>
-            </div>
+<section class="landing-hero-dark blueberry-hero-grid">
+    <div class="landing-hero-copy">
+        <span class="landing-chip">Sistema web interno · Control y trazabilidad</span>
+        <h1>Un front corporativo claro para supervisar invernaderos, camas y procesos</h1>
+        <p>
+            Plataforma interna enfocada solo en el área de arándanos dentro de frutales. El sistema organiza
+            invernaderos como A1, A2, B1 y B2, permite controlar camas o filas de bandejas y mejora la visibilidad de
+            siembra, procesos, clasificación y despacho.
+        </p>
+        <div class="landing-actions">
+            <a class="primary-btn" th:href="@{/auth/login}">
+                <iconify-icon icon="mdi:monitor-dashboard"></iconify-icon>
+                <span>Entrar al sistema</span>
+            </a>
+            <a class="ghost-btn dark-ghost" href="#modulos">
+                <iconify-icon icon="mdi:view-grid-outline"></iconify-icon>
+                <span>Ver módulos</span>
+            </a>
         </div>
+    </div>
 
-        <div class="landing-hero-panel">
-            <div class="floating-card">
-                <div class="floating-card-head">
-                    <strong>Vista general</strong>
-                    <span>Operación interna</span>
+    <div class="landing-hero-side">
+        <div class="landing-summary-card">
+            <div class="landing-summary-head">
+                <strong>Resumen visual</strong>
+                <span>Estado actual</span>
+            </div>
+            <div class="landing-summary-metrics">
+                <div>
+                    <strong>12</strong>
+                    <span>Invernaderos activos</span>
                 </div>
-                <div class="floating-grid">
-                    <div class="floating-mini-card"><iconify-icon
-                            icon="mdi:sprout-outline"></iconify-icon><span>Lotes</span></div>
-                    <div class="floating-mini-card"><iconify-icon
-                            icon="mdi:view-grid-outline"></iconify-icon><span>Camas</span></div>
-                    <div class="floating-mini-card"><iconify-icon
-                            icon="mdi:seed-outline"></iconify-icon><span>Siembra</span></div>
-                    <div class="floating-mini-card"><iconify-icon
-                            icon="mdi:cog-transfer-outline"></iconify-icon><span>Procesos</span></div>
-                    <div class="floating-mini-card"><iconify-icon
-                            icon="mdi:tune-variant"></iconify-icon><span>Clasificación</span></div>
-                    <div class="floating-mini-card"><iconify-icon
-                            icon="mdi:truck-delivery-outline"></iconify-icon><span>Despacho</span></div>
+                <div>
+                    <strong>48</strong>
+                    <span>Camas operativas</span>
+                </div>
+                <div>
+                    <strong>186</strong>
+                    <span>Clasificaciones del día</span>
+                </div>
+                <div>
+                    <strong>07</strong>
+                    <span>Despachos pendientes</span>
                 </div>
             </div>
         </div>
-    </section>
 
-    <section class="landing-section-dark" id="proceso">
-        <div class="landing-section-title">
-            <h2>Proceso observado</h2>
-            <p>Flujo general del área de arándano dentro del sistema.</p>
-        </div>
-        <div class="dark-process-flow">
-            <div class="dark-step"><span>1</span><strong>Siembra</strong></div>
-            <div class="dark-step"><span>2</span><strong>Camas</strong></div>
-            <div class="dark-step"><span>3</span><strong>Uniformización</strong></div>
-            <div class="dark-step"><span>4</span><strong>Formalización</strong></div>
-            <div class="dark-step"><span>5</span><strong>Clasificación</strong></div>
-            <div class="dark-step"><span>6</span><strong>Despacho</strong></div>
-        </div>
-    </section>
-
-    <section class="landing-section-dark" id="modulos">
-        <div class="landing-section-title">
-            <h2>Módulos del sistema</h2>
-            <p>Componentes principales del aplicativo web interno.</p>
-        </div>
-        <div class="dark-modules-grid">
-            <article class="dark-module-card"><iconify-icon
-                    icon="mdi:account-group-outline"></iconify-icon><strong>Usuarios y roles</strong><span>Gestión de
-                    accesos y perfiles.</span></article>
-            <article class="dark-module-card"><iconify-icon icon="mdi:sprout-outline"></iconify-icon><strong>Lotes y
-                    camas</strong><span>Base operativa de la trazabilidad.</span></article>
-            <article class="dark-module-card"><iconify-icon icon="mdi:seed-outline"></iconify-icon><strong>Siembra y
-                    ubicación</strong><span>Registro por lote y cama.</span></article>
-            <article class="dark-module-card"><iconify-icon
-                    icon="mdi:cog-transfer-outline"></iconify-icon><strong>Procesos</strong><span>Uniformización y
-                    formalización.</span></article>
-            <article class="dark-module-card"><iconify-icon
-                    icon="mdi:tune-variant"></iconify-icon><strong>Clasificación</strong><span>Control por condición y
-                    tamaño.</span></article>
-            <article class="dark-module-card"><iconify-icon
-                    icon="mdi:file-chart-outline"></iconify-icon><strong>Despacho y reportes</strong><span>Seguimiento y
-                    salida del proceso.</span></article>
-        </div>
-    </section>
-
-    <section class="landing-section-dark" id="informacion">
-        <div class="landing-section-title">
-            <h2>Información del sistema</h2>
-            <p>Propósito general y lógica de acceso del aplicativo.</p>
-        </div>
-        <div class="dark-info-grid">
-            <div class="dark-info-card">
-                <strong>Problema que resuelve</strong>
-                <p>Reduce el registro manual, mejora la organización de datos y fortalece la trazabilidad interna del
-                    proceso.</p>
+        <div class="floating-card blueberry-floating-card">
+            <div class="floating-card-head">
+                <strong>Bloques principales</strong>
+                <span>Vista rápida</span>
             </div>
-            <div class="dark-info-card">
-                <strong>Enfoque de solución</strong>
-                <p>Aplicación web interna para computadora, centrada exclusivamente en plantas de arándano del área de
-                    frutales.</p>
-            </div>
-            <div class="dark-info-card">
-                <strong>Acceso al sistema</strong>
-                <p>Desde esta portada lo correcto es entrar por login. El dashboard debe ser el panel posterior al
-                    acceso del usuario.</p>
+            <div class="floating-grid">
+                <div class="floating-mini-card"><iconify-icon icon="mdi:greenhouse"></iconify-icon><span>Invernaderos</span></div>
+                <div class="floating-mini-card"><iconify-icon icon="mdi:view-grid-outline"></iconify-icon><span>Camas / filas</span></div>
+                <div class="floating-mini-card"><iconify-icon icon="mdi:seed-outline"></iconify-icon><span>Siembra</span></div>
+                <div class="floating-mini-card"><iconify-icon icon="mdi:chart-timeline-variant"></iconify-icon><span>Procesos</span></div>
+                <div class="floating-mini-card"><iconify-icon icon="mdi:tune-variant"></iconify-icon><span>Clasificación</span></div>
+                <div class="floating-mini-card"><iconify-icon icon="mdi:truck-delivery-outline"></iconify-icon><span>Despacho</span></div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
-    <footer class="landing-footer-dark">
-        <div class="landing-footer-brand">
-            <div class="landing-logo small"><iconify-icon icon="mdi:fruit-grapes"></iconify-icon></div>
-            <div>
-                <strong>Blueberry System</strong>
-                <span>Sistema interno para Vivero Los Viñedos</span>
-            </div>
-        </div>
-        <div class="landing-footer-links">
-            <a href="#proceso">Proceso</a>
-            <a href="#modulos">Módulos</a>
-            <a href="#informacion">Información</a>
-            <a th:href="@{/auth/login}">Acceso</a>
-        </div>
-    </footer>
+<section class="landing-section-dark" id="proceso">
+    <div class="landing-section-title">
+        <h2>Proceso cubierto por el sistema</h2>
+        <p>Flujo operativo ordenado, con jerarquía clara y seguimiento por etapas.</p>
+    </div>
 
-    <script src="../static/js/app.js" th:src="@{/js/app.js}"></script>
+    <div class="dark-process-flow corporate-process-flow">
+        <div class="dark-step"><span>1</span><strong>Siembra</strong></div>
+        <div class="dark-step"><span>2</span><strong>Ubicación en camas</strong></div>
+        <div class="dark-step"><span>3</span><strong>Uniformización</strong></div>
+        <div class="dark-step"><span>4</span><strong>Formalización</strong></div>
+        <div class="dark-step"><span>5</span><strong>Clasificación</strong></div>
+        <div class="dark-step"><span>6</span><strong>Despacho</strong></div>
+    </div>
+</section>
+
+<section class="landing-section-dark" id="modulos">
+    <div class="landing-section-title">
+        <h2>Módulos visibles dentro del dashboard</h2>
+        <p>El diseño se separa por procesos y gestión admin para mejorar la lectura y navegación.</p>
+    </div>
+
+    <div class="dark-modules-grid">
+        <article class="dark-module-card">
+            <h3>Procesos</h3>
+            <p>Invernaderos, camas, siembra, procesos, clasificación y despacho en una misma línea de trabajo.</p>
+        </article>
+        <article class="dark-module-card">
+            <h3>Gestión admin</h3>
+            <p>Usuarios, accesos y configuración del sistema en una sección administrativa independiente.</p>
+        </article>
+        <article class="dark-module-card">
+            <h3>Reportes</h3>
+            <p>Base visual lista para consolidar información por lote, fecha, clasificación o despacho.</p>
+        </article>
+        <article class="dark-module-card">
+            <h3>Ajustes de cuenta</h3>
+            <p>La cuenta del usuario se presenta como otro dashboard, no como una vista improvisada.</p>
+        </article>
+    </div>
+</section>
+
+<section class="landing-section-dark" id="informacion">
+    <div class="landing-section-title">
+        <h2>Información clave del alcance</h2>
+        <p>Diseño alineado al contexto real del proyecto.</p>
+    </div>
+
+    <div class="dark-info-grid">
+        <article class="dark-info-card">
+            <h3>Alcance real</h3>
+            <p>Solo cubre arándanos dentro del área de frutales. No abarca toda la empresa ni otras líneas productivas.</p>
+        </article>
+        <article class="dark-info-card">
+            <h3>Estructura operativa</h3>
+            <p>Los lotes se representan como invernaderos. Cada invernadero contiene varias camas o filas de bandejas.</p>
+        </article>
+        <article class="dark-info-card">
+            <h3>Objetivo del rediseño</h3>
+            <p>Mejor contraste, jerarquía visual, bloques seccionados, tarjetas limpias y mejor experiencia de uso.</p>
+        </article>
+    </div>
+</section>
+
+<footer class="landing-footer-dark">
+    <div class="landing-footer-brand">
+        <div class="landing-logo small"><iconify-icon icon="mdi:fruit-blueberry"></iconify-icon></div>
+        <div>
+            <strong>Blueberry Trace</strong>
+            <span>Sistema interno para Vivero Los Viñedos</span>
+        </div>
+    </div>
+    <div class="landing-footer-links">
+        <a href="#proceso">Proceso</a>
+        <a href="#modulos">Módulos</a>
+        <a href="#informacion">Información</a>
+        <a th:href="@{/auth/login}">Acceso</a>
+    </div>
+</footer>
+
+<script src="../static/js/app.js" th:src="@{/js/app.js}"></script>
 </body>
-
 </html>

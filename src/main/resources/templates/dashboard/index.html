@@ -1,107 +1,199 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../static/css/style.css" th:href="@{/css/style.css}">
-    <title>Dashboard</title>
+    <title>Dashboard | Blueberry Trace</title>
 </head>
+<body class="app-body corporate-dashboard-body">
+<div class="app-shell">
+    <div th:replace="~{fragments/app-shell :: sidebar('dashboard')}"></div>
 
-<body class="app-body">
-    <div class="app-shell">
-        <div th:replace="~{fragments/app-shell :: sidebar('dashboard')}"></div>
+    <main class="main-content corporate-main-content">
+        <div th:replace="~{fragments/app-shell :: topbar('Dashboard ejecutivo', 'Resumen del sistema interno del área de arándanos con enfoque en procesos y gestión administrativa')}"></div>
 
-        <main class="main-content">
-            <div
-                th:replace="~{fragments/app-shell :: topbar('Dashboard operativo', 'Resumen visual de invernaderos, camas y operaciones del área de frutales')}">
+        <section class="executive-hero">
+            <div class="executive-hero-copy">
+                <span class="executive-chip">Monitoreo central del vivero · Área de arándanos</span>
+                <h2>Dashboard corporativo con mejor contraste y secciones claras</h2>
+                <p>
+                    La interfaz fue reorganizada para separar procesos, métricas y gestión admin. Ahora los bloques
+                    principales tienen mejor jerarquía visual y lectura más cómoda.
+                </p>
             </div>
+            <div class="executive-hero-meta">
+                <div><strong>Estado general</strong><span>Operación estable y módulos visibles</span></div>
+                <div><strong>Vista principal</strong><span>Invernaderos, camas y flujo operativo</span></div>
+                <div><strong>Enfoque actual</strong><span>Trazabilidad de arándanos dentro de frutales</span></div>
+            </div>
+        </section>
 
-            <section class="stats-grid premium-stats">
-                <article class="metric-card metric-primary"><span class="metric-label">Invernaderos
-                        activos</span><strong>128</strong><small>Seguimiento del día</small></article>
-                <article class="metric-card soft-card"><span class="metric-label">Camas
-                        operativas</span><strong>42</strong><small>Filas operativas del vivero</small></article>
-                <article class="metric-card soft-card"><span
-                        class="metric-label">Clasificaciones</span><strong>316</strong><small>Registradas esta
-                        semana</small></article>
-                <article class="metric-card metric-warning"><span class="metric-label">Despachos
-                        pendientes</span><strong>09</strong><small>Por validar</small></article>
-            </section>
+        <section class="stats-grid premium-stats corporate-kpis">
+            <article class="metric-card metric-primary corporate-metric-card">
+                <span class="metric-label">Invernaderos activos</span>
+                <strong>12</strong>
+                <small>Bloques operativos visibles del área de arándanos</small>
+            </article>
+            <article class="metric-card soft-card corporate-metric-card">
+                <span class="metric-label">Camas en uso</span>
+                <strong>48</strong>
+                <small>Filas de bandejas distribuidas dentro de los invernaderos</small>
+            </article>
+            <article class="metric-card soft-card corporate-metric-card">
+                <span class="metric-label">Clasificaciones del día</span>
+                <strong>186</strong>
+                <small>Registros operativos por tamaño, estado o condición</small>
+            </article>
+            <article class="metric-card metric-warning corporate-metric-card">
+                <span class="metric-label">Despachos pendientes</span>
+                <strong>07</strong>
+                <small>Salidas internas que aún requieren validación final</small>
+            </article>
+        </section>
 
-            <section class="dashboard-grid">
-                <article class="panel-card premium-panel">
-                    <div class="panel-head">
-                        <h3>Flujo del proceso</h3><span>Invernadero a despacho</span>
-                    </div>
-                    <div class="bar-chart">
-                        <div class="bar-col">
-                            <div class="bar-track"><span style="height:55%"></span></div><label>Siembra</label>
-                        </div>
-                        <div class="bar-col">
-                            <div class="bar-track"><span style="height:72%"></span></div><label>Camas</label>
-                        </div>
-                        <div class="bar-col">
-                            <div class="bar-track"><span style="height:67%"></span></div><label>Uniformización</label>
-                        </div>
-                        <div class="bar-col">
-                            <div class="bar-track"><span style="height:60%"></span></div><label>Formalización</label>
-                        </div>
-                        <div class="bar-col">
-                            <div class="bar-track"><span style="height:82%"></span></div><label>Clasificación</label>
-                        </div>
-                        <div class="bar-col">
-                            <div class="bar-track"><span style="height:45%"></span></div><label>Despacho</label>
-                        </div>
-                    </div>
-                </article>
+        <div class="section-ribbon">
+            <span>Procesos</span>
+            <h3>Seguimiento operativo del área de arándanos</h3>
+        </div>
 
-                <article class="panel-card premium-panel">
-                    <div class="panel-head">
-                        <h3>Estado general</h3><span>Producción</span>
-                    </div>
-                    <div class="donut-box">
-                        <div class="donut-chart"><span>78%</span></div>
-                        <ul class="legend">
-                            <li><i class="dot dot-blue"></i> Procesado</li>
-                            <li><i class="dot dot-orange"></i> En curso</li>
-                            <li><i class="dot dot-gray"></i> Pendiente</li>
-                        </ul>
-                    </div>
-                </article>
-            </section>
+        <section class="dashboard-grid corporate-dashboard-grid">
+            <article class="panel-card corporate-panel">
+                <div class="panel-head">
+                    <h3>Estado por fase del proceso</h3>
+                    <span>Vista general</span>
+                </div>
 
-            <section class="dashboard-grid bottom-grid">
-                <article class="panel-card premium-panel">
-                    <div class="panel-head">
-                        <h3>Accesos rápidos</h3><span>Navegación</span>
+                <div class="phase-progress-list">
+                    <div class="phase-progress-item">
+                        <div class="phase-progress-head"><strong>Siembra</strong><span>64%</span></div>
+                        <div class="phase-progress-bar"><span style="width:64%"></span></div>
                     </div>
-                    <div class="quick-grid premium-quick-grid">
-                        <a th:href="@{/lotes}">Ir a invernaderos</a>
-                        <a th:href="@{/camas}">Ir a camas</a>
-                        <a th:href="@{/siembra}">Registrar siembra</a>
-                        <a th:href="@{/procesos}">Ver procesos</a>
-                        <a th:href="@{/clasificacion}">Clasificación</a>
-                        <a th:href="@{/despacho}">Despacho</a>
+                    <div class="phase-progress-item">
+                        <div class="phase-progress-head"><strong>Ubicación en camas</strong><span>78%</span></div>
+                        <div class="phase-progress-bar"><span style="width:78%"></span></div>
                     </div>
-                </article>
+                    <div class="phase-progress-item">
+                        <div class="phase-progress-head"><strong>Uniformización</strong><span>58%</span></div>
+                        <div class="phase-progress-bar"><span style="width:58%"></span></div>
+                    </div>
+                    <div class="phase-progress-item">
+                        <div class="phase-progress-head"><strong>Formalización</strong><span>52%</span></div>
+                        <div class="phase-progress-bar"><span style="width:52%"></span></div>
+                    </div>
+                    <div class="phase-progress-item">
+                        <div class="phase-progress-head"><strong>Clasificación</strong><span>83%</span></div>
+                        <div class="phase-progress-bar"><span style="width:83%"></span></div>
+                    </div>
+                    <div class="phase-progress-item">
+                        <div class="phase-progress-head"><strong>Despacho</strong><span>41%</span></div>
+                        <div class="phase-progress-bar"><span style="width:41%"></span></div>
+                    </div>
+                </div>
+            </article>
 
-                <article class="panel-card premium-panel">
-                    <div class="panel-head">
-                        <h3>Actividad reciente</h3><span>Últimos movimientos</span>
+            <article class="panel-card corporate-panel">
+                <div class="panel-head">
+                    <h3>Invernaderos destacados</h3>
+                    <span>Distribución operativa</span>
+                </div>
+
+                <div class="status-breakdown-grid">
+                    <div class="status-breakdown-card">
+                        <strong>A1</strong>
+                        <span>Biloxi</span>
+                        <small>4 camas activas</small>
                     </div>
-                    <div class="activity-feed">
-                        <div class="activity-card"><strong>A1</strong><span>Registrado en CAM-004</span></div>
-                        <div class="activity-card"><strong>Clasificación</strong><span>Tamaño actualizado en
-                                B2</span></div>
-                        <div class="activity-card"><strong>Despacho</strong><span>Bin preparado para validación</span>
-                        </div>
-                        <div class="activity-card"><strong>Usuario</strong><span>Nuevo operario pendiente</span></div>
+                    <div class="status-breakdown-card">
+                        <strong>A2</strong>
+                        <span>Ventura</span>
+                        <small>3 camas activas</small>
                     </div>
-                </article>
-            </section>
-        </main>
-    </div>
+                    <div class="status-breakdown-card">
+                        <strong>B1</strong>
+                        <span>Biloxi</span>
+                        <small>5 camas activas</small>
+                    </div>
+                    <div class="status-breakdown-card">
+                        <strong>B2</strong>
+                        <span>En mantenimiento</span>
+                        <small>2 camas pausadas</small>
+                    </div>
+                </div>
+            </article>
+        </section>
+
+        <div class="section-ribbon">
+            <span>Procesos</span>
+            <h3>Acciones rápidas para operación</h3>
+        </div>
+
+        <section class="dashboard-grid bottom-grid corporate-dashboard-grid">
+            <article class="panel-card corporate-panel">
+                <div class="panel-head">
+                    <h3>Módulos operativos</h3>
+                    <span>Accesos rápidos</span>
+                </div>
+                <div class="quick-grid corporate-quick-grid">
+                    <a th:href="@{/lotes}">Invernaderos</a>
+                    <a th:href="@{/camas}">Camas / filas</a>
+                    <a th:href="@{/siembra}">Registrar siembra</a>
+                    <a th:href="@{/procesos}">Procesos</a>
+                    <a th:href="@{/clasificacion}">Clasificación</a>
+                    <a th:href="@{/despacho}">Despacho</a>
+                </div>
+            </article>
+
+            <article class="panel-card corporate-panel">
+                <div class="panel-head">
+                    <h3>Actividad reciente</h3>
+                    <span>Últimos movimientos</span>
+                </div>
+                <div class="activity-feed corporate-activity-feed">
+                    <div class="activity-card corporate-activity-card"><strong>Invernadero A1</strong><span>Se actualizó la distribución de camas y variedad.</span></div>
+                    <div class="activity-card corporate-activity-card"><strong>Clasificación</strong><span>Se registró nuevo lote validado para exportación.</span></div>
+                    <div class="activity-card corporate-activity-card"><strong>Despacho</strong><span>Se preparó salida programada pendiente de cierre.</span></div>
+                </div>
+            </article>
+        </section>
+
+        <div class="section-ribbon">
+            <span>Gestión admin</span>
+            <h3>Control administrativo y configuración</h3>
+        </div>
+
+        <section class="dashboard-grid bottom-grid corporate-dashboard-grid">
+            <article class="panel-card corporate-panel">
+                <div class="panel-head">
+                    <h3>Supervisión administrativa</h3>
+                    <span>Acceso independiente</span>
+                </div>
+                <div class="admin-highlight-grid">
+                    <a class="admin-highlight-card" th:href="@{/admin/gestion}">
+                        <strong>Gestión administrador</strong>
+                        <span>Usuarios, roles, estados y control interno desde un dashboard separado.</span>
+                    </a>
+                    <a class="admin-highlight-card" th:href="@{/cuenta/ajustes}">
+                        <strong>Ajustes de la cuenta</strong>
+                        <span>Configuración personal y validación segura del perfil actual.</span>
+                    </a>
+                </div>
+            </article>
+
+            <article class="panel-card corporate-panel context-card">
+                <div class="panel-head">
+                    <h3>Resumen del rediseño</h3>
+                    <span>UX/UI</span>
+                </div>
+                <div class="context-list">
+                    <div><strong>Contraste mejorado</strong><span>Los textos ya no se pierden sobre tarjetas o fondos lavados.</span></div>
+                    <div><strong>Secciones claras</strong><span>Procesos y gestión admin ya no compiten dentro del mismo bloque.</span></div>
+                    <div><strong>Navegación estable</strong><span>El menú del perfil y la búsqueda del sidebar tienen mejor comportamiento visual.</span></div>
+                </div>
+            </article>
+        </section>
+    </main>
+</div>
+<script src="../static/js/app.js" th:src="@{/js/app.js}"></script>
 </body>
-
 </html>

@@ -1,88 +1,94 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../static/css/style.css" th:href="@{/css/style.css}">
-    <title>Registro</title>
+    <title>Registro | Blueberry Trace</title>
 </head>
-
 <body class="auth-clean-body">
-    <div class="auth-clean-shell auth-clean-shell-reverse">
-        <section class="auth-clean-form-side">
-            <div class="auth-clean-card">
-                <a class="auth-clean-back" th:href="@{/auth/login}">← Volver a login</a>
-                <h2>Crear cuenta</h2>
-                <p class="auth-clean-muted">Alta de usuarios del sistema con estilo profesional e integración futura con
-                    roles.</p>
+<div class="auth-clean-shell auth-clean-shell-reverse">
+    <section class="auth-clean-form-side">
+        <div class="auth-clean-card">
+            <a class="auth-clean-back" th:href="@{/auth/login}">← Volver a login</a>
+            <h2>Crear usuario</h2>
+            <p class="auth-clean-muted">Pantalla de alta interna con mejor orden visual y campos listos para futura integración total.</p>
 
-                <form class="auth-clean-form auth-clean-form-grid">
-                    <div>
-                        <label>Nombre completo</label>
-                        <input type="text" placeholder="Ej. Ramón Jiménez">
-                    </div>
-                    <div>
-                        <label>Usuario</label>
-                        <input type="text" placeholder="Ej. keraune">
-                    </div>
-                    <div>
-                        <label>Correo</label>
-                        <input type="email" placeholder="correo@empresa.com">
-                    </div>
-                    <div>
-                        <label>Rol</label>
-                        <select>
-                            <option>Administrador</option>
-                            <option>Supervisor</option>
-                            <option>Contabilizador</option>
-                            <option>Operario</option>
-                            <option>Control de calidad</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label>Contraseña</label>
-                        <input type="password" placeholder="Mínimo 8 caracteres">
-                    </div>
-                    <div>
-                        <label>Confirmar contraseña</label>
-                        <input type="password" placeholder="Repite la contraseña">
-                    </div>
-                    <div class="full-span">
-                        <label>Estado</label>
-                        <select>
-                            <option>Activo</option>
-                            <option>Inactivo</option>
-                        </select>
-                    </div>
-                    <button class="primary-btn full-width full-span" type="button">Guardar usuario</button>
-                </form>
+            <form class="auth-clean-form auth-clean-form-grid">
+                <div>
+                    <label>Nombre completo</label>
+                    <input type="text" placeholder="Ej. Ramón Jiménez">
+                </div>
+                <div>
+                    <label>Usuario</label>
+                    <input type="text" placeholder="Ej. keraune">
+                </div>
+                <div>
+                    <label>Correo</label>
+                    <input type="email" placeholder="correo@empresa.com">
+                </div>
+                <div>
+                    <label>Rol</label>
+                    <select>
+                        <option>Administrador</option>
+                        <option>Supervisor</option>
+                        <option>Contabilizador</option>
+                        <option>Operario</option>
+                        <option>Control de calidad</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Contraseña</label>
+                    <input type="password" placeholder="Mínimo 8 caracteres">
+                </div>
+                <div>
+                    <label>Confirmar contraseña</label>
+                    <input type="password" placeholder="Repite la contraseña">
+                </div>
+                <div class="full-span">
+                    <label>Estado</label>
+                    <select>
+                        <option>Activo</option>
+                        <option>Inactivo</option>
+                    </select>
+                </div>
+                <button class="primary-btn full-width full-span" type="button">Guardar usuario</button>
+            </form>
 
-                <div class="auth-clean-footer">
-                    <span>¿Ya tienes una cuenta?</span>
-                    <a th:href="@{/auth/login}">Ir a login</a>
+            <div class="auth-clean-footer">
+                <span>¿Ya existe una cuenta?</span>
+                <a th:href="@{/auth/login}">Ir a login</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="auth-clean-visual auth-visual-register">
+        <div class="auth-clean-overlay">
+            <div>
+                <span class="auth-clean-chip">Gestión de accesos</span>
+                <h1>Registra perfiles internos con una vista más limpia y profesional</h1>
+                <p>
+                    El rediseño mejora la lectura, el espaciado y el contraste para que el alta de usuarios se sienta
+                    parte del mismo sistema corporativo.
+                </p>
+            </div>
+
+            <div class="auth-clean-feature-list">
+                <div class="auth-clean-feature">
+                    <strong>Roles claros</strong>
+                    <span>Administrador, supervisor, operario y demás actores del proceso.</span>
+                </div>
+                <div class="auth-clean-feature">
+                    <strong>Seguridad visual</strong>
+                    <span>Campos consistentes, bordes suaves y foco visible al interactuar.</span>
+                </div>
+                <div class="auth-clean-feature">
+                    <strong>Integración futura</strong>
+                    <span>Diseño listo para conectarse a validaciones, backend y estados reales.</span>
                 </div>
             </div>
-        </section>
-
-        <section class="auth-clean-visual auth-visual-register">
-            <div class="auth-clean-overlay">
-                <span class="auth-clean-chip">Registro interno</span>
-                <h1>Configura accesos para cada actor del sistema</h1>
-                <p>Administra usuarios con roles como administrador, supervisor, contabilizador, operario y control de
-                    calidad.</p>
-
-                <div class="auth-clean-feature-list">
-                    <div class="auth-clean-feature"><strong>Usuarios</strong><span>Alta y gestión de accesos</span>
-                    </div>
-                    <div class="auth-clean-feature"><strong>Roles</strong><span>Control por perfil de trabajo</span>
-                    </div>
-                    <div class="auth-clean-feature"><strong>Seguridad</strong><span>Base para autenticación
-                            futura</span></div>
-                </div>
-            </div>
-        </section>
-    </div>
+        </div>
+    </section>
+</div>
 </body>
-
 </html>

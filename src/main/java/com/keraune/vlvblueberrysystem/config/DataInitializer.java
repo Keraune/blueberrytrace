@@ -1,5 +1,12 @@
 package com.keraune.vlvblueberrysystem.config;
 
+import java.time.LocalDate;
+
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
+
 import com.keraune.vlvblueberrysystem.entity.Cama;
 import com.keraune.vlvblueberrysystem.entity.Lote;
 import com.keraune.vlvblueberrysystem.entity.Role;
@@ -8,11 +15,6 @@ import com.keraune.vlvblueberrysystem.repository.CamaRepository;
 import com.keraune.vlvblueberrysystem.repository.LoteRepository;
 import com.keraune.vlvblueberrysystem.repository.RoleRepository;
 import com.keraune.vlvblueberrysystem.repository.UserRepository;
-import org.springframework.boot.CommandLineRunner;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import java.time.LocalDate;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Configuration
 public class DataInitializer {
@@ -23,8 +25,7 @@ public class DataInitializer {
             UserRepository userRepository,
             LoteRepository loteRepository,
             CamaRepository camaRepository,
-            PasswordEncoder passwordEncoder
-    ) {
+            PasswordEncoder passwordEncoder) {
         return args -> {
             createRoleIfNotExists(roleRepository, "ADMINISTRADOR", "Acceso total al sistema");
             createRoleIfNotExists(roleRepository, "SUPERVISOR", "Supervisa el proceso operativo");
@@ -33,7 +34,8 @@ public class DataInitializer {
             createRoleIfNotExists(roleRepository, "CONTROL_CALIDAD", "Valida calidad y despacho");
 
             if (userRepository.findByUsername("admin").isEmpty()) {
-                Role adminRole = roleRepository.findByNombre("ADMINISTRADOR")
+                Role adminRole = roleRepository
+                        .findByNombre("ADMINISTRADOR")
                         .orElseThrow(() -> new IllegalStateException("No existe el rol ADMINISTRADOR"));
 
                 User admin = new User();
@@ -47,7 +49,8 @@ public class DataInitializer {
                 userRepository.save(admin);
             }
 
-            User admin = userRepository.findByUsername("admin")
+            User admin = userRepository
+                    .findByUsername("admin")
                     .orElseThrow(() -> new IllegalStateException("No existe el usuario administrador."));
 
             if (loteRepository.count() == 0) {
@@ -76,9 +79,11 @@ public class DataInitializer {
             }
 
             if (camaRepository.count() == 0) {
-                Lote lotePrincipal = loteRepository.findByCodigo("A1")
+                Lote lotePrincipal = loteRepository
+                        .findByCodigo("A1")
                         .orElseThrow(() -> new IllegalStateException("No existe el invernadero A1."));
-                Lote loteSecundario = loteRepository.findByCodigo("B1")
+                Lote loteSecundario = loteRepository
+                        .findByCodigo("B1")
                         .orElseThrow(() -> new IllegalStateException("No existe el invernadero B1."));
 
                 Cama camaUno = new Cama();
@@ -103,7 +108,8 @@ public class DataInitializer {
         };
     }
 
-    private void createRoleIfNotExists(RoleRepository roleRepository, String nombre, String descripcion) {
+    private void createRoleIfNotExists(
+            RoleRepository roleRepository, String nombre, String descripcion) {
         if (roleRepository.findByNombre(nombre).isEmpty()) {
             Role role = new Role();
             role.setNombre(nombre);
