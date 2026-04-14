@@ -14,14 +14,14 @@
 
         <main class="main-content">
             <div
-                th:replace="~{fragments/app-shell :: topbar('Dashboard operativo', 'Resumen visual del proceso del área de arándano')}">
+                th:replace="~{fragments/app-shell :: topbar('Dashboard operativo', 'Resumen visual de invernaderos, camas y operaciones del área de frutales')}">
             </div>
 
             <section class="stats-grid premium-stats">
-                <article class="metric-card metric-primary"><span class="metric-label">Lotes
+                <article class="metric-card metric-primary"><span class="metric-label">Invernaderos
                         activos</span><strong>128</strong><small>Seguimiento del día</small></article>
                 <article class="metric-card soft-card"><span class="metric-label">Camas
-                        operativas</span><strong>42</strong><small>Disponibles en área</small></article>
+                        operativas</span><strong>42</strong><small>Filas operativas del vivero</small></article>
                 <article class="metric-card soft-card"><span
                         class="metric-label">Clasificaciones</span><strong>316</strong><small>Registradas esta
                         semana</small></article>
@@ -32,7 +32,7 @@
             <section class="dashboard-grid">
                 <article class="panel-card premium-panel">
                     <div class="panel-head">
-                        <h3>Flujo del proceso</h3><span>Siembra a despacho</span>
+                        <h3>Flujo del proceso</h3><span>Invernadero a despacho</span>
                     </div>
                     <div class="bar-chart">
                         <div class="bar-col">
@@ -77,7 +77,7 @@
                         <h3>Accesos rápidos</h3><span>Navegación</span>
                     </div>
                     <div class="quick-grid premium-quick-grid">
-                        <a th:href="@{/lotes}">Ir a lotes</a>
+                        <a th:href="@{/lotes}">Ir a invernaderos</a>
                         <a th:href="@{/camas}">Ir a camas</a>
                         <a th:href="@{/siembra}">Registrar siembra</a>
                         <a th:href="@{/procesos}">Ver procesos</a>
@@ -91,9 +91,9 @@
                         <h3>Actividad reciente</h3><span>Últimos movimientos</span>
                     </div>
                     <div class="activity-feed">
-                        <div class="activity-card"><strong>LOT-001</strong><span>Registrado en CAM-004</span></div>
+                        <div class="activity-card"><strong>A1</strong><span>Registrado en CAM-004</span></div>
                         <div class="activity-card"><strong>Clasificación</strong><span>Tamaño actualizado en
-                                LOT-003</span></div>
+                                B2</span></div>
                         <div class="activity-card"><strong>Despacho</strong><span>Bin preparado para validación</span>
                         </div>
                         <div class="activity-card"><strong>Usuario</strong><span>Nuevo operario pendiente</span></div>
