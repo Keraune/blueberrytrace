@@ -1,1 +1,0 @@
-Dashboard renovado con estilo mas profesional, sidebar lateral y panel administrativo.
