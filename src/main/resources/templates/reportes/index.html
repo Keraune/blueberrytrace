@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reportes</title>
+    <title>Reportes y trazabilidad</title>
     <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
 </head>
 
@@ -12,34 +12,67 @@
     <div class="app-shell">
         <div th:replace="~{fragments/app-shell :: sidebar('reportes')}"></div>
         <main class="main-content">
-            <div
-                th:replace="~{fragments/app-shell :: topbar('Reportes', 'Vista preliminar para exportaciones futuras en Excel y PDF')}">
-            </div>
+            <div th:replace="~{fragments/app-shell :: topbar('Reportes y trazabilidad', 'Consulta por lote, variedad o fecha de registro')}"></div>
+
             <section class="stats-grid">
-                <article class="stat-card"><span>Reporte por lote</span><strong>Disponible</strong><small>Vista
-                        preliminar</small></article>
-                <article class="stat-card"><span>Reporte por fecha</span><strong>Disponible</strong><small>Vista
-                        preliminar</small></article>
-                <article class="stat-card"><span>Clasificación</span><strong>Disponible</strong><small>Vista
-                        preliminar</small></article>
-                <article class="stat-card"><span>Despacho</span><strong>Disponible</strong><small>Vista
-                        preliminar</small></article>
+                <article class="stat-card"><span>Búsqueda por lote</span><strong>Disponible</strong><small>Código exacto con búsqueda binaria</small></article>
+                <article class="stat-card"><span>Filtro por variedad</span><strong>Disponible</strong><small>Coincidencia parcial normalizada</small></article>
+                <article class="stat-card"><span>Filtro por fecha</span><strong>Disponible</strong><small>Consulta puntual de registros</small></article>
+                <article class="stat-card"><span>Ordenamiento</span><strong>Disponible</strong><small>Fecha desc y código asc</small></article>
             </section>
+
             <section class="panel-card">
                 <div class="panel-head">
-                    <h3>Filtros visuales</h3><span>Frontend</span>
+                    <h3>Consulta de historial</h3><span>Trazabilidad</span>
                 </div>
-                <form class="form-grid three-columns">
-                    <div class="form-group"><label>Desde</label><input type="date"></div>
-                    <div class="form-group"><label>Hasta</label><input type="date"></div>
-                    <div class="form-group"><label>Tipo de reporte</label><select>
-                            <option>Por lote</option>
-                            <option>Por fecha</option>
-                            <option>Clasificación</option>
-                            <option>Despacho</option>
-                        </select></div><button class="primary-btn full-width full-span" type="button">Generar
-                        reporte</button>
+                <form class="form-grid three-columns" method="get" th:action="@{/reportes}">
+                    <div class="form-group">
+                        <label for="codigo">Código de lote</label>
+                        <input id="codigo" name="codigo" type="text" th:value="${codigo}" placeholder="Ej. A1">
+                    </div>
+                    <div class="form-group">
+                        <label for="variedad">Variedad</label>
+                        <input id="variedad" name="variedad" type="text" th:value="${variedad}" placeholder="Ej. Biloxi">
+                    </div>
+                    <div class="form-group">
+                        <label for="fecha">Fecha de registro</label>
+                        <input id="fecha" name="fecha" type="date" th:value="${fecha}">
+                    </div>
+                    <button class="primary-btn full-width full-span" type="submit">Buscar trazabilidad</button>
                 </form>
+            </section>
+
+            <section class="panel-card">
+                <div class="panel-head">
+                    <h3>Resultados</h3>
+                    <span th:text="${#lists.size(resultados)} + ' registro(s)'">0 registro(s)</span>
+                </div>
+
+                <div class="empty-state-card" th:if="${#lists.isEmpty(resultados)}">
+                    <h4>Sin resultados para los filtros aplicados</h4>
+                    <p>Prueba consultando por código de lote, variedad o fecha de registro.</p>
+                </div>
+
+                <table class="custom-table" th:if="${!#lists.isEmpty(resultados)}">
+                    <thead>
+                    <tr>
+                        <th>Código</th>
+                        <th>Descripción</th>
+                        <th>Variedad</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:each="lote : ${resultados}">
+                        <td th:text="${lote.codigo}">A1</td>
+                        <td th:text="${lote.descripcion}">Lote</td>
+                        <td th:text="${lote.variedad ?: 'No registrada'}">Biloxi</td>
+                        <td th:text="${lote.fechaRegistro}">2026-04-01</td>
+                        <td><span class="badge neutral" th:text="${lote.estado}">ACTIVO</span></td>
+                    </tr>
+                    </tbody>
+                </table>
             </section>
         </main>
     </div>

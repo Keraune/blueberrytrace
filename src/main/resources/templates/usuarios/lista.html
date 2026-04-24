@@ -1,49 +1,23 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Usuarios</title>
     <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
 </head>
-
 <body class="app-body">
     <div class="app-shell">
         <div th:replace="~{fragments/app-shell :: sidebar('usuarios')}"></div>
         <main class="main-content">
-            <div
-                th:replace="~{fragments/app-shell :: topbar('Usuarios y roles', 'Gestión visual de accesos y perfiles del sistema')}">
-            </div>
+            <div th:replace="~{fragments/app-shell :: topbar('Usuarios y roles', 'Administración de accesos del sistema')}"></div>
             <section class="panel-card">
-                <div class="panel-head">
-                    <h3>Registro de usuarios</h3><a class="primary-btn" th:href="@{/auth/register}">Nuevo usuario</a>
-                </div>
+                <div class="panel-head"><h3>Registro de usuarios</h3><a class="primary-btn" th:href="@{/auth/register}">Nuevo usuario</a></div>
                 <table class="custom-table">
-                    <thead>
-                        <tr>
-                            <th>Nombre</th>
-                            <th>Usuario</th>
-                            <th>Rol</th>
-                            <th>Estado</th>
-                            <th>Acciones</th>
-                        </tr>
-                    </thead>
+                    <thead><tr><th>Nombre</th><th>Usuario</th><th>Rol</th><th>Estado</th><th>Acciones</th></tr></thead>
                     <tbody>
-                        <tr>
-                            <td>Ramón Jiménez</td>
-                            <td>keraune</td>
-                            <td>Administrador</td>
-                            <td><span class="badge success">Activo</span></td>
-                            <td><a href="#">Editar</a></td>
-                        </tr>
-                        <tr>
-                            <td>Supervisor Frutales</td>
-                            <td>supervisor01</td>
-                            <td>Supervisor</td>
-                            <td><span class="badge neutral">Activo</span></td>
-                            <td><a href="#">Editar</a></td>
-                        </tr>
+                        <tr><td>Ramón Jiménez</td><td>keraune</td><td>Administrador</td><td><span class="badge success">Activo</span></td><td><a href="#">Editar</a></td></tr>
+                        <tr><td>Supervisor Frutales</td><td>supervisor01</td><td>Supervisor</td><td><span class="badge neutral">Activo</span></td><td><a href="#">Editar</a></td></tr>
                     </tbody>
                 </table>
             </section>
@@ -51,5 +25,4 @@
     </div>
     <script src="../../static/js/app.js" th:src="@{/js/app.js}"></script>
 </body>
-
 </html>

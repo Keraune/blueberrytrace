@@ -5,170 +5,168 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <script src="https://code.iconify.design/iconify-icon/2.1.0/iconify-icon.min.js"></script>
     <link rel="stylesheet" href="../static/css/style.css" th:href="@{/css/style.css}">
-    <title>Blueberry Trace | Vivero Los Viñedos</title>
+    <title>Sistema web de arándanos | Vivero Los Viñedos</title>
 </head>
-<body class="landing-dark-body blueberry-landing-body">
-<header class="landing-topbar blueberry-landing-topbar">
-    <div class="landing-brand">
-        <div class="landing-logo"><iconify-icon icon="mdi:fruit-blueberry"></iconify-icon></div>
-        <div>
-            <strong>Blueberry Trace</strong>
-            <span>Vivero Los Viñedos · Área interna de arándanos</span>
-        </div>
-    </div>
-
-    <nav class="landing-menu">
-        <a href="#proceso">Proceso</a>
-        <a href="#modulos">Módulos</a>
-        <a href="#informacion">Información</a>
-        <a class="primary-btn" th:href="@{/auth/login}">
-            <iconify-icon icon="mdi:login"></iconify-icon>
-            <span>Iniciar sesión</span>
+<body class="vlv-site-body">
+<header class="vlv-site-header">
+    <div class="vlv-site-header-inner">
+        <a class="vlv-site-brand" th:href="@{/}">
+            <img th:src="@{/img/vlv/image_11.png}" src="../static/img/vlv/image_11.png" alt="Vivero Los Viñedos" class="vlv-logo-img">
+            <div>
+                <strong>Sistema web de arándanos</strong>
+                <span>Vivero Los Viñedos · Área de frutales</span>
+            </div>
         </a>
-    </nav>
+
+        <nav class="vlv-site-nav">
+            <a href="#sistema">Sistema</a>
+            <a href="#proceso">Proceso</a>
+            <a href="#entorno">Entorno</a>
+            <a href="#acceso">Acceso</a>
+            <a class="primary-btn" th:href="@{/auth/login}">
+                <iconify-icon icon="mdi:login"></iconify-icon>
+                <span>Iniciar sesión</span>
+            </a>
+        </nav>
+    </div>
 </header>
 
-<section class="landing-hero-dark blueberry-hero-grid">
-    <div class="landing-hero-copy">
-        <span class="landing-chip">Sistema web interno · Control y trazabilidad</span>
-        <h1>Un front corporativo claro para supervisar invernaderos, camas y procesos</h1>
+<section class="vlv-hero-full" id="inicio">
+    <img th:src="@{/img/vlv/image_10.png}" src="../static/img/vlv/image_10.png" alt="Vivero Los Viñedos" class="vlv-hero-bg">
+    <div class="vlv-hero-overlay"></div>
+    <div class="vlv-hero-content">
+        <span class="vlv-hero-kicker">Control, clasificación y trazabilidad</span>
+        <h1>Sistema web interno para la gestión de plantas de arándano</h1>
         <p>
-            Plataforma interna enfocada solo en el área de arándanos dentro de frutales. El sistema organiza
-            invernaderos como A1, A2, B1 y B2, permite controlar camas o filas de bandejas y mejora la visibilidad de
-            siembra, procesos, clasificación y despacho.
+            Plataforma orientada al control del proceso de siembra, ubicación en camas, uniformización,
+            formalización, clasificación y despacho dentro del área de arándanos de Vivero Los Viñedos.
         </p>
-        <div class="landing-actions">
+        <div class="vlv-hero-actions">
             <a class="primary-btn" th:href="@{/auth/login}">
                 <iconify-icon icon="mdi:monitor-dashboard"></iconify-icon>
                 <span>Entrar al sistema</span>
             </a>
-            <a class="ghost-btn dark-ghost" href="#modulos">
-                <iconify-icon icon="mdi:view-grid-outline"></iconify-icon>
-                <span>Ver módulos</span>
+            <a class="ghost-btn ghost-btn-light" href="#sistema">
+                <iconify-icon icon="mdi:arrow-down"></iconify-icon>
+                <span>Conocer más</span>
             </a>
         </div>
     </div>
+</section>
 
-    <div class="landing-hero-side">
-        <div class="landing-summary-card">
-            <div class="landing-summary-head">
-                <strong>Resumen visual</strong>
-                <span>Estado actual</span>
-            </div>
-            <div class="landing-summary-metrics">
-                <div>
-                    <strong>12</strong>
-                    <span>Invernaderos activos</span>
-                </div>
-                <div>
-                    <strong>48</strong>
-                    <span>Camas operativas</span>
-                </div>
-                <div>
-                    <strong>186</strong>
-                    <span>Clasificaciones del día</span>
-                </div>
-                <div>
-                    <strong>07</strong>
-                    <span>Despachos pendientes</span>
-                </div>
-            </div>
+<section class="vlv-section vlv-section-about" id="sistema">
+    <div class="vlv-two-column">
+        <div class="vlv-copy-block">
+            <span class="vlv-section-tag">Sistema</span>
+            <h2>Una solución web enfocada en la operación interna del área de arándanos</h2>
+            <p>
+                El sistema organiza la información del proceso productivo mediante el registro de lotes,
+                invernaderos, camas y eventos operativos, permitiendo mantener un seguimiento continuo de
+                cada etapa dentro del flujo de trabajo.
+            </p>
+            <p>
+                Su propósito es centralizar la información del proceso en una sola plataforma, mejorar el orden
+                de los registros y facilitar la consulta del historial por lote, variedad y fecha.
+            </p>
+            <ul class="vlv-inline-list">
+                <li>Registro estructurado por lote e invernadero</li>
+                <li>Ubicación de plantas por camas o filas</li>
+                <li>Seguimiento del flujo operativo completo</li>
+                <li>Consulta de reportes y trazabilidad</li>
+            </ul>
         </div>
-
-        <div class="floating-card blueberry-floating-card">
-            <div class="floating-card-head">
-                <strong>Bloques principales</strong>
-                <span>Vista rápida</span>
-            </div>
-            <div class="floating-grid">
-                <div class="floating-mini-card"><iconify-icon icon="mdi:greenhouse"></iconify-icon><span>Invernaderos</span></div>
-                <div class="floating-mini-card"><iconify-icon icon="mdi:view-grid-outline"></iconify-icon><span>Camas / filas</span></div>
-                <div class="floating-mini-card"><iconify-icon icon="mdi:seed-outline"></iconify-icon><span>Siembra</span></div>
-                <div class="floating-mini-card"><iconify-icon icon="mdi:chart-timeline-variant"></iconify-icon><span>Procesos</span></div>
-                <div class="floating-mini-card"><iconify-icon icon="mdi:tune-variant"></iconify-icon><span>Clasificación</span></div>
-                <div class="floating-mini-card"><iconify-icon icon="mdi:truck-delivery-outline"></iconify-icon><span>Despacho</span></div>
-            </div>
+        <div class="vlv-media-block">
+            <img th:src="@{/img/vlv/image_3.png}" src="../static/img/vlv/image_3.png" alt="Área de cultivo" class="vlv-large-image">
         </div>
     </div>
 </section>
 
-<section class="landing-section-dark" id="proceso">
-    <div class="landing-section-title">
-        <h2>Proceso cubierto por el sistema</h2>
-        <p>Flujo operativo ordenado, con jerarquía clara y seguimiento por etapas.</p>
-    </div>
-
-    <div class="dark-process-flow corporate-process-flow">
-        <div class="dark-step"><span>1</span><strong>Siembra</strong></div>
-        <div class="dark-step"><span>2</span><strong>Ubicación en camas</strong></div>
-        <div class="dark-step"><span>3</span><strong>Uniformización</strong></div>
-        <div class="dark-step"><span>4</span><strong>Formalización</strong></div>
-        <div class="dark-step"><span>5</span><strong>Clasificación</strong></div>
-        <div class="dark-step"><span>6</span><strong>Despacho</strong></div>
-    </div>
-</section>
-
-<section class="landing-section-dark" id="modulos">
-    <div class="landing-section-title">
-        <h2>Módulos visibles dentro del dashboard</h2>
-        <p>El diseño se separa por procesos y gestión admin para mejorar la lectura y navegación.</p>
-    </div>
-
-    <div class="dark-modules-grid">
-        <article class="dark-module-card">
-            <h3>Procesos</h3>
-            <p>Invernaderos, camas, siembra, procesos, clasificación y despacho en una misma línea de trabajo.</p>
-        </article>
-        <article class="dark-module-card">
-            <h3>Gestión admin</h3>
-            <p>Usuarios, accesos y configuración del sistema en una sección administrativa independiente.</p>
-        </article>
-        <article class="dark-module-card">
-            <h3>Reportes</h3>
-            <p>Base visual lista para consolidar información por lote, fecha, clasificación o despacho.</p>
-        </article>
-        <article class="dark-module-card">
-            <h3>Ajustes de cuenta</h3>
-            <p>La cuenta del usuario se presenta como otro dashboard, no como una vista improvisada.</p>
-        </article>
+<section class="vlv-system-strip">
+    <div class="vlv-system-strip-inner">
+        <div class="vlv-strip-item">
+            <strong>Control centralizado</strong>
+            <span>Gestión ordenada de lotes, camas y procesos del sistema.</span>
+        </div>
+        <div class="vlv-strip-item">
+            <strong>Trazabilidad</strong>
+            <span>Consulta por lote, variedad y fecha dentro del historial registrado.</span>
+        </div>
+        <div class="vlv-strip-item">
+            <strong>Operación interna</strong>
+            <span>Seguimiento del flujo desde siembra hasta despacho.</span>
+        </div>
+        <div class="vlv-strip-item">
+            <strong>Persistencia de datos</strong>
+            <span>Base preparada para conservar el historial completo del sistema.</span>
+        </div>
     </div>
 </section>
 
-<section class="landing-section-dark" id="informacion">
-    <div class="landing-section-title">
-        <h2>Información clave del alcance</h2>
-        <p>Diseño alineado al contexto real del proyecto.</p>
+<section class="vlv-process-band" id="proceso">
+    <div class="vlv-section-heading center">
+        <span class="vlv-section-tag">Proceso</span>
+        <h2>Flujo operativo gestionado por el sistema</h2>
     </div>
-
-    <div class="dark-info-grid">
-        <article class="dark-info-card">
-            <h3>Alcance real</h3>
-            <p>Solo cubre arándanos dentro del área de frutales. No abarca toda la empresa ni otras líneas productivas.</p>
-        </article>
-        <article class="dark-info-card">
-            <h3>Estructura operativa</h3>
-            <p>Los lotes se representan como invernaderos. Cada invernadero contiene varias camas o filas de bandejas.</p>
-        </article>
-        <article class="dark-info-card">
-            <h3>Objetivo del rediseño</h3>
-            <p>Mejor contraste, jerarquía visual, bloques seccionados, tarjetas limpias y mejor experiencia de uso.</p>
-        </article>
+    <div class="vlv-process-line">
+        <div class="vlv-process-step"><span>01</span><strong>Siembra</strong></div>
+        <div class="vlv-process-step"><span>02</span><strong>Ubicación en camas</strong></div>
+        <div class="vlv-process-step"><span>03</span><strong>Uniformización</strong></div>
+        <div class="vlv-process-step"><span>04</span><strong>Formalización</strong></div>
+        <div class="vlv-process-step"><span>05</span><strong>Clasificación</strong></div>
+        <div class="vlv-process-step"><span>06</span><strong>Despacho</strong></div>
     </div>
 </section>
 
-<footer class="landing-footer-dark">
-    <div class="landing-footer-brand">
-        <div class="landing-logo small"><iconify-icon icon="mdi:fruit-blueberry"></iconify-icon></div>
+<section class="vlv-section vlv-section-gallery" id="entorno">
+    <div class="vlv-section-heading">
+        <span class="vlv-section-tag">Entorno de trabajo</span>
+        <h2>Referencia visual del contexto empresarial</h2>
+        <p>La interfaz del sistema adopta una línea corporativa inspirada en la identidad visual de Vivero Los Viñedos.</p>
+    </div>
+
+    <div class="vlv-gallery-grid expanded-gallery">
+        <img th:src="@{/img/vlv/image_1.png}" src="../static/img/vlv/image_1.png" alt="Cultivo 1" class="vlv-gallery-item tall">
+        <img th:src="@{/img/vlv/image_2.png}" src="../static/img/vlv/image_2.png" alt="Cultivo 2" class="vlv-gallery-item">
+        <img th:src="@{/img/vlv/image_5.png}" src="../static/img/vlv/image_5.png" alt="Cultivo 3" class="vlv-gallery-item">
+        <img th:src="@{/img/vlv/image_7.png}" src="../static/img/vlv/image_7.png" alt="Cultivo 4" class="vlv-gallery-item wide">
+        <img th:src="@{/img/vlv/image_6.png}" src="../static/img/vlv/image_6.png" alt="Cultivo 5" class="vlv-gallery-item">
+        <img th:src="@{/img/vlv/image_8.png}" src="../static/img/vlv/image_8.png" alt="Cultivo 6" class="vlv-gallery-item">
+        <img th:src="@{/img/vlv/image_9.png}" src="../static/img/vlv/image_9.png" alt="Cultivo 7" class="vlv-gallery-item">
+    </div>
+</section>
+
+<section class="vlv-section vlv-section-cta" id="acceso">
+    <div class="vlv-cta-strip">
         <div>
-            <strong>Blueberry Trace</strong>
-            <span>Sistema interno para Vivero Los Viñedos</span>
+            <span class="vlv-section-tag">Acceso</span>
+            <h2>Ingresa al sistema y gestiona la información del proceso de arándanos</h2>
+            <p>
+                Accede a los módulos internos del proyecto para registrar operaciones, consultar trazabilidad y
+                administrar la información del área.
+            </p>
+        </div>
+        <div class="vlv-cta-actions">
+            <a class="primary-btn" th:href="@{/auth/login}">Iniciar sesión</a>
+            <a class="ghost-btn" th:href="@{/auth/register}">Crear usuario</a>
         </div>
     </div>
-    <div class="landing-footer-links">
-        <a href="#proceso">Proceso</a>
-        <a href="#modulos">Módulos</a>
-        <a href="#informacion">Información</a>
-        <a th:href="@{/auth/login}">Acceso</a>
+</section>
+
+<footer class="vlv-site-footer">
+    <div class="vlv-site-footer-inner">
+        <div class="vlv-site-brand footer-brand">
+            <img th:src="@{/img/vlv/image_11.png}" src="../static/img/vlv/image_11.png" alt="Vivero Los Viñedos" class="vlv-logo-img">
+            <div>
+                <strong>Sistema web de arándanos</strong>
+                <span>Proyecto interno · Vivero Los Viñedos</span>
+            </div>
+        </div>
+        <div class="vlv-site-footer-links">
+            <a href="#sistema">Sistema</a>
+            <a href="#proceso">Proceso</a>
+            <a href="#entorno">Entorno</a>
+            <a th:href="@{/auth/login}">Acceso</a>
+        </div>
     </div>
 </footer>
 

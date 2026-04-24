@@ -4,15 +4,33 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../static/css/style.css" th:href="@{/css/style.css}">
-    <title>Registro | Blueberry Trace</title>
+    <title>Registro | Sistema web de arándanos</title>
 </head>
-<body class="auth-clean-body">
-<div class="auth-clean-shell auth-clean-shell-reverse">
-    <section class="auth-clean-form-side">
-        <div class="auth-clean-card">
+<body class="auth-clean-body vlv-auth-page">
+<div class="vlv-auth-layout">
+    <section class="vlv-auth-side">
+        <div class="vlv-auth-side-inner">
+            <img th:src="@{/img/vlv/image_11.png}" src="../../static/img/vlv/image_11.png" alt="Vivero Los Viñedos" class="vlv-auth-logo">
+            <span class="vlv-section-tag">Gestión de accesos</span>
+            <h1>Registro de usuarios para el sistema interno</h1>
+            <p>
+                Esta vista permite dar de alta perfiles de acceso para la operación y supervisión del sistema.
+            </p>
+            <ul class="vlv-auth-points">
+                <li>Asignación de roles internos</li>
+                <li>Control de accesos por perfil</li>
+                <li>Alta de usuarios activos e inactivos</li>
+                <li>Base preparada para seguridad del sistema</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="vlv-auth-form-wrap">
+        <div class="auth-clean-card vlv-auth-card">
             <a class="auth-clean-back" th:href="@{/auth/login}">← Volver a login</a>
+            <img th:src="@{/img/vlv/image_11.png}" src="../../static/img/vlv/image_11.png" alt="Vivero Los Viñedos" class="vlv-auth-card-logo">
             <h2>Crear usuario</h2>
-            <p class="auth-clean-muted">Pantalla de alta interna con mejor orden visual y campos listos para futura integración total.</p>
+            <p class="auth-clean-muted">Registro interno de nuevos perfiles del sistema.</p>
 
             <form class="auth-clean-form auth-clean-form-grid">
                 <div>
@@ -21,11 +39,11 @@
                 </div>
                 <div>
                     <label>Usuario</label>
-                    <input type="text" placeholder="Ej. keraune">
+                    <input type="text" placeholder="Ej. supervisor01">
                 </div>
                 <div>
                     <label>Correo</label>
-                    <input type="email" placeholder="correo@empresa.com">
+                    <input type="email" placeholder="correo@vlv.pe">
                 </div>
                 <div>
                     <label>Rol</label>
@@ -58,34 +76,6 @@
             <div class="auth-clean-footer">
                 <span>¿Ya existe una cuenta?</span>
                 <a th:href="@{/auth/login}">Ir a login</a>
-            </div>
-        </div>
-    </section>
-
-    <section class="auth-clean-visual auth-visual-register">
-        <div class="auth-clean-overlay">
-            <div>
-                <span class="auth-clean-chip">Gestión de accesos</span>
-                <h1>Registra perfiles internos con una vista más limpia y profesional</h1>
-                <p>
-                    El rediseño mejora la lectura, el espaciado y el contraste para que el alta de usuarios se sienta
-                    parte del mismo sistema corporativo.
-                </p>
-            </div>
-
-            <div class="auth-clean-feature-list">
-                <div class="auth-clean-feature">
-                    <strong>Roles claros</strong>
-                    <span>Administrador, supervisor, operario y demás actores del proceso.</span>
-                </div>
-                <div class="auth-clean-feature">
-                    <strong>Seguridad visual</strong>
-                    <span>Campos consistentes, bordes suaves y foco visible al interactuar.</span>
-                </div>
-                <div class="auth-clean-feature">
-                    <strong>Integración futura</strong>
-                    <span>Diseño listo para conectarse a validaciones, backend y estados reales.</span>
-                </div>
             </div>
         </div>
     </section>

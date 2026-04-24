@@ -3,140 +3,113 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../static/css/style.css" th:href="@{/css/style.css}">
-    <title>Dashboard | Blueberry Trace</title>
+    <title>Dashboard | Sistema web de arándanos</title>
+    <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
 </head>
-<body class="app-body corporate-dashboard-body">
-<div class="app-shell">
+<body class="app-body corporate-dashboard-body vlv-dashboard-body">
+<div class="app-shell corporate-app-shell">
     <div th:replace="~{fragments/app-shell :: sidebar('dashboard')}"></div>
 
     <main class="main-content corporate-main-content">
-        <div th:replace="~{fragments/app-shell :: topbar('Dashboard ejecutivo', 'Resumen del sistema interno del área de arándanos con enfoque en procesos y gestión administrativa')}"></div>
+        <div th:replace="~{fragments/app-shell :: topbar('Dashboard principal', 'Resumen del sistema web para control, clasificación y trazabilidad de plantas de arándano')}" ></div>
 
-        <section class="executive-hero">
-            <div class="executive-hero-copy">
-                <span class="executive-chip">Monitoreo central del vivero · Área de arándanos</span>
-                <h2>Dashboard corporativo con mejor contraste y secciones claras</h2>
+        <section class="executive-hero vlv-text-hero">
+            <div class="executive-copy">
+                <span class="executive-chip">Resumen operativo</span>
+                <h2>Vista general del sistema</h2>
                 <p>
-                    La interfaz fue reorganizada para separar procesos, métricas y gestión admin. Ahora los bloques
-                    principales tienen mejor jerarquía visual y lectura más cómoda.
+                    Esta pantalla centraliza el acceso a los módulos principales del sistema y resume el flujo
+                    operativo del área de arándanos dentro de Vivero Los Viñedos.
                 </p>
             </div>
             <div class="executive-hero-meta">
-                <div><strong>Estado general</strong><span>Operación estable y módulos visibles</span></div>
-                <div><strong>Vista principal</strong><span>Invernaderos, camas y flujo operativo</span></div>
-                <div><strong>Enfoque actual</strong><span>Trazabilidad de arándanos dentro de frutales</span></div>
+                <div><strong>Proceso</strong><span>Desde siembra hasta despacho</span></div>
+                <div><strong>Trazabilidad</strong><span>Consulta por lote, variedad y fecha</span></div>
+                <div><strong>Historial</strong><span>Persistencia completa de los registros</span></div>
             </div>
         </section>
 
         <section class="stats-grid premium-stats corporate-kpis">
             <article class="metric-card metric-primary corporate-metric-card">
-                <span class="metric-label">Invernaderos activos</span>
-                <strong>12</strong>
-                <small>Bloques operativos visibles del área de arándanos</small>
+                <span class="metric-label">Lotes registrados</span>
+                <strong>Control base</strong>
+                <small>Identificación principal de cada lote o invernadero.</small>
             </article>
             <article class="metric-card soft-card corporate-metric-card">
-                <span class="metric-label">Camas en uso</span>
-                <strong>48</strong>
-                <small>Filas de bandejas distribuidas dentro de los invernaderos</small>
+                <span class="metric-label">Camas</span>
+                <strong>Ubicación</strong>
+                <small>Ordenamiento interno para el seguimiento físico del proceso.</small>
             </article>
             <article class="metric-card soft-card corporate-metric-card">
-                <span class="metric-label">Clasificaciones del día</span>
-                <strong>186</strong>
-                <small>Registros operativos por tamaño, estado o condición</small>
+                <span class="metric-label">Clasificación</span>
+                <strong>Seguimiento</strong>
+                <small>Registro por condición, etapa o criterio de planta.</small>
             </article>
             <article class="metric-card metric-warning corporate-metric-card">
-                <span class="metric-label">Despachos pendientes</span>
-                <strong>07</strong>
-                <small>Salidas internas que aún requieren validación final</small>
+                <span class="metric-label">Reportes</span>
+                <strong>Trazabilidad</strong>
+                <small>Consulta de historial por filtros operativos del sistema.</small>
             </article>
         </section>
 
         <div class="section-ribbon">
-            <span>Procesos</span>
-            <h3>Seguimiento operativo del área de arándanos</h3>
+            <span>Proceso</span>
+            <h3>Flujo operativo del proyecto</h3>
         </div>
 
         <section class="dashboard-grid corporate-dashboard-grid">
             <article class="panel-card corporate-panel">
                 <div class="panel-head">
-                    <h3>Estado por fase del proceso</h3>
-                    <span>Vista general</span>
+                    <h3>Etapas del proceso</h3>
+                    <span>Secuencia</span>
                 </div>
 
                 <div class="phase-progress-list">
-                    <div class="phase-progress-item">
-                        <div class="phase-progress-head"><strong>Siembra</strong><span>64%</span></div>
-                        <div class="phase-progress-bar"><span style="width:64%"></span></div>
-                    </div>
-                    <div class="phase-progress-item">
-                        <div class="phase-progress-head"><strong>Ubicación en camas</strong><span>78%</span></div>
-                        <div class="phase-progress-bar"><span style="width:78%"></span></div>
-                    </div>
-                    <div class="phase-progress-item">
-                        <div class="phase-progress-head"><strong>Uniformización</strong><span>58%</span></div>
-                        <div class="phase-progress-bar"><span style="width:58%"></span></div>
-                    </div>
-                    <div class="phase-progress-item">
-                        <div class="phase-progress-head"><strong>Formalización</strong><span>52%</span></div>
-                        <div class="phase-progress-bar"><span style="width:52%"></span></div>
-                    </div>
-                    <div class="phase-progress-item">
-                        <div class="phase-progress-head"><strong>Clasificación</strong><span>83%</span></div>
-                        <div class="phase-progress-bar"><span style="width:83%"></span></div>
-                    </div>
-                    <div class="phase-progress-item">
-                        <div class="phase-progress-head"><strong>Despacho</strong><span>41%</span></div>
-                        <div class="phase-progress-bar"><span style="width:41%"></span></div>
-                    </div>
+                    <div class="phase-progress-item"><div class="phase-progress-head"><strong>Siembra</strong><span>Etapa 1</span></div><div class="phase-progress-bar"><span style="width:64%"></span></div></div>
+                    <div class="phase-progress-item"><div class="phase-progress-head"><strong>Ubicación en camas</strong><span>Etapa 2</span></div><div class="phase-progress-bar"><span style="width:78%"></span></div></div>
+                    <div class="phase-progress-item"><div class="phase-progress-head"><strong>Uniformización</strong><span>Etapa 3</span></div><div class="phase-progress-bar"><span style="width:58%"></span></div></div>
+                    <div class="phase-progress-item"><div class="phase-progress-head"><strong>Formalización</strong><span>Etapa 4</span></div><div class="phase-progress-bar"><span style="width:52%"></span></div></div>
+                    <div class="phase-progress-item"><div class="phase-progress-head"><strong>Clasificación</strong><span>Etapa 5</span></div><div class="phase-progress-bar"><span style="width:83%"></span></div></div>
+                    <div class="phase-progress-item"><div class="phase-progress-head"><strong>Despacho</strong><span>Etapa 6</span></div><div class="phase-progress-bar"><span style="width:41%"></span></div></div>
                 </div>
             </article>
 
             <article class="panel-card corporate-panel">
                 <div class="panel-head">
-                    <h3>Invernaderos destacados</h3>
-                    <span>Distribución operativa</span>
+                    <h3>Recomendaciones de implementación</h3>
+                    <span>Entrega final</span>
                 </div>
-
-                <div class="status-breakdown-grid">
-                    <div class="status-breakdown-card">
-                        <strong>A1</strong>
-                        <span>Biloxi</span>
-                        <small>4 camas activas</small>
+                <div class="info-list-plain">
+                    <div>
+                        <strong>Algoritmos de trazabilidad</strong>
+                        <p>Preparar búsquedas y ordenación en Java para consultas rápidas por lote, variedad o fecha de injerto.</p>
                     </div>
-                    <div class="status-breakdown-card">
-                        <strong>A2</strong>
-                        <span>Ventura</span>
-                        <small>3 camas activas</small>
+                    <div>
+                        <strong>Seguridad de datos</strong>
+                        <p>Garantizar persistencia del historial completo de cada planta sin pérdida de información.</p>
                     </div>
-                    <div class="status-breakdown-card">
-                        <strong>B1</strong>
-                        <span>Biloxi</span>
-                        <small>5 camas activas</small>
-                    </div>
-                    <div class="status-breakdown-card">
-                        <strong>B2</strong>
-                        <span>En mantenimiento</span>
-                        <small>2 camas pausadas</small>
+                    <div>
+                        <strong>Consistencia del sistema</strong>
+                        <p>Mantener estructura técnica y visual coherente para la sustentación final del proyecto.</p>
                     </div>
                 </div>
             </article>
         </section>
 
         <div class="section-ribbon">
-            <span>Procesos</span>
-            <h3>Acciones rápidas para operación</h3>
+            <span>Módulos</span>
+            <h3>Accesos principales</h3>
         </div>
 
         <section class="dashboard-grid bottom-grid corporate-dashboard-grid">
             <article class="panel-card corporate-panel">
                 <div class="panel-head">
                     <h3>Módulos operativos</h3>
-                    <span>Accesos rápidos</span>
+                    <span>Acceso rápido</span>
                 </div>
                 <div class="quick-grid corporate-quick-grid">
-                    <a th:href="@{/lotes}">Invernaderos</a>
-                    <a th:href="@{/camas}">Camas / filas</a>
+                    <a th:href="@{/lotes}">Lotes / invernaderos</a>
+                    <a th:href="@{/camas}">Camas</a>
                     <a th:href="@{/siembra}">Registrar siembra</a>
                     <a th:href="@{/procesos}">Procesos</a>
                     <a th:href="@{/clasificacion}">Clasificación</a>
@@ -146,49 +119,18 @@
 
             <article class="panel-card corporate-panel">
                 <div class="panel-head">
-                    <h3>Actividad reciente</h3>
-                    <span>Últimos movimientos</span>
-                </div>
-                <div class="activity-feed corporate-activity-feed">
-                    <div class="activity-card corporate-activity-card"><strong>Invernadero A1</strong><span>Se actualizó la distribución de camas y variedad.</span></div>
-                    <div class="activity-card corporate-activity-card"><strong>Clasificación</strong><span>Se registró nuevo lote validado para exportación.</span></div>
-                    <div class="activity-card corporate-activity-card"><strong>Despacho</strong><span>Se preparó salida programada pendiente de cierre.</span></div>
-                </div>
-            </article>
-        </section>
-
-        <div class="section-ribbon">
-            <span>Gestión admin</span>
-            <h3>Control administrativo y configuración</h3>
-        </div>
-
-        <section class="dashboard-grid bottom-grid corporate-dashboard-grid">
-            <article class="panel-card corporate-panel">
-                <div class="panel-head">
-                    <h3>Supervisión administrativa</h3>
-                    <span>Acceso independiente</span>
+                    <h3>Gestión del sistema</h3>
+                    <span>Administración</span>
                 </div>
                 <div class="admin-highlight-grid">
-                    <a class="admin-highlight-card" th:href="@{/admin/gestion}">
-                        <strong>Gestión administrador</strong>
-                        <span>Usuarios, roles, estados y control interno desde un dashboard separado.</span>
+                    <a class="admin-highlight-card" th:href="@{/reportes}">
+                        <strong>Reportes</strong>
+                        <span>Consulta el historial de trazabilidad y aplica filtros por lote, variedad y fecha.</span>
                     </a>
-                    <a class="admin-highlight-card" th:href="@{/cuenta/ajustes}">
-                        <strong>Ajustes de la cuenta</strong>
-                        <span>Configuración personal y validación segura del perfil actual.</span>
+                    <a class="admin-highlight-card" th:href="@{/usuarios}">
+                        <strong>Usuarios</strong>
+                        <span>Administra perfiles y roles vinculados al uso del sistema.</span>
                     </a>
-                </div>
-            </article>
-
-            <article class="panel-card corporate-panel context-card">
-                <div class="panel-head">
-                    <h3>Resumen del rediseño</h3>
-                    <span>UX/UI</span>
-                </div>
-                <div class="context-list">
-                    <div><strong>Contraste mejorado</strong><span>Los textos ya no se pierden sobre tarjetas o fondos lavados.</span></div>
-                    <div><strong>Secciones claras</strong><span>Procesos y gestión admin ya no compiten dentro del mismo bloque.</span></div>
-                    <div><strong>Navegación estable</strong><span>El menú del perfil y la búsqueda del sidebar tienen mejor comportamiento visual.</span></div>
                 </div>
             </article>
         </section>

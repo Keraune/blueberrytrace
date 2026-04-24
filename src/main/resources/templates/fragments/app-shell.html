@@ -3,10 +3,12 @@
 <body>
 <aside class="sidebar blueberry-sidebar" th:fragment="sidebar(activePage)">
     <div class="brand-block">
-        <div class="brand-badge">VLV</div>
+        <div class="brand-badge vlv-brand-image">
+            <img th:src="@{/img/vlv/image_11.png}" src="../../static/img/vlv/image_11.png" alt="Vivero Los Viñedos" class="vlv-logo-img sidebar-logo-img">
+        </div>
         <div>
-            <h2>Blueberry Trace</h2>
-            <p>Área interna de arándanos</p>
+            <h2>Sistema web de arándanos</h2>
+            <p>Vivero Los Viñedos</p>
         </div>
     </div>
 
@@ -31,11 +33,11 @@
         <div class="sidebar-section-title">Procesos</div>
         <a data-module-item th:href="@{/lotes}" th:classappend="${activePage == 'lotes'} ? 'active' : ''">
             <span class="nav-svg"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2c3.87 0 7 3.13 7 7c0 5.25-7 13-7 13S5 14.25 5 9c0-3.87 3.13-7 7-7m0 9.5A2.5 2.5 0 1 0 12 6.5a2.5 2.5 0 0 0 0 5"/></svg></span>
-            <span>Invernaderos</span>
+            <span>Lotes / invernaderos</span>
         </a>
         <a data-module-item th:href="@{/camas}" th:classappend="${activePage == 'camas'} ? 'active' : ''">
             <span class="nav-svg"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg></span>
-            <span>Camas / filas</span>
+            <span>Camas</span>
         </a>
         <a data-module-item th:href="@{/siembra}" th:classappend="${activePage == 'siembra'} ? 'active' : ''">
             <span class="nav-svg"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 22c-4.97 0-9-4.03-9-9c0-2.76 1.25-5.24 3.22-6.89c1.24 3.54 4.6 6.05 8.56 6.05c1.56 0 3.03-.39 4.31-1.08C20.28 15.56 16.54 22 12 22"/></svg></span>
@@ -54,7 +56,7 @@
             <span>Despacho</span>
         </a>
 
-        <div class="sidebar-section-title">Gestión admin</div>
+        <div class="sidebar-section-title">Gestión</div>
         <a data-module-item th:href="@{/admin/gestion}" th:classappend="${activePage == 'admin'} ? 'active' : ''">
             <span class="nav-svg"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 2a2 2 0 0 1 2 2v1.09a7.99 7.99 0 0 1 3.91 2.26l.77-.45a2 2 0 1 1 2 3.46l-.77.45c.06.39.09.79.09 1.19s-.03.8-.09 1.19l.77.45a2 2 0 1 1-2 3.46l-.77-.45A7.99 7.99 0 0 1 14 18.91V20a2 2 0 1 1-4 0v-1.09a7.99 7.99 0 0 1-3.91-2.26l-.77.45a2 2 0 1 1-2-3.46l.77-.45A7.9 7.9 0 0 1 4 12c0-.4.03-.8.09-1.19l-.77-.45a2 2 0 1 1 2-3.46l.77.45A7.99 7.99 0 0 1 10 5.09V4a2 2 0 0 1 2-2m0 6a4 4 0 1 0 0 8a4 4 0 0 0 0-8"/></svg></span>
             <span>Gestión admin</span>
@@ -71,7 +73,7 @@
 
     <div class="sidebar-account" data-account-menu>
         <button class="sidebar-user sidebar-user-button" type="button" data-account-toggle>
-            <div class="avatar-mini">BT</div>
+            <div class="avatar-mini">VLV</div>
             <div>
                 <strong>Cuenta activa</strong>
                 <small>Perfil interno</small>
@@ -91,7 +93,7 @@
 
 <header class="topbar blueberry-topbar" th:fragment="topbar(title, subtitle)">
     <div>
-        <span class="topbar-kicker">Blueberry Trace · Dashboard corporativo</span>
+        <span class="topbar-kicker">Vivero Los Viñedos · sistema web de arándanos</span>
         <h1 th:text="${title}">Dashboard</h1>
         <p th:text="${subtitle}">Sistema interno del área de arándanos.</p>
     </div>
