@@ -53,7 +53,8 @@
                     <p>Prueba consultando por código de lote, variedad o fecha de registro.</p>
                 </div>
 
-                <table class="custom-table" th:if="${!#lists.isEmpty(resultados)}">
+                <div class="table-responsive" th:if="${!#lists.isEmpty(resultados)}">
+                <table class="custom-table">
                     <thead>
                     <tr>
                         <th>Código</th>
@@ -73,6 +74,7 @@
                     </tr>
                     </tbody>
                 </table>
+                </div>
             </section>
         </main>
     </div>
