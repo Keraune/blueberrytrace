@@ -9,4 +9,5 @@ public interface LoteRepository extends JpaRepository<Lote, Long> {
     Optional<Lote> findByCodigo(String codigo);
     boolean existsByCodigoIgnoreCase(String codigo);
     List<Lote> findAllByOrderByFechaRegistroDescIdDesc();
+    long countByEstadoIgnoreCase(String estado);
 }

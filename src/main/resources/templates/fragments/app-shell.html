@@ -7,7 +7,7 @@
             <img th:src="@{/img/vlv/image_11.png}" src="../../static/img/vlv/image_11.png" alt="Vivero Los Viñedos" class="vlv-logo-img sidebar-logo-img">
         </div>
         <div>
-            <h2>Sistema web de arándanos</h2>
+            <h2>BlueberryTrace</h2>
             <p>Vivero Los Viñedos</p>
         </div>
     </div>
@@ -45,7 +45,7 @@
         </a>
         <a data-module-item th:href="@{/procesos}" th:classappend="${activePage == 'procesos'} ? 'active' : ''">
             <span class="nav-svg"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 5h6v4H3zm12 0h6v4h-6zM9 15h6v4H9zm-3-4h12l-3 3h-6z"/></svg></span>
-            <span>Procesos</span>
+            <span>Uniformización y formalización</span>
         </a>
         <a data-module-item th:href="@{/clasificacion}" th:classappend="${activePage == 'clasificacion'} ? 'active' : ''">
             <span class="nav-svg"><svg viewBox="0 0 24 24"><path fill="currentColor" d="M3 17h6v2H3zm0-6h12v2H3zm0-6h18v2H3z"/></svg></span>
@@ -93,7 +93,7 @@
 
 <header class="topbar blueberry-topbar" th:fragment="topbar(title, subtitle)">
     <div>
-        <span class="topbar-kicker">Vivero Los Viñedos · sistema web de arándanos</span>
+        <span class="topbar-kicker">Vivero Los Viñedos · BlueberryTrace</span>
         <h1 th:text="${title}">Dashboard</h1>
         <p th:text="${subtitle}">Sistema interno del área de arándanos.</p>
     </div>

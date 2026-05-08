@@ -1,6 +1,8 @@
 package com.keraune.vlvblueberrysystem.controller;
 
+import com.keraune.vlvblueberrysystem.repository.UserRepository;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -8,8 +10,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/usuarios")
 public class UsuarioController {
 
+    private final UserRepository userRepository;
+
+    public UsuarioController(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
+
     @GetMapping
-    public String listarUsuarios() {
+    public String listarUsuarios(Model model) {
+        model.addAttribute("usuarios", userRepository.findAllByOrderByNombreCompletoAsc());
         return "usuarios/lista";
     }
 }

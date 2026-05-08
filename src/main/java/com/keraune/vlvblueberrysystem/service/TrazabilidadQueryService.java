@@ -1,7 +1,14 @@
 package com.keraune.vlvblueberrysystem.service;
 
+import com.keraune.vlvblueberrysystem.dto.TrazabilidadRow;
 import com.keraune.vlvblueberrysystem.entity.Lote;
+import com.keraune.vlvblueberrysystem.repository.CamaRepository;
+import com.keraune.vlvblueberrysystem.repository.ClasificacionRepository;
+import com.keraune.vlvblueberrysystem.repository.DespachoRepository;
+import com.keraune.vlvblueberrysystem.repository.FormalizacionRepository;
 import com.keraune.vlvblueberrysystem.repository.LoteRepository;
+import com.keraune.vlvblueberrysystem.repository.SiembraRepository;
+import com.keraune.vlvblueberrysystem.repository.UniformizacionRepository;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -14,14 +21,32 @@ import org.springframework.transaction.annotation.Transactional;
 public class TrazabilidadQueryService {
 
     private final LoteRepository loteRepository;
+    private final CamaRepository camaRepository;
+    private final SiembraRepository siembraRepository;
+    private final UniformizacionRepository uniformizacionRepository;
+    private final FormalizacionRepository formalizacionRepository;
+    private final ClasificacionRepository clasificacionRepository;
+    private final DespachoRepository despachoRepository;
 
-    public TrazabilidadQueryService(LoteRepository loteRepository) {
+    public TrazabilidadQueryService(LoteRepository loteRepository,
+                                    CamaRepository camaRepository,
+                                    SiembraRepository siembraRepository,
+                                    UniformizacionRepository uniformizacionRepository,
+                                    FormalizacionRepository formalizacionRepository,
+                                    ClasificacionRepository clasificacionRepository,
+                                    DespachoRepository despachoRepository) {
         this.loteRepository = loteRepository;
+        this.camaRepository = camaRepository;
+        this.siembraRepository = siembraRepository;
+        this.uniformizacionRepository = uniformizacionRepository;
+        this.formalizacionRepository = formalizacionRepository;
+        this.clasificacionRepository = clasificacionRepository;
+        this.despachoRepository = despachoRepository;
     }
 
     @Transactional(readOnly = true)
-    public List<Lote> buscar(String codigo, String variedad, LocalDate fechaRegistro) {
-        List<Lote> lotes = new ArrayList<>(loteRepository.findAll());
+    public List<TrazabilidadRow> buscar(String codigo, String variedad, LocalDate fechaRegistro) {
+        List<Lote> lotes = new ArrayList<>(loteRepository.findAllByOrderByFechaRegistroDescIdDesc());
 
         if (fechaRegistro != null) {
             lotes.removeIf(lote -> lote.getFechaRegistro() == null || !fechaRegistro.equals(lote.getFechaRegistro()));
@@ -32,10 +57,6 @@ public class TrazabilidadQueryService {
             lotes.removeIf(lote -> lote.getVariedad() == null
                     || !normalizar(lote.getVariedad()).contains(variedadNormalizada));
         }
-
-        lotes.sort(Comparator
-                .comparing(Lote::getFechaRegistro, Comparator.nullsLast(Comparator.reverseOrder()))
-                .thenComparing(Lote::getCodigo, Comparator.nullsLast(String.CASE_INSENSITIVE_ORDER)));
 
         if (codigo != null && !codigo.isBlank()) {
             String codigoNormalizado = normalizar(codigo).toUpperCase(Locale.ROOT);
@@ -49,16 +70,42 @@ public class TrazabilidadQueryService {
             }
 
             String codigoEncontrado = ordenadosPorCodigo.get(index).getCodigo();
-            List<Lote> coincidencias = new ArrayList<>();
-            for (Lote lote : lotes) {
-                if (lote.getCodigo() != null && lote.getCodigo().equalsIgnoreCase(codigoEncontrado)) {
-                    coincidencias.add(lote);
-                }
-            }
-            return coincidencias;
+            lotes.removeIf(lote -> lote.getCodigo() == null || !lote.getCodigo().equalsIgnoreCase(codigoEncontrado));
         }
 
-        return lotes;
+        return lotes.stream().map(this::construirFila).toList();
+    }
+
+    private TrazabilidadRow construirFila(Lote lote) {
+        Long loteId = lote.getId();
+        long siembras = siembraRepository.countByLoteId(loteId);
+        long uniformizaciones = uniformizacionRepository.countByLoteId(loteId);
+        long formalizaciones = formalizacionRepository.countByLoteId(loteId);
+        long clasificaciones = clasificacionRepository.countByLoteId(loteId);
+        long despachos = despachoRepository.countByLoteId(loteId);
+
+        return new TrazabilidadRow(
+                lote,
+                camaRepository.countByLoteId(loteId),
+                siembras,
+                siembraRepository.sumCantidadRegistradaByLoteId(loteId),
+                uniformizaciones,
+                formalizaciones,
+                clasificaciones,
+                despachos,
+                despachoRepository.sumCantidadDespachadaByLoteId(loteId),
+                resolverUltimoEvento(siembras, uniformizaciones, formalizaciones, clasificaciones, despachos)
+        );
+    }
+
+    private String resolverUltimoEvento(long siembras, long uniformizaciones, long formalizaciones,
+                                        long clasificaciones, long despachos) {
+        if (despachos > 0) return "Despacho registrado";
+        if (clasificaciones > 0) return "Clasificación registrada";
+        if (formalizaciones > 0) return "Formalización registrada";
+        if (uniformizaciones > 0) return "Uniformización registrada";
+        if (siembras > 0) return "Siembra registrada";
+        return "Solo estructura base";
     }
 
     private int busquedaBinariaPorCodigo(List<Lote> lotes, String codigoBuscado) {

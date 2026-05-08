@@ -3,134 +3,124 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | Sistema web de arándanos</title>
+    <title>Dashboard | BlueberryTrace</title>
     <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
 </head>
 <body class="app-body corporate-dashboard-body vlv-dashboard-body">
 <div class="app-shell corporate-app-shell">
     <div th:replace="~{fragments/app-shell :: sidebar('dashboard')}"></div>
 
-    <main class="main-content corporate-main-content">
-        <div th:replace="~{fragments/app-shell :: topbar('Dashboard principal', 'Resumen del sistema web para control, clasificación y trazabilidad de plantas de arándano')}" ></div>
+    <main class="main-content corporate-main-content dashboard-main">
+        <div th:replace="~{fragments/app-shell :: topbar('Dashboard principal', 'Indicadores, control operativo y trazabilidad del área de arándanos')}"></div>
 
-        <section class="executive-hero vlv-text-hero">
-            <div class="executive-copy">
-                <span class="executive-chip">Resumen operativo</span>
-                <h2>Vista general del sistema</h2>
+        <section class="dashboard-hero-v2">
+            <div class="dashboard-hero-copy">
+                <span class="executive-chip">BlueberryTrace · Panel ejecutivo</span>
+                <h2>Control operativo del vivero en una sola vista</h2>
                 <p>
-                    Esta pantalla centraliza el acceso a los módulos principales del sistema y resume el flujo
-                    operativo del área de arándanos dentro de Vivero Los Viñedos.
+                    Visualiza indicadores clave de lotes, camas, siembra, clasificación y despacho para sostener una operación
+                    más ordenada, trazable y confiable en el proceso de plantas de arándano.
                 </p>
+                <div class="vlv-hero-actions">
+                    <a class="primary-btn" th:href="@{/siembra}">Registrar siembra</a>
+                    <a class="ghost-btn" th:href="@{/reportes}">Ver trazabilidad</a>
+                </div>
             </div>
-            <div class="executive-hero-meta">
-                <div><strong>Proceso</strong><span>Desde siembra hasta despacho</span></div>
-                <div><strong>Trazabilidad</strong><span>Consulta por lote, variedad y fecha</span></div>
-                <div><strong>Historial</strong><span>Persistencia completa de los registros</span></div>
+            <div class="dashboard-hero-panel">
+                <span class="hero-panel-label">Despacho sobre siembra</span>
+                <strong th:text="${summary.porcentajePlantasDespachadas()} + '%'">0%</strong>
+                <p>Relación entre plantas despachadas y plantas sembradas registradas</p>
+                <div class="hero-panel-track">
+                    <span th:style="'width:' + ${summary.porcentajePlantasDespachadas()} + '%'" style="width: 0%"></span>
+                </div>
             </div>
         </section>
 
-        <section class="stats-grid premium-stats corporate-kpis">
-            <article class="metric-card metric-primary corporate-metric-card">
-                <span class="metric-label">Lotes registrados</span>
-                <strong>Control base</strong>
-                <small>Identificación principal de cada lote o invernadero.</small>
-            </article>
-            <article class="metric-card soft-card corporate-metric-card">
-                <span class="metric-label">Camas</span>
-                <strong>Ubicación</strong>
-                <small>Ordenamiento interno para el seguimiento físico del proceso.</small>
-            </article>
-            <article class="metric-card soft-card corporate-metric-card">
-                <span class="metric-label">Clasificación</span>
-                <strong>Seguimiento</strong>
-                <small>Registro por condición, etapa o criterio de planta.</small>
-            </article>
-            <article class="metric-card metric-warning corporate-metric-card">
-                <span class="metric-label">Reportes</span>
-                <strong>Trazabilidad</strong>
-                <small>Consulta de historial por filtros operativos del sistema.</small>
-            </article>
-        </section>
-
-        <div class="section-ribbon">
-            <span>Proceso</span>
-            <h3>Flujo operativo del proyecto</h3>
-        </div>
-
-        <section class="dashboard-grid corporate-dashboard-grid">
-            <article class="panel-card corporate-panel">
-                <div class="panel-head">
-                    <h3>Etapas del proceso</h3>
-                    <span>Secuencia</span>
-                </div>
-
-                <div class="phase-progress-list">
-                    <div class="phase-progress-item"><div class="phase-progress-head"><strong>Siembra</strong><span>Etapa 1</span></div><div class="phase-progress-bar"><span style="width:64%"></span></div></div>
-                    <div class="phase-progress-item"><div class="phase-progress-head"><strong>Ubicación en camas</strong><span>Etapa 2</span></div><div class="phase-progress-bar"><span style="width:78%"></span></div></div>
-                    <div class="phase-progress-item"><div class="phase-progress-head"><strong>Uniformización</strong><span>Etapa 3</span></div><div class="phase-progress-bar"><span style="width:58%"></span></div></div>
-                    <div class="phase-progress-item"><div class="phase-progress-head"><strong>Formalización</strong><span>Etapa 4</span></div><div class="phase-progress-bar"><span style="width:52%"></span></div></div>
-                    <div class="phase-progress-item"><div class="phase-progress-head"><strong>Clasificación</strong><span>Etapa 5</span></div><div class="phase-progress-bar"><span style="width:83%"></span></div></div>
-                    <div class="phase-progress-item"><div class="phase-progress-head"><strong>Despacho</strong><span>Etapa 6</span></div><div class="phase-progress-bar"><span style="width:41%"></span></div></div>
-                </div>
+        <section class="kpi-dashboard-grid" aria-label="Indicadores principales del dashboard">
+            <article class="kpi-card kpi-card-primary">
+                <div class="kpi-card-head"><span class="kpi-icon" aria-hidden="true">⌂</span><span class="kpi-status">Base operativa</span></div>
+                <span class="kpi-label">Lotes registrados</span>
+                <strong th:text="${summary.lotesRegistrados()}">0</strong>
+                <small><span th:text="${summary.lotesActivos()}">0</span> activos · <span th:text="${summary.lotesInactivos()}">0</span> no activos</small>
             </article>
 
-            <article class="panel-card corporate-panel">
-                <div class="panel-head">
-                    <h3>Recomendaciones de implementación</h3>
-                    <span>Entrega final</span>
-                </div>
-                <div class="info-list-plain">
-                    <div>
-                        <strong>Algoritmos de trazabilidad</strong>
-                        <p>Preparar búsquedas y ordenación en Java para consultas rápidas por lote, variedad o fecha de injerto.</p>
-                    </div>
-                    <div>
-                        <strong>Seguridad de datos</strong>
-                        <p>Garantizar persistencia del historial completo de cada planta sin pérdida de información.</p>
-                    </div>
-                    <div>
-                        <strong>Consistencia del sistema</strong>
-                        <p>Mantener estructura técnica y visual coherente para la sustentación final del proyecto.</p>
-                    </div>
-                </div>
+            <article class="kpi-card">
+                <div class="kpi-card-head"><span class="kpi-icon kpi-icon-green" aria-hidden="true">✓</span><span class="kpi-status success">Camas</span></div>
+                <span class="kpi-label">Camas activas</span>
+                <strong th:text="${summary.porcentajeCamasActivas()} + '%'">0%</strong>
+                <small><span th:text="${summary.camasActivas()}">0</span> activas de <span th:text="${summary.camasRegistradas()}">0</span> registradas.</small>
+            </article>
+
+            <article class="kpi-card">
+                <div class="kpi-card-head"><span class="kpi-icon kpi-icon-rose" aria-hidden="true">↟</span><span class="kpi-status accent">Siembra</span></div>
+                <span class="kpi-label">Plantas sembradas</span>
+                <strong th:text="${summary.plantasSembradas()}">0</strong>
+                <small><span th:text="${summary.siembrasRegistradas()}">0</span> registros de siembra almacenados.</small>
+            </article>
+
+            <article class="kpi-card">
+                <div class="kpi-card-head"><span class="kpi-icon kpi-icon-soft" aria-hidden="true">▦</span><span class="kpi-status neutral">Despacho</span></div>
+                <span class="kpi-label">Plantas despachadas</span>
+                <strong th:text="${summary.plantasDespachadas()}">0</strong>
+                <small><span th:text="${summary.despachosRegistrados()}">0</span> despachos registrados.</small>
             </article>
         </section>
 
-        <div class="section-ribbon">
-            <span>Módulos</span>
-            <h3>Accesos principales</h3>
-        </div>
-
-        <section class="dashboard-grid bottom-grid corporate-dashboard-grid">
-            <article class="panel-card corporate-panel">
+        <section class="analytics-grid">
+            <article class="panel-card analytics-card chart-card">
                 <div class="panel-head">
-                    <h3>Módulos operativos</h3>
-                    <span>Acceso rápido</span>
+                    <div><h3>Estado de lotes</h3><span>Distribución actual de invernaderos</span></div>
+                    <span class="chart-badge">KPI</span>
                 </div>
-                <div class="quick-grid corporate-quick-grid">
-                    <a th:href="@{/lotes}">Lotes / invernaderos</a>
-                    <a th:href="@{/camas}">Camas</a>
-                    <a th:href="@{/siembra}">Registrar siembra</a>
-                    <a th:href="@{/procesos}">Procesos</a>
-                    <a th:href="@{/clasificacion}">Clasificación</a>
-                    <a th:href="@{/despacho}">Despacho</a>
+                <div class="donut-layout">
+                    <div class="donut-chart" th:style="'--value:' + ${summary.porcentajeLotesActivos()} + '%'" style="--value:0%">
+                        <div><strong th:text="${summary.porcentajeLotesActivos()} + '%'">0%</strong><span>Activos</span></div>
+                    </div>
+                    <div class="chart-legend">
+                        <div><span class="legend-dot green"></span><strong th:text="${summary.lotesActivos()}">0</strong><small>Lotes activos</small></div>
+                        <div><span class="legend-dot rose"></span><strong th:text="${summary.lotesInactivos()}">0</strong><small>Lotes no activos</small></div>
+                        <div><span class="legend-dot neutral"></span><strong th:text="${summary.lotesRegistrados()}">0</strong><small>Total registrados</small></div>
+                    </div>
                 </div>
             </article>
 
-            <article class="panel-card corporate-panel">
+            <article class="panel-card analytics-card chart-card wide-chart-card">
                 <div class="panel-head">
-                    <h3>Gestión del sistema</h3>
-                    <span>Administración</span>
+                    <div><h3>Volumen real por etapa</h3><span>Datos calculados desde registros transaccionales</span></div>
+                    <span class="chart-badge accent">Proceso</span>
                 </div>
-                <div class="admin-highlight-grid">
-                    <a class="admin-highlight-card" th:href="@{/reportes}">
-                        <strong>Reportes</strong>
-                        <span>Consulta el historial de trazabilidad y aplica filtros por lote, variedad y fecha.</span>
-                    </a>
-                    <a class="admin-highlight-card" th:href="@{/usuarios}">
-                        <strong>Usuarios</strong>
-                        <span>Administra perfiles y roles vinculados al uso del sistema.</span>
-                    </a>
+                <div class="bar-chart-list">
+                    <div class="bar-chart-row"><span>Siembras</span><div><i th:style="'width:' + ${summary.siembrasRegistradas() > 0 ? 100 : 0} + '%'" style="width:0%"></i></div><strong th:text="${summary.siembrasRegistradas()}">0</strong></div>
+                    <div class="bar-chart-row"><span>Uniformización</span><div><i th:style="'width:' + ${summary.porcentajeUniformizacionesSobreSiembras()} + '%'" style="width:0%"></i></div><strong th:text="${summary.uniformizacionesRegistradas()}">0</strong></div>
+                    <div class="bar-chart-row"><span>Formalización</span><div><i th:style="'width:' + ${summary.porcentajeFormalizacionesSobreSiembras()} + '%'" style="width:0%"></i></div><strong th:text="${summary.formalizacionesRegistradas()}">0</strong></div>
+                    <div class="bar-chart-row"><span>Clasificación</span><div><i th:style="'width:' + ${summary.porcentajeClasificacionesSobreSiembras()} + '%'" style="width:0%"></i></div><strong th:text="${summary.clasificacionesRegistradas()}">0</strong></div>
+                    <div class="bar-chart-row"><span>Despacho</span><div><i th:style="'width:' + ${summary.porcentajeDespachosSobreSiembras()} + '%'" style="width:0%"></i></div><strong th:text="${summary.despachosRegistrados()}">0</strong></div>
+                </div>
+                <p class="chart-note">Los valores ya no son demostrativos: se calculan desde los módulos de siembra, uniformización, formalización, clasificación y despacho.</p>
+            </article>
+        </section>
+
+        <section class="analytics-grid secondary-dashboard-grid">
+            <article class="panel-card analytics-card">
+                <div class="panel-head"><div><h3>Alertas operativas</h3><span>Lectura rápida para supervisión</span></div></div>
+                <div class="alert-summary-list">
+                    <div><span class="alert-marker green"></span><strong>Camas activas</strong><p><span th:text="${summary.camasActivas()}">0</span> camas disponibles para continuidad del proceso.</p></div>
+                    <div><span class="alert-marker rose"></span><strong>Clasificación pendiente</strong><p><span th:text="${summary.clasificacionesPendientes()}">0</span> registro(s) pendientes de validación.</p></div>
+                    <div><span class="alert-marker neutral"></span><strong>Capacidad referencial</strong><p><span th:text="${summary.capacidadReferencialTotal()}">0</span> plantas como capacidad declarada en camas.</p></div>
+                </div>
+            </article>
+
+            <article class="panel-card analytics-card quick-access-card">
+                <div class="panel-head"><div><h3>Accesos principales</h3><span>Módulos del sistema</span></div></div>
+                <div class="module-tile-grid">
+                    <a th:href="@{/lotes}"><span>Lotes</span><small>Invernaderos</small></a>
+                    <a th:href="@{/camas}"><span>Camas</span><small>Ubicación</small></a>
+                    <a th:href="@{/siembra}"><span>Siembra</span><small>Registro inicial</small></a>
+                    <a th:href="@{/procesos}"><span>Procesos</span><small>Uniformización</small></a>
+                    <a th:href="@{/clasificacion}"><span>Clasificación</span><small>Calidad</small></a>
+                    <a th:href="@{/despacho}"><span>Despacho</span><small>Salida</small></a>
+                    <a th:href="@{/reportes}"><span>Reportes</span><small>Historial</small></a>
+                    <a th:href="@{/usuarios}"><span>Usuarios</span><small>Roles</small></a>
                 </div>
             </article>
         </section>
