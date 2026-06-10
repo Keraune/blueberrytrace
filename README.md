@@ -176,3 +176,39 @@ Se incorporó una capa de interacción productiva para operaciones frecuentes:
 - Corrección del formulario de formalización para incluir el campo obligatorio `detalle`.
 
 Documentación de esta etapa: `docs/frontend-fase-5.md`.
+
+
+## Separación progresiva para React/Vue
+
+Se agregó una capa API inicial bajo `/api/v1/**` para preparar una futura integración con React o Vue sin retirar Thymeleaf todavía.
+
+Endpoints principales disponibles:
+
+```text
+GET /api/v1/frontend/bootstrap
+GET /api/v1/session/me
+GET /api/v1/dashboard/summary
+GET /api/v1/catalogs/operations
+GET /api/v1/lotes
+GET /api/v1/camas
+GET /api/v1/siembras
+GET /api/v1/procesos
+GET /api/v1/procesos/uniformizaciones
+GET /api/v1/procesos/formalizaciones
+GET /api/v1/clasificaciones
+GET /api/v1/despachos
+GET /api/v1/reportes/trazabilidad
+GET /api/v1/usuarios
+```
+
+La API no expone entidades JPA directamente. Usa DTOs/records en `src/main/java/com/keraune/vlvblueberrysystem/api/dto` y mappers en `src/main/java/com/keraune/vlvblueberrysystem/api/mapper`.
+
+También se agregó `static/js/api-client.js`, un cliente ligero para consumir el API desde JavaScript o como referencia para una futura app React/Vue.
+
+CORS para desarrollo local:
+
+```properties
+blueberrytrace.api.cors.allowed-origins=http://localhost:5173,http://localhost:3000
+```
+
+Documentación de esta etapa: `docs/frontend-fase-6.md`.
