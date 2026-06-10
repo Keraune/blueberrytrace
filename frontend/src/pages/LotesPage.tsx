@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
-import { Eye, Factory, Pencil, Plus } from 'lucide-react';
+import { Eye, Pencil, Plus } from 'lucide-react';
+import { DetailDrawer } from '../components/DetailDrawer';
 import { FilterToolbar } from '../components/FilterToolbar';
+import { InfoGrid } from '../components/InfoGrid';
 import { LoteForm } from '../components/LoteForm';
 import { Modal } from '../components/Modal';
 import { ModuleHeader } from '../components/ModuleHeader';
@@ -22,6 +24,7 @@ export function LotesPage({ lotes, camas, siembras, onLotesChange }: LotesPagePr
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState<(typeof statusTabs)[number]>('TODOS');
   const [modalOpen, setModalOpen] = useState(false);
+  const [selectedLote, setSelectedLote] = useState<LoteResponse | null>(null);
 
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase();
@@ -108,7 +111,7 @@ export function LotesPage({ lotes, camas, siembras, onLotesChange }: LotesPagePr
                     <td><StatusBadge value={lote.estado} /></td>
                     <td>
                       <div className="icon-actions">
-                        <button type="button" className="icon-action" title="Visualizar"><Eye size={15} /></button>
+                        <button type="button" className="icon-action" title="Visualizar" onClick={() => setSelectedLote(lote)}><Eye size={15} /></button>
                         <button type="button" className="icon-action" title="Editar estado" onClick={async () => onLotesChange((await blueberryApi.toggleLoteStatus(lote.id)).items)}><Pencil size={15} /></button>
                       </div>
                     </td>
@@ -120,6 +123,37 @@ export function LotesPage({ lotes, camas, siembras, onLotesChange }: LotesPagePr
         </div>
         <div className="table-footer-note">Mostrando {filtered.length} de {lotes.length} lotes registrados</div>
       </section>
+
+      <DetailDrawer
+        open={Boolean(selectedLote)}
+        title={selectedLote?.codigo || 'Detalle del lote'}
+        subtitle={selectedLote?.descripcion || 'Información operativa del lote'}
+        onClose={() => setSelectedLote(null)}
+        actions={selectedLote ? (
+          <button type="button" className="action-button" onClick={async () => onLotesChange((await blueberryApi.toggleLoteStatus(selectedLote.id)).items)}>
+            <Pencil size={15} /> Cambiar estado
+          </button>
+        ) : null}
+      >
+        {selectedLote ? (
+          <>
+            <InfoGrid
+              items={[
+                { label: 'Código', value: selectedLote.codigo, tone: 'green' },
+                { label: 'Cultivo', value: selectedLote.cultivo || 'No definido' },
+                { label: 'Variedad', value: selectedLote.variedad || 'No definida', tone: 'purple' },
+                { label: 'Estado', value: <StatusBadge value={selectedLote.estado} />, tone: 'blue' },
+                { label: 'Fecha de registro', value: dateShort(selectedLote.fechaRegistro) },
+                { label: 'Supervisor', value: selectedLote.usuarioRegistro?.nombreCompleto || 'Sin asignar' }
+              ]}
+            />
+            <section className="drawer-section">
+              <h3>Observación</h3>
+              <p>{selectedLote.observacion || 'No se registraron observaciones para este lote.'}</p>
+            </section>
+          </>
+        ) : null}
+      </DetailDrawer>
 
       <Modal open={modalOpen} title="Nuevo lote" description="Registra un lote productivo o invernadero." onClose={() => setModalOpen(false)}>
         <LoteForm onSubmit={createLote} onCancel={() => setModalOpen(false)} />

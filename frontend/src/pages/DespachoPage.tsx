@@ -1,6 +1,8 @@
 import { useMemo, useState } from 'react';
 import { Download, Eye, Filter, Plus, Truck } from 'lucide-react';
 import { DespachoForm } from '../components/DespachoForm';
+import { DetailDrawer } from '../components/DetailDrawer';
+import { InfoGrid } from '../components/InfoGrid';
 import { ModuleHeader } from '../components/ModuleHeader';
 import { StatusBadge } from '../components/StatusBadge';
 import { blueberryApi } from '../lib/api';
@@ -17,6 +19,7 @@ interface DespachoPageProps {
 
 export function DespachoPage({ despachos, lotes, modalidades, validaciones, onDespachosChange }: DespachoPageProps) {
   const [tab, setTab] = useState<'historial' | 'nuevo'>('historial');
+  const [selectedDespacho, setSelectedDespacho] = useState<DespachoResponse | null>(null);
   const plantas = despachos.reduce((total, item) => total + (item.cantidadDespachada || 0), 0);
   const enTransito = despachos.filter((item) => /TRANSITO/i.test(item.estado || '')).reduce((total, item) => total + (item.cantidadDespachada || 0), 0);
   const exportaciones = despachos.filter((item) => /EXPORT/i.test(item.modalidad || '')).length;
@@ -93,7 +96,7 @@ export function DespachoPage({ despachos, lotes, modalidades, validaciones, onDe
                     <td><StatusBadge value={item.modalidad} /></td>
                     <td>{item.destino || 'Sin destino'}</td>
                     <td><StatusBadge value={item.estado} /></td>
-                    <td><button type="button" className="icon-action"><Eye size={15} /></button></td>
+                    <td><button type="button" className="icon-action" onClick={() => setSelectedDespacho(item)}><Eye size={15} /></button></td>
                   </tr>
                 ))}
               </tbody>
@@ -107,6 +110,33 @@ export function DespachoPage({ despachos, lotes, modalidades, validaciones, onDe
           <DespachoForm lotes={lotes} modalidades={modalidades} validaciones={validaciones} onSubmit={create} onCancel={() => setTab('historial')} />
         </section>
       )}
+      <DetailDrawer
+        open={Boolean(selectedDespacho)}
+        title={selectedDespacho ? `D-${String(selectedDespacho.id).padStart(4, '0')}` : 'Detalle de despacho'}
+        subtitle={selectedDespacho?.destino || selectedDespacho?.lote?.codigo || 'Registro de salida'}
+        onClose={() => setSelectedDespacho(null)}
+      >
+        {selectedDespacho ? (
+          <>
+            <InfoGrid
+              items={[
+                { label: 'Lote', value: selectedDespacho.lote?.codigo || 'Sin lote', tone: 'green' },
+                { label: 'Fecha', value: dateShort(selectedDespacho.fechaDespacho) },
+                { label: 'Cantidad', value: numberCompact(selectedDespacho.cantidadDespachada || 0), tone: 'blue' },
+                { label: 'Modalidad', value: <StatusBadge value={selectedDespacho.modalidad} />, tone: 'purple' },
+                { label: 'Estado', value: <StatusBadge value={selectedDespacho.estado} />, tone: 'orange' },
+                { label: 'Validación', value: selectedDespacho.validacionCalidad || 'No registrada' }
+              ]}
+            />
+            <section className="drawer-section">
+              <h3>Guía y observación</h3>
+              <p><strong>Guía:</strong> {selectedDespacho.guiaRemision || 'Sin guía registrada'}</p>
+              <p>{selectedDespacho.observacion || 'No se registraron observaciones.'}</p>
+            </section>
+          </>
+        ) : null}
+      </DetailDrawer>
+
     </main>
   );
 }

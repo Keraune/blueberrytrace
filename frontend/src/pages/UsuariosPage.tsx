@@ -1,5 +1,7 @@
 import { useMemo, useState } from 'react';
-import { Pencil, Plus, Trash2 } from 'lucide-react';
+import { Eye, Pencil, Plus, Trash2 } from 'lucide-react';
+import { DetailDrawer } from '../components/DetailDrawer';
+import { InfoGrid } from '../components/InfoGrid';
 import { ModuleHeader } from '../components/ModuleHeader';
 import { StatusBadge } from '../components/StatusBadge';
 import type { UserReferenceResponse } from '../types/api';
@@ -16,8 +18,10 @@ export function UsuariosPage({ usuarios }: UsuariosPageProps) {
   const [query, setQuery] = useState('');
   const [roleFilter, setRoleFilter] = useState('TODOS');
   const [statusFilter, setStatusFilter] = useState('TODOS');
+  const [selectedUser, setSelectedUser] = useState<UserReferenceResponse | null>(null);
 
   const roles = Array.from(new Set(usuarios.map((usuario) => usuario.rol).filter(Boolean))) as string[];
+  const activos = usuarios.filter((usuario) => usuario.activo).length;
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase();
     return usuarios.filter((usuario) => {
@@ -37,6 +41,12 @@ export function UsuariosPage({ usuarios }: UsuariosPageProps) {
         description="Administrar accesos y roles del sistema."
         actions={<button className="action-button" type="button"><Plus size={16} /> Nuevo usuario</button>}
       />
+
+      <section className="summary-strip summary-strip--three">
+        <article className="summary-pill summary-pill--green"><strong>{usuarios.length}</strong><span>Usuarios</span><small>cuentas registradas</small></article>
+        <article className="summary-pill summary-pill--blue"><strong>{activos}</strong><span>Activos</span><small>con acceso habilitado</small></article>
+        <article className="summary-pill summary-pill--purple"><strong>{roles.length}</strong><span>Roles</span><small>perfiles operativos</small></article>
+      </section>
 
       <section className="panel-card">
         <div className="module-toolbar-card module-toolbar-card--filters">
@@ -87,7 +97,8 @@ export function UsuariosPage({ usuarios }: UsuariosPageProps) {
                   <td>{index < 3 ? 'Hoy' : index < 6 ? 'Ayer' : 'Sin registro reciente'}</td>
                   <td>
                     <div className="icon-actions">
-                      <button type="button" className="icon-action"><Pencil size={15} /></button>
+                      <button type="button" className="icon-action" title="Ver detalle" onClick={() => setSelectedUser(usuario)}><Eye size={15} /></button>
+                      <button type="button" className="icon-action" title="Editar"><Pencil size={15} /></button>
                       <button type="button" className="icon-action"><Trash2 size={15} /></button>
                     </div>
                   </td>
@@ -98,6 +109,31 @@ export function UsuariosPage({ usuarios }: UsuariosPageProps) {
         </div>
         <div className="table-footer-note">Mostrando {filtered.length} de {usuarios.length} usuarios</div>
       </section>
+      <DetailDrawer
+        open={Boolean(selectedUser)}
+        title={selectedUser?.nombreCompleto || 'Detalle de usuario'}
+        subtitle={selectedUser?.email || selectedUser?.username}
+        onClose={() => setSelectedUser(null)}
+        actions={<button type="button" className="action-button"><Pencil size={15} /> Editar usuario</button>}
+      >
+        {selectedUser ? (
+          <>
+            <InfoGrid
+              items={[
+                { label: 'Usuario', value: selectedUser.username, tone: 'green' },
+                { label: 'Rol', value: <StatusBadge value={selectedUser.rol} />, tone: 'purple' },
+                { label: 'Estado', value: selectedUser.activo ? 'Activo' : 'Inactivo', tone: selectedUser.activo ? 'blue' : 'neutral' },
+                { label: 'Correo', value: selectedUser.email }
+              ]}
+            />
+            <section className="drawer-section drawer-section--soft">
+              <h3>Permisos operativos</h3>
+              <p>Este perfil se utilizará para validar accesos a módulos productivos, reportes y acciones administrativas desde React.</p>
+            </section>
+          </>
+        ) : null}
+      </DetailDrawer>
+
     </main>
   );
 }

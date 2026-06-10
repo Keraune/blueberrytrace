@@ -1,7 +1,9 @@
 import { useMemo, useState } from 'react';
-import { Download, Plus } from 'lucide-react';
+import { Download, Eye, Plus } from 'lucide-react';
 import { ClasificacionForm } from '../components/ClasificacionForm';
+import { DetailDrawer } from '../components/DetailDrawer';
 import { FilterToolbar } from '../components/FilterToolbar';
+import { InfoGrid } from '../components/InfoGrid';
 import { Modal } from '../components/Modal';
 import { ModuleHeader } from '../components/ModuleHeader';
 import { StatusBadge } from '../components/StatusBadge';
@@ -28,6 +30,7 @@ function bucketOf(item: ClasificacionResponse, index: number) {
 export function ClasificacionPage({ clasificaciones, lotes, camas, onClasificacionesChange }: ClasificacionPageProps) {
   const [query, setQuery] = useState('');
   const [creating, setCreating] = useState(false);
+  const [selectedClasificacion, setSelectedClasificacion] = useState<ClasificacionResponse | null>(null);
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase();
     return clasificaciones.filter((item) => !term || [item.lote?.codigo, item.estadoPlanta, item.tamano, item.condicion, item.estado]
@@ -99,6 +102,7 @@ export function ClasificacionPage({ clasificaciones, lotes, camas, onClasificaci
                 <th>Total</th>
                 <th>Operario</th>
                 <th>Estado</th>
+                <th />
               </tr>
             </thead>
             <tbody>
@@ -123,6 +127,7 @@ export function ClasificacionPage({ clasificaciones, lotes, camas, onClasificaci
                     <td><strong>{numberCompact(amount)}</strong></td>
                     <td>{item.usuarioRegistro?.nombreCompleto || 'Sin operario'}</td>
                     <td><StatusBadge value={item.estado} /></td>
+                    <td><button type="button" className="icon-action" onClick={() => setSelectedClasificacion(item)}><Eye size={15} /></button></td>
                   </tr>
                 );
               })}
@@ -131,6 +136,33 @@ export function ClasificacionPage({ clasificaciones, lotes, camas, onClasificaci
         </div>
         <div className="table-footer-note">{filtered.length} registros · {numberCompact(total)} plantas clasificadas</div>
       </section>
+
+      <DetailDrawer
+        open={Boolean(selectedClasificacion)}
+        title={selectedClasificacion ? `CL-${String(selectedClasificacion.id).padStart(4, '0')}` : 'Detalle de clasificación'}
+        subtitle={selectedClasificacion?.lote?.codigo || 'Control de calidad'}
+        onClose={() => setSelectedClasificacion(null)}
+      >
+        {selectedClasificacion ? (
+          <>
+            <InfoGrid
+              items={[
+                { label: 'Lote', value: selectedClasificacion.lote?.codigo || 'Sin lote', tone: 'green' },
+                { label: 'Cama', value: selectedClasificacion.cama?.codigo || 'Sin cama' },
+                { label: 'Cantidad', value: numberCompact(selectedClasificacion.cantidad || 0), tone: 'blue' },
+                { label: 'Estado planta', value: selectedClasificacion.estadoPlanta || 'No definido' },
+                { label: 'Tamaño', value: selectedClasificacion.tamano || 'No definido', tone: 'purple' },
+                { label: 'Estado', value: <StatusBadge value={selectedClasificacion.estado} />, tone: 'orange' }
+              ]}
+            />
+            <section className="drawer-section">
+              <h3>Condición y observación</h3>
+              <p><strong>Condición:</strong> {selectedClasificacion.condicion || 'Sin condición registrada'}</p>
+              <p>{selectedClasificacion.observacion || 'No se registraron observaciones.'}</p>
+            </section>
+          </>
+        ) : null}
+      </DetailDrawer>
 
       <Modal open={creating} title="Nueva clasificación" description="Registra el resultado de control de calidad por lote y cama." onClose={() => setCreating(false)}>
         <ClasificacionForm lotes={lotes} camas={camas} onSubmit={create} onCancel={() => setCreating(false)} />

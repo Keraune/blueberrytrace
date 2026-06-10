@@ -338,3 +338,15 @@ Se pulió el dashboard interno para acercarlo más al estilo visual definido en 
 
 Documentación: `docs/frontend-fase-17.md`.
 
+## Fase 18 - Pulido visual de módulos internos
+
+Se unificó el diseño de los módulos internos del frontend React con vistas rápidas laterales, tarjetas resumen consistentes y detalles operativos para lotes, camas, usuarios, clasificaciones y despachos.
+
+Validación principal:
+
+```bash
+cd frontend
+npm ci
+npm run build
+```
+

@@ -1953,3 +1953,214 @@ textarea {
     height: 11.5rem;
   }
 }
+
+/* Phase 18: unified internal modules */
+.summary-strip--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.drawer-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  background: rgba(8, 24, 16, 0.28);
+  display: flex;
+  justify-content: flex-end;
+  backdrop-filter: blur(3px);
+}
+
+.detail-drawer {
+  width: min(31rem, 100%);
+  height: 100vh;
+  background: var(--surface);
+  border-left: 1px solid var(--line);
+  box-shadow: -30px 0 70px rgba(8, 24, 16, 0.18);
+  display: flex;
+  flex-direction: column;
+  animation: drawer-in 180ms ease-out;
+}
+
+@keyframes drawer-in {
+  from { transform: translateX(1.5rem); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.detail-drawer__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.2rem;
+  border-bottom: 1px solid var(--line);
+  background: linear-gradient(180deg, #ffffff 0%, #f7faf7 100%);
+}
+
+.detail-drawer__eyebrow {
+  color: var(--green);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+}
+
+.detail-drawer__header h2,
+.drawer-section h3 {
+  margin: 0;
+}
+
+.detail-drawer__header h2 {
+  margin-top: 0.25rem;
+  font-size: 1.45rem;
+  letter-spacing: -0.04em;
+}
+
+.detail-drawer__header p {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+}
+
+.detail-drawer__body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 1.1rem;
+  display: grid;
+  align-content: start;
+  gap: 1rem;
+}
+
+.detail-drawer__actions {
+  border-top: 1px solid var(--line);
+  padding: 1rem 1.1rem;
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  background: #fbfdfb;
+}
+
+.info-grid {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.8rem;
+}
+
+.info-grid__item {
+  border: 1px solid var(--line);
+  background: #f7faf7;
+  border-radius: 0.95rem;
+  padding: 0.85rem;
+}
+
+.info-grid__item dt,
+.info-grid__item dd {
+  margin: 0;
+}
+
+.info-grid__item dt {
+  color: var(--muted);
+  font-size: 0.74rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+}
+
+.info-grid__item dd {
+  margin-top: 0.35rem;
+  color: var(--text);
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.info-grid__item--green { border-color: #c6ebd1; background: #f4fcf5; }
+.info-grid__item--blue { border-color: #c8e5f8; background: #f3f9fe; }
+.info-grid__item--purple { border-color: #dfd0ff; background: #faf7ff; }
+.info-grid__item--orange { border-color: #f3d99d; background: #fffaf0; }
+.info-grid__item--red { border-color: #ffcaca; background: #fff6f6; }
+
+.drawer-section {
+  border: 1px solid var(--line);
+  border-radius: 1rem;
+  padding: 1rem;
+  background: var(--surface);
+}
+
+.drawer-section--soft {
+  background: #f7faf7;
+}
+
+.drawer-section h3 {
+  font-size: 1rem;
+  margin-bottom: 0.55rem;
+}
+
+.drawer-section p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.drawer-section p + p {
+  margin-top: 0.65rem;
+}
+
+.panel-card > .panel-card {
+  border-radius: 0.85rem;
+  box-shadow: none;
+}
+
+.panel-card > .filter-toolbar {
+  margin-bottom: 0.85rem;
+}
+
+.summary-pill {
+  position: relative;
+  overflow: hidden;
+}
+
+.summary-pill::after {
+  content: "";
+  position: absolute;
+  width: 5.5rem;
+  height: 5.5rem;
+  right: -2.4rem;
+  top: -2.7rem;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0.06;
+}
+
+.summary-pill small {
+  position: relative;
+  z-index: 1;
+}
+
+.icon-action:hover {
+  border-color: #b9c8bc;
+  background: #f5f8f5;
+  transform: translateY(-1px);
+}
+
+.data-table tbody tr {
+  transition: background 140ms ease, transform 140ms ease;
+}
+
+.data-table tbody tr:hover {
+  background: #f6faf6;
+}
+
+@media (max-width: 1280px) {
+  .summary-strip--three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 900px) {
+  .summary-strip--three,
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .detail-drawer {
+    width: 100%;
+  }
+}
