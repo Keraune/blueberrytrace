@@ -2,6 +2,7 @@ package com.keraune.vlvblueberrysystem.controller;
 
 import com.keraune.vlvblueberrysystem.dto.LoteForm;
 import com.keraune.vlvblueberrysystem.service.LoteService;
+import com.keraune.vlvblueberrysystem.web.HtmxRequestSupport;
 import jakarta.validation.Valid;
 import java.security.Principal;
 import java.time.LocalDate;
@@ -13,12 +14,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/lotes")
 public class LoteController {
+
+    private static final String LIST_VIEW = "lotes/lista";
+    private static final String LIST_FRAGMENT = "lotes/lista :: moduleContent";
 
     private final LoteService loteService;
 
@@ -27,9 +32,12 @@ public class LoteController {
     }
 
     @GetMapping
-    public String listarLotes(Model model) {
+    public String listarLotes(
+            Model model,
+            @RequestHeader(value = HtmxRequestSupport.HX_REQUEST_HEADER, required = false) String hxRequest
+    ) {
         model.addAttribute("lotes", loteService.listarTodos());
-        return "lotes/lista";
+        return HtmxRequestSupport.view(LIST_VIEW, LIST_FRAGMENT, hxRequest);
     }
 
     @GetMapping("/nuevo")
@@ -122,17 +130,45 @@ public class LoteController {
     }
 
     @PostMapping("/{id}/estado")
-    public String cambiarEstado(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String cambiarEstado(
+            @PathVariable Long id,
+            Model model,
+            RedirectAttributes redirectAttributes,
+            @RequestHeader(value = HtmxRequestSupport.HX_REQUEST_HEADER, required = false) String hxRequest
+    ) {
+        String message = "Estado del invernadero actualizado correctamente.";
         loteService.cambiarEstado(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Estado del invernadero actualizado correctamente.");
+
+        if (HtmxRequestSupport.isHtmxRequest(hxRequest)) {
+            return cargarListadoParcial(model, message);
+        }
+
+        redirectAttributes.addFlashAttribute("successMessage", message);
         return "redirect:/lotes";
     }
 
     @PostMapping("/{id}/eliminar")
-    public String eliminarLote(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String eliminarLote(
+            @PathVariable Long id,
+            Model model,
+            RedirectAttributes redirectAttributes,
+            @RequestHeader(value = HtmxRequestSupport.HX_REQUEST_HEADER, required = false) String hxRequest
+    ) {
+        String message = "Invernadero marcado como eliminado.";
         loteService.eliminarLogicamente(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Invernadero marcado como eliminado.");
+
+        if (HtmxRequestSupport.isHtmxRequest(hxRequest)) {
+            return cargarListadoParcial(model, message);
+        }
+
+        redirectAttributes.addFlashAttribute("successMessage", message);
         return "redirect:/lotes";
+    }
+
+    private String cargarListadoParcial(Model model, String successMessage) {
+        model.addAttribute("successMessage", successMessage);
+        model.addAttribute("lotes", loteService.listarTodos());
+        return LIST_FRAGMENT;
     }
 
     private void cargarCatalogos(Model model) {

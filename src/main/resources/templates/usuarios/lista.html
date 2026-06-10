@@ -7,6 +7,9 @@
     <main class="main-content">
         <div th:replace="~{fragments/app-shell :: topbar('Gestión de Usuarios', 'Administración de perfiles, roles y estado de acceso')}"></div>
 
+        <div id="module-content" class="module-content" th:fragment="moduleContent" hx-target="this" hx-swap="outerHTML">
+            <div class="module-loading-indicator" aria-hidden="true"><span></span></div>
+
         <section class="operation-kpi-grid">
             <article class="operation-kpi kpi-green"><span class="kpi-icon">U</span><div><small>Usuarios</small><strong th:text="${#lists.size(usuarios)}">0</strong><p>Perfiles registrados</p></div></article>
             <article class="operation-kpi kpi-purple"><span class="kpi-icon">★</span><div><small>Administradores</small><strong th:text="${#lists.size(usuarios.?[rol != null and rol.nombre == 'ADMINISTRADOR'])}">0</strong><p>Acceso global del sistema</p></div></article>
@@ -33,6 +36,7 @@
                 </table>
             </div>
         </section>
+        </div>
     </main>
 </div>
 <div th:replace="~{fragments/layout :: scripts}"></div>

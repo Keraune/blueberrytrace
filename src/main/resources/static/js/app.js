@@ -208,3 +208,52 @@ const initializeProductionTables = (scope = document) => {
 
 document.addEventListener('DOMContentLoaded', () => initializeProductionTables(document));
 document.body?.addEventListener('htmx:afterSwap', event => initializeProductionTables(event.detail.target || document));
+
+const showHtmxErrorToast = message => {
+    document.querySelectorAll('.htmx-error-toast').forEach(item => item.remove());
+    const toast = document.createElement('div');
+    toast.className = 'htmx-error-toast';
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    window.setTimeout(() => {
+        toast.classList.add('is-hiding');
+        toast.addEventListener('transitionend', () => toast.remove(), { once: true });
+    }, 3600);
+};
+
+const restoreSubmitButtons = (scope = document) => {
+    scope.querySelectorAll('button.is-loading').forEach(button => {
+        button.classList.remove('is-loading');
+        if (button.dataset.originalText) {
+            button.textContent = button.dataset.originalText;
+            delete button.dataset.originalText;
+        }
+    });
+};
+
+document.body?.addEventListener('htmx:afterRequest', event => {
+    document.body.classList.remove('htmx-busy');
+    restoreSubmitButtons(event.detail.elt || document);
+});
+
+document.body?.addEventListener('htmx:responseError', () => {
+    document.body.classList.remove('htmx-busy');
+    showHtmxErrorToast('No se pudo actualizar la vista. Verifica la conexión o intenta nuevamente.');
+});
+
+document.body?.addEventListener('htmx:sendError', () => {
+    document.body.classList.remove('htmx-busy');
+    showHtmxErrorToast('No se pudo enviar la solicitud. Intenta nuevamente.');
+});
+
+document.body?.addEventListener('htmx:afterSwap', event => {
+    const target = event.detail.target;
+    const moduleContent = target?.id === 'module-content' ? target : target?.querySelector?.('#module-content');
+    if (moduleContent) {
+        const alert = moduleContent.querySelector('.lote-alert');
+        const invalidField = moduleContent.querySelector('.field-error:not(:empty)');
+        if (alert || invalidField) {
+            moduleContent.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+});

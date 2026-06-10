@@ -149,3 +149,16 @@ Documentación de auditoría: `docs/frontend-fase-1.md`.
 ./mvnw test
 ```
 
+
+## Interactividad progresiva con HTMX
+
+Se incorporó actualización parcial en módulos operativos sin reemplazar Spring MVC ni Thymeleaf:
+
+- Formularios con `hx-post` y fallback tradicional por `action`/`method`.
+- Acciones de estado con recarga parcial del contenido del módulo.
+- Consulta de reportes con `hx-get` y conservación de URL.
+- Fragmentos Thymeleaf reutilizables mediante `moduleContent`.
+- Helper backend `HtmxRequestSupport` para responder vista completa o fragmento según el encabezado `HX-Request`.
+- Indicadores visuales de carga, transición de contenido y toast de error.
+
+Documentación técnica: `docs/frontend-fase-4.md`.

@@ -5,6 +5,7 @@ import com.keraune.vlvblueberrysystem.dto.UniformizacionForm;
 import com.keraune.vlvblueberrysystem.service.CamaService;
 import com.keraune.vlvblueberrysystem.service.LoteService;
 import com.keraune.vlvblueberrysystem.service.ProcesoOperativoService;
+import com.keraune.vlvblueberrysystem.web.HtmxRequestSupport;
 import jakarta.validation.Valid;
 import java.security.Principal;
 import java.util.List;
@@ -15,12 +16,16 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 @RequestMapping("/procesos")
 public class ProcesoController {
+
+    private static final String VIEW = "procesos/index";
+    private static final String FRAGMENT = "procesos/index :: moduleContent";
 
     private final ProcesoOperativoService procesoOperativoService;
     private final LoteService loteService;
@@ -33,9 +38,12 @@ public class ProcesoController {
     }
 
     @GetMapping
-    public String vistaProcesos(Model model) {
+    public String vistaProcesos(
+            Model model,
+            @RequestHeader(value = HtmxRequestSupport.HX_REQUEST_HEADER, required = false) String hxRequest
+    ) {
         cargarModeloBase(model);
-        return "procesos/index";
+        return HtmxRequestSupport.view(VIEW, FRAGMENT, hxRequest);
     }
 
     @PostMapping("/uniformizacion")
@@ -44,21 +52,29 @@ public class ProcesoController {
             BindingResult bindingResult,
             Principal principal,
             Model model,
-            RedirectAttributes redirectAttributes
+            RedirectAttributes redirectAttributes,
+            @RequestHeader(value = HtmxRequestSupport.HX_REQUEST_HEADER, required = false) String hxRequest
     ) {
         if (bindingResult.hasErrors()) {
             cargarModeloBase(model);
-            return "procesos/index";
+            return HtmxRequestSupport.view(VIEW, FRAGMENT, hxRequest);
         }
 
         try {
             procesoOperativoService.crearUniformizacion(form, principal.getName());
-            redirectAttributes.addFlashAttribute("successMessage", "Uniformización registrada correctamente.");
+            String message = "Uniformización registrada correctamente.";
+            if (HtmxRequestSupport.isHtmxRequest(hxRequest)) {
+                model.addAttribute("successMessage", message);
+                model.addAttribute("uniformizacionForm", procesoOperativoService.crearFormularioUniformizacionInicial());
+                cargarModeloBase(model);
+                return FRAGMENT;
+            }
+            redirectAttributes.addFlashAttribute("successMessage", message);
             return "redirect:/procesos";
         } catch (IllegalArgumentException ex) {
             bindingResult.reject("uniformizacion.error", ex.getMessage());
             cargarModeloBase(model);
-            return "procesos/index";
+            return HtmxRequestSupport.view(VIEW, FRAGMENT, hxRequest);
         }
     }
 
@@ -68,35 +84,69 @@ public class ProcesoController {
             BindingResult bindingResult,
             Principal principal,
             Model model,
-            RedirectAttributes redirectAttributes
+            RedirectAttributes redirectAttributes,
+            @RequestHeader(value = HtmxRequestSupport.HX_REQUEST_HEADER, required = false) String hxRequest
     ) {
         if (bindingResult.hasErrors()) {
             cargarModeloBase(model);
-            return "procesos/index";
+            return HtmxRequestSupport.view(VIEW, FRAGMENT, hxRequest);
         }
 
         try {
             procesoOperativoService.crearFormalizacion(form, principal.getName());
-            redirectAttributes.addFlashAttribute("successMessage", "Formalización registrada correctamente.");
+            String message = "Formalización registrada correctamente.";
+            if (HtmxRequestSupport.isHtmxRequest(hxRequest)) {
+                model.addAttribute("successMessage", message);
+                model.addAttribute("formalizacionForm", procesoOperativoService.crearFormularioFormalizacionInicial());
+                cargarModeloBase(model);
+                return FRAGMENT;
+            }
+            redirectAttributes.addFlashAttribute("successMessage", message);
             return "redirect:/procesos";
         } catch (IllegalArgumentException ex) {
             bindingResult.reject("formalizacion.error", ex.getMessage());
             cargarModeloBase(model);
-            return "procesos/index";
+            return HtmxRequestSupport.view(VIEW, FRAGMENT, hxRequest);
         }
     }
 
     @PostMapping("/uniformizacion/{id}/estado")
-    public String cambiarEstadoUniformizacion(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String cambiarEstadoUniformizacion(
+            @PathVariable Long id,
+            Model model,
+            RedirectAttributes redirectAttributes,
+            @RequestHeader(value = HtmxRequestSupport.HX_REQUEST_HEADER, required = false) String hxRequest
+    ) {
+        String message = "Estado de uniformización actualizado.";
         procesoOperativoService.cambiarEstadoUniformizacion(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Estado de uniformización actualizado.");
+
+        if (HtmxRequestSupport.isHtmxRequest(hxRequest)) {
+            model.addAttribute("successMessage", message);
+            cargarModeloBase(model);
+            return FRAGMENT;
+        }
+
+        redirectAttributes.addFlashAttribute("successMessage", message);
         return "redirect:/procesos";
     }
 
     @PostMapping("/formalizacion/{id}/estado")
-    public String cambiarEstadoFormalizacion(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String cambiarEstadoFormalizacion(
+            @PathVariable Long id,
+            Model model,
+            RedirectAttributes redirectAttributes,
+            @RequestHeader(value = HtmxRequestSupport.HX_REQUEST_HEADER, required = false) String hxRequest
+    ) {
+        String message = "Estado de formalización actualizado.";
         procesoOperativoService.cambiarEstadoFormalizacion(id);
-        redirectAttributes.addFlashAttribute("successMessage", "Estado de formalización actualizado.");
+
+        if (HtmxRequestSupport.isHtmxRequest(hxRequest)) {
+            model.addAttribute("successMessage", message);
+            cargarModeloBase(model);
+            return FRAGMENT;
+        }
+
+        redirectAttributes.addFlashAttribute("successMessage", message);
         return "redirect:/procesos";
     }
 

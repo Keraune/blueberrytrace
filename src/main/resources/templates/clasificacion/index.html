@@ -7,6 +7,9 @@
     <main class="main-content">
         <div th:replace="~{fragments/app-shell :: topbar('Clasificación', 'Control de calidad por estado de planta, tamaño, condición y cantidad')}"></div>
 
+        <div id="module-content" class="module-content" th:fragment="moduleContent" hx-target="this" hx-swap="outerHTML">
+            <div class="module-loading-indicator" aria-hidden="true"><span></span></div>
+
         <div class="lote-alert success" th:if="${successMessage}" th:text="${successMessage}"></div>
 
         <section class="quality-strip-grid">
@@ -19,7 +22,7 @@
         <section class="operational-split-grid">
             <article class="panel-card form-main-card">
                 <div class="panel-head module-panel-head"><div><h3>Nueva clasificación</h3><span>Control de calidad</span></div></div>
-                <form class="form-grid three-columns" method="post" th:action="@{/clasificacion}" th:object="${clasificacionForm}">
+                <form class="form-grid three-columns" method="post" th:action="@{/clasificacion}" th:object="${clasificacionForm}" th:attr="hx-post=@{/clasificacion}" hx-target="#module-content" hx-swap="outerHTML" hx-disabled-elt="button[type='submit']">
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
                     <div class="lote-alert full-span" th:if="${#fields.hasGlobalErrors()}"><span th:each="err : ${#fields.globalErrors()}" th:text="${err}">Error</span></div>
                     <div class="form-group"><label>Invernadero</label><select th:field="*{loteId}"><option value="">Seleccione</option><option th:each="lote : ${lotes}" th:value="${lote.id}" th:text="${lote.codigo + ' - ' + lote.variedad}"></option></select><small class="field-error" th:if="${#fields.hasErrors('loteId')}" th:errors="*{loteId}"></small></div>
@@ -61,12 +64,13 @@
                         <td th:text="${item.tamano}">Mediano</td>
                         <td><strong th:text="${item.cantidad}">0</strong></td>
                         <td><span class="badge" th:classappend="${item.estado == 'VALIDADA'} ? ' success' : (${item.estado == 'PENDIENTE'} ? ' neutral' : ' warning')" th:text="${item.estado}">PENDIENTE</span></td>
-                        <td><form class="table-select-action" th:action="@{/clasificacion/{id}/estado(id=${item.id})}" method="post"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><select name="estado"><option value="VALIDADA">Validar</option><option value="OBSERVADA">Observar</option><option value="ANULADA">Anular</option></select><button class="ghost-btn compact-btn" type="submit">Aplicar</button></form></td>
+                        <td><form class="table-select-action" th:action="@{/clasificacion/{id}/estado(id=${item.id})}" method="post" th:attr="hx-post=@{/clasificacion/{id}/estado(id=${item.id})}" hx-target="#module-content" hx-swap="outerHTML" hx-disabled-elt="button[type='submit']"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><select name="estado"><option value="VALIDADA">Validar</option><option value="OBSERVADA">Observar</option><option value="ANULADA">Anular</option></select><button class="ghost-btn compact-btn" type="submit">Aplicar</button></form></td>
                     </tr>
                     </tbody>
                 </table>
             </div>
         </section>
+        </div>
     </main>
 </div>
 <div th:replace="~{fragments/layout :: scripts}"></div>

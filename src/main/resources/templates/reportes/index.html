@@ -7,6 +7,9 @@
     <main class="main-content">
         <div th:replace="~{fragments/app-shell :: topbar('Reportes y trazabilidad', 'Consulta consolidada por lote, variedad, fecha y eventos productivos')}"></div>
 
+        <div id="module-content" class="module-content" th:fragment="moduleContent" hx-target="this" hx-swap="outerHTML">
+            <div class="module-loading-indicator" aria-hidden="true"><span></span></div>
+
         <section class="operation-kpi-grid">
             <article class="operation-kpi kpi-green"><span class="kpi-icon">▦</span><div><small>Lotes encontrados</small><strong th:text="${#lists.size(resultados)}">0</strong><p>Resultado según filtros aplicados</p></div></article>
             <article class="operation-kpi kpi-lime"><span class="kpi-icon">∑</span><div><small>Plantas sembradas</small><strong th:text="${#aggregates.sum(resultados.![plantasSembradas]) ?: 0}">0</strong><p>Total dentro de la consulta</p></div></article>
@@ -16,11 +19,11 @@
 
         <section class="panel-card report-filter-card">
             <div class="panel-head module-panel-head"><div><h3>Consulta de historial</h3><span>Trazabilidad integral</span></div></div>
-            <form class="form-grid report-filter-grid" method="get" th:action="@{/reportes}">
+            <form class="form-grid report-filter-grid" method="get" th:action="@{/reportes}" th:attr="hx-get=@{/reportes}" hx-target="#module-content" hx-swap="outerHTML" hx-push-url="true">
                 <div class="form-group"><label for="codigo">Código de lote</label><input id="codigo" name="codigo" type="text" th:value="${codigo}" placeholder="Ej. A1"></div>
                 <div class="form-group"><label for="variedad">Variedad</label><input id="variedad" name="variedad" type="text" th:value="${variedad}" placeholder="Ej. Biloxi"></div>
                 <div class="form-group"><label for="fecha">Fecha de registro</label><input id="fecha" name="fecha" type="date" th:value="${fecha}"></div>
-                <div class="report-filter-actions"><button class="primary-btn full-width" type="submit">Buscar trazabilidad</button><a class="ghost-btn full-width" th:href="@{/reportes}">Limpiar filtros</a></div>
+                <div class="report-filter-actions"><button class="primary-btn full-width" type="submit">Buscar trazabilidad</button><a class="ghost-btn full-width" th:href="@{/reportes}" th:attr="hx-get=@{/reportes}" hx-target="#module-content" hx-swap="outerHTML" hx-push-url="true">Limpiar filtros</a></div>
             </form>
         </section>
 
@@ -68,6 +71,7 @@
                 </table>
             </div>
         </section>
+        </div>
     </main>
 </div>
 <div th:replace="~{fragments/layout :: scripts}"></div>
