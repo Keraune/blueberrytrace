@@ -144,3 +144,10 @@ npm run doctor
 ```
 
 Esto restaura permisos del Maven Wrapper y muestra el estado de Java, Node, npm, puerto 8080 y configuración local.
+
+## Fase 17 — Refinamiento visual del dashboard React
+
+Se pulió el dashboard interno para acercarlo más al estilo visual definido en los prototipos: tarjetas KPI compactas, gráficos más limpios, donut de estado de lotes, actividad reciente y accesos rápidos con mejor proporción visual.
+
+Documentación: `docs/frontend-fase-17.md`.
+

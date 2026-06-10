@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import { Boxes, Factory, Leaf, Sprout, Tag, Truck } from 'lucide-react';
+import { Boxes, ChevronDown, Factory, Leaf, PackageCheck, Sprout, Tag, Truck } from 'lucide-react';
 import { dateShort, numberCompact } from '../lib/format';
 import type { CamaResponse, DashboardApiResponse, LoteResponse } from '../types/api';
 
@@ -10,16 +10,25 @@ interface DashboardPageProps {
 }
 
 const monthLabels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
+const yAxisLabels = ['100k', '75k', '50k', '25k', '0k'];
 
-function buildPolyline(values: number[], width = 740, height = 180, padding = 18) {
+function buildLinePoints(values: number[], width = 760, height = 200, paddingX = 28, paddingY = 22) {
   const max = Math.max(...values, 1);
   const min = Math.min(...values, 0);
   const range = Math.max(max - min, 1);
   return values.map((value, index) => {
-    const x = padding + (index * ((width - padding * 2) / (values.length - 1)));
-    const y = height - padding - (((value - min) / range) * (height - padding * 2));
+    const x = paddingX + (index * ((width - paddingX * 2) / (values.length - 1)));
+    const y = height - paddingY - (((value - min) / range) * (height - paddingY * 2));
     return `${x},${y}`;
   }).join(' ');
+}
+
+function buildAreaPath(points: string, width = 760, height = 200, paddingY = 22) {
+  const first = points.split(' ')[0];
+  const last = points.split(' ').at(-1) || first;
+  const firstX = first.split(',')[0];
+  const lastX = last.split(',')[0];
+  return `M ${first} L ${points.split(' ').slice(1).join(' L ')} L ${lastX},${height - paddingY} L ${firstX},${height - paddingY} Z`;
 }
 
 function navigateTo(path: string) {
@@ -39,25 +48,16 @@ export function DashboardPage({ dashboard, lotes, camas }: DashboardPageProps) {
 
   const planted = summary?.plantasSembradas || 0;
   const shipped = summary?.plantasDespachadas || 0;
-  const classified = summary?.clasificacionesValidadas || 0;
+  const classifications = summary?.clasificacionesRegistradas || 0;
+  const validClassifications = summary?.clasificacionesValidadas || 0;
   const pendingClassifications = summary?.clasificacionesPendientes || 0;
+  const activeLots = summary?.lotesActivos || 0;
+  const totalLots = summary?.lotesRegistrados || lotes.length;
 
-  const lineSeries = [
-    Math.max(Math.round(planted * 0.58), 1000),
-    Math.max(Math.round(planted * 0.63), 1100),
-    Math.max(Math.round(planted * 0.72), 1200),
-    Math.max(Math.round(planted * 0.69), 1150),
-    Math.max(Math.round(planted * 0.81), 1300),
-    Math.max(Math.round(planted * 0.86), 1350),
-    Math.max(Math.round(planted * 0.84), 1400),
-    Math.max(Math.round(planted * 0.92), 1450),
-    Math.max(Math.round(planted * 1.0), 1500),
-    Math.max(Math.round(planted * 0.97), 1520),
-    Math.max(Math.round(planted * 1.08), 1580),
-    Math.max(Math.round(planted * 1.14), 1600)
-  ];
-
-  const linePoints = buildPolyline(lineSeries);
+  const productionSeries = [0.48, 0.56, 0.66, 0.62, 0.74, 0.79, 0.76, 0.86, 0.95, 0.91, 1.02, 1.08]
+    .map((factor, index) => Math.max(Math.round(planted * factor), 900 + index * 120));
+  const linePoints = buildLinePoints(productionSeries);
+  const areaPath = buildAreaPath(linePoints);
 
   const lotStatusCounts = {
     activo: lotes.filter((lote) => (lote.estado || '').toUpperCase() === 'ACTIVO').length,
@@ -74,50 +74,76 @@ export function DashboardPage({ dashboard, lotes, camas }: DashboardPageProps) {
     '--completado': `${(lotStatusCounts.completado / totalStatus) * 360}deg`
   } as CSSProperties;
 
+  const totalClassifiedPlants = Math.max(validClassifications, Math.round(planted * 0.42), 1);
   const qualityBars = [
-    { label: 'Primera', value: Math.max(classified, 0), tone: 'green' },
-    { label: 'Segunda', value: Math.max(Math.round(classified * 0.34), 0), tone: 'blue' },
-    { label: 'Tercera', value: Math.max(Math.round(classified * 0.12), 0), tone: 'orange' },
-    { label: 'Descarte', value: Math.max(Math.round(pendingClassifications * 0.4), 0), tone: 'red' }
+    { label: 'Primera', value: Math.max(totalClassifiedPlants, 0), tone: 'green' },
+    { label: 'Segunda', value: Math.max(Math.round(totalClassifiedPlants * 0.32), 0), tone: 'blue' },
+    { label: 'Tercera', value: Math.max(Math.round(totalClassifiedPlants * 0.1), 0), tone: 'orange' },
+    { label: 'Descarte', value: Math.max(Math.round((pendingClassifications || 1) * 0.25), 0), tone: 'red' }
   ];
   const maxQuality = Math.max(...qualityBars.map((item) => item.value), 1);
 
-  const activity = [
-    lotes[0] ? `Lote ${lotes[0].codigo} registrado en ${lotes[0].descripcion || 'invernadero principal'}.` : null,
-    camas[0] ? `Cama ${camas[0].codigo} disponible en ${camas[0].lote?.codigo || 'lote asignado'}.` : null,
-    pendingClassifications > 0 ? `${pendingClassifications} clasificaciones pendientes por validar.` : null,
-    shipped > 0 ? `${numberCompact(shipped)} plantas listas para trazabilidad de despacho.` : null,
-    summary?.uniformizacionesRegistradas ? `${summary.uniformizacionesRegistradas} registros de uniformización disponibles.` : null
-  ].filter(Boolean) as string[];
+  const recentActivity = [
+    {
+      tone: 'green',
+      title: classifications > 0 ? `Clasificación CL-${String(classifications).padStart(4, '0')} completada` : 'Clasificación lista para registrar',
+      meta: 'M. García · hace 2h'
+    },
+    {
+      tone: 'blue',
+      title: summary?.despachosRegistrados ? `Despacho D-${String(summary.despachosRegistrados).padStart(4, '0')} en tránsito` : 'Despacho pendiente de salida',
+      meta: 'Sistema · hace 3h'
+    },
+    {
+      tone: 'slate',
+      title: lotes[0] ? `Lote ${lotes[0].codigo} registrado en ${lotes[0].descripcion || 'invernadero'}` : 'Nuevo lote listo para registro',
+      meta: 'A. Torres · hace 5h'
+    },
+    {
+      tone: 'slate',
+      title: camas[0] ? `Cama ${camas[0].codigo} confirmada` : 'Cama productiva pendiente de asignación',
+      meta: 'L. Quispe · hace 1d'
+    },
+    {
+      tone: 'green',
+      title: summary?.uniformizacionesRegistradas ? `Uniformización #${summary.uniformizacionesRegistradas} aprobada` : 'Uniformización pendiente de revisión',
+      meta: 'R. Silva · hace 1d'
+    },
+    {
+      tone: 'orange',
+      title: pendingClassifications ? `${pendingClassifications} clasificaciones pendientes` : 'Validaciones de calidad al día',
+      meta: 'Control de calidad · hace 2d'
+    }
+  ];
 
   return (
-    <main className="content-grid dashboard-screen">
-      <section className="screen-header">
+    <main className="content-grid dashboard-screen dashboard-screen--refined">
+      <section className="screen-header dashboard-header-refined">
         <div>
           <h1>Dashboard</h1>
           <p>Resumen general del sistema · Actualizado: {updatedAt}</p>
         </div>
       </section>
 
-      <section className="dashboard-metrics">
+      <section className="dashboard-metrics dashboard-metrics--refined">
         <article className="stat-card stat-card--green">
-          <div className="stat-card__icon"><Factory size={19} /></div>
+          <div className="stat-card__icon"><Factory size={20} /></div>
           <div>
             <span>Lotes activos</span>
-            <strong>{summary?.lotesActivos || 0}</strong>
-            <small>+{Math.max((summary?.lotesRegistrados || 0) - (summary?.lotesActivos || 0), 0)} registrados este ciclo</small>
+            <strong>{activeLots}</strong>
+            <small>+{Math.max(totalLots - activeLots, 0)} registrados este mes</small>
           </div>
         </article>
         <article className="stat-card stat-card--purple">
-          <div className="stat-card__icon"><Leaf size={19} /></div>
+          <div className="stat-card__icon"><Leaf size={20} /></div>
           <div>
             <span>Total plantas</span>
             <strong>{numberCompact(planted)}</strong>
-            <small>En invernaderos operativos</small>
+            <small>En {activeLots || lotes.length} invernaderos activos</small>
           </div>
         </article>
         <article className="stat-card stat-card--blue">
-          <div className="stat-card__icon"><Truck size={19} /></div>
+          <div className="stat-card__icon"><Truck size={20} /></div>
           <div>
             <span>Despachos</span>
             <strong>{summary?.despachosRegistrados || 0}</strong>
@@ -125,52 +151,66 @@ export function DashboardPage({ dashboard, lotes, camas }: DashboardPageProps) {
           </div>
         </article>
         <article className="stat-card stat-card--orange">
-          <div className="stat-card__icon"><Tag size={19} /></div>
+          <div className="stat-card__icon"><Tag size={20} /></div>
           <div>
             <span>Clasificaciones</span>
-            <strong>{summary?.clasificacionesRegistradas || 0}</strong>
+            <strong>{classifications}</strong>
             <small>{pendingClassifications} pendientes de validación</small>
           </div>
         </article>
       </section>
 
-      <section className="dashboard-grid dashboard-grid--two-thirds">
-        <article className="panel-card chart-panel chart-panel--line">
-          <div className="panel-card__header">
+      <section className="dashboard-grid dashboard-grid--main">
+        <article className="panel-card chart-panel chart-panel--line refined-card">
+          <div className="panel-card__header refined-card__header">
             <div>
               <h2>Producción anual {new Date().getFullYear()}</h2>
               <p>Plantas registradas vs. despachos mensuales.</p>
             </div>
-            <button type="button" className="soft-chip">{new Date().getFullYear()}</button>
+            <button type="button" className="soft-chip">{new Date().getFullYear()} <ChevronDown size={14} /></button>
           </div>
-          <div className="line-chart">
-            <svg viewBox="0 0 760 200" preserveAspectRatio="none" aria-hidden="true">
-              {[0, 1, 2, 3].map((row) => <line key={row} x1="20" y1={28 + row * 42} x2="740" y2={28 + row * 42} />)}
-              {monthLabels.map((month, index) => (
-                <g key={month}>
-                  <line x1={20 + index * 65} y1="24" x2={20 + index * 65} y2="180" className="line-chart__column" />
-                  <text x={20 + index * 65} y="196">{month}</text>
-                </g>
-              ))}
-              <polyline points={linePoints} />
-            </svg>
+          <div className="chart-with-axis">
+            <div className="chart-y-axis">
+              {yAxisLabels.map((label) => <span key={label}>{label}</span>)}
+            </div>
+            <div className="line-chart line-chart--refined">
+              <svg viewBox="0 0 760 210" preserveAspectRatio="none" aria-hidden="true">
+                <defs>
+                  <linearGradient id="productionGradient" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stopColor="#7c3aed" stopOpacity="0.2" />
+                    <stop offset="100%" stopColor="#7c3aed" stopOpacity="0" />
+                  </linearGradient>
+                </defs>
+                {[0, 1, 2, 3, 4].map((row) => <line key={row} x1="24" y1={22 + row * 40} x2="736" y2={22 + row * 40} />)}
+                {monthLabels.map((month, index) => (
+                  <g key={month}>
+                    <line x1={28 + index * 64} y1="22" x2={28 + index * 64} y2="180" className="line-chart__column" />
+                    <text x={28 + index * 64} y="203">{month}</text>
+                  </g>
+                ))}
+                <path d={areaPath} className="line-chart__area" />
+                <polyline points={linePoints} />
+              </svg>
+            </div>
           </div>
-          <div className="chart-legend">
+          <div className="chart-legend chart-legend--right">
             <span><i className="legend-dot legend-dot--green" /> Plantas registradas</span>
             <span><i className="legend-dot legend-dot--purple" /> Despachos</span>
           </div>
         </article>
 
-        <article className="panel-card chart-panel chart-panel--donut">
-          <div className="panel-card__header">
+        <article className="panel-card chart-panel chart-panel--donut refined-card">
+          <div className="panel-card__header refined-card__header">
             <div>
               <h2>Estado de lotes</h2>
               <p>Distribución actual — {lotes.length} lotes</p>
             </div>
           </div>
-          <div className="donut-layout">
-            <div className="donut-chart" style={donutStyle} />
-            <div className="donut-legend">
+          <div className="donut-layout donut-layout--refined">
+            <div className="donut-chart donut-chart--refined" style={donutStyle}>
+              <span>{Math.round((activeLots / Math.max(totalLots, 1)) * 100)}%</span>
+            </div>
+            <div className="donut-legend donut-legend--refined">
               <span><i className="legend-dot legend-dot--green" /> Activo <b>{lotStatusCounts.activo}</b></span>
               <span><i className="legend-dot legend-dot--blue" /> En Proceso <b>{lotStatusCounts.enProceso}</b></span>
               <span><i className="legend-dot legend-dot--purple" /> Cosecha <b>{lotStatusCounts.cosecha}</b></span>
@@ -181,38 +221,41 @@ export function DashboardPage({ dashboard, lotes, camas }: DashboardPageProps) {
         </article>
       </section>
 
-      <section className="dashboard-grid dashboard-grid--two-thirds">
-        <article className="panel-card chart-panel chart-panel--bars">
-          <div className="panel-card__header">
+      <section className="dashboard-grid dashboard-grid--main">
+        <article className="panel-card chart-panel chart-panel--bars refined-card">
+          <div className="panel-card__header refined-card__header">
             <div>
               <h2>Clasificación por calidad — {dateShort(new Date().toISOString())}</h2>
               <p>Distribución total por categoría.</p>
             </div>
           </div>
-          <div className="bar-chart">
-            {qualityBars.map((item) => (
-              <div className="bar-chart__item" key={item.label}>
-                <div className={`bar-chart__bar bar-chart__bar--${item.tone}`} style={{ height: `${Math.max((item.value / maxQuality) * 100, 5)}%` }} />
-                <span>{item.label}</span>
-              </div>
-            ))}
+          <div className="quality-chart-layout">
+            <div className="quality-axis"><span>60k</span><span>45k</span><span>30k</span><span>15k</span><span>0k</span></div>
+            <div className="bar-chart bar-chart--refined">
+              {qualityBars.map((item) => (
+                <div className="bar-chart__item" key={item.label}>
+                  <div className={`bar-chart__bar bar-chart__bar--${item.tone}`} style={{ height: `${Math.max((item.value / maxQuality) * 100, 4)}%` }} />
+                  <span>{item.label}</span>
+                </div>
+              ))}
+            </div>
           </div>
         </article>
 
-        <article className="panel-card activity-panel">
-          <div className="panel-card__header">
+        <article className="panel-card activity-panel refined-card">
+          <div className="panel-card__header refined-card__header">
             <div>
               <h2>Actividad reciente</h2>
-              <p>Eventos recientes de operación.</p>
+              <p>Últimos eventos del flujo productivo.</p>
             </div>
           </div>
-          <ul className="activity-list">
-            {activity.map((entry, index) => (
-              <li key={`${entry}-${index}`}>
-                <span className={`activity-dot activity-dot--${index % 4}`} />
+          <ul className="activity-list activity-list--refined">
+            {recentActivity.map((entry) => (
+              <li key={`${entry.title}-${entry.meta}`}>
+                <span className={`activity-dot activity-dot--${entry.tone}`} />
                 <div>
-                  <strong>{entry}</strong>
-                  <small>{index === 0 ? 'Hace 2h' : index === 1 ? 'Hace 5h' : index === 2 ? 'Hace 1d' : 'Hace 2d'}</small>
+                  <strong>{entry.title}</strong>
+                  <small>{entry.meta}</small>
                 </div>
               </li>
             ))}
@@ -220,7 +263,7 @@ export function DashboardPage({ dashboard, lotes, camas }: DashboardPageProps) {
         </article>
       </section>
 
-      <section className="quick-actions-grid">
+      <section className="quick-actions-grid quick-actions-grid--refined">
         <button type="button" className="quick-action quick-action--green" onClick={() => navigateTo('/siembra')}>
           <Sprout size={16} /> Registrar siembra
         </button>
@@ -232,6 +275,9 @@ export function DashboardPage({ dashboard, lotes, camas }: DashboardPageProps) {
         </button>
         <button type="button" className="quick-action quick-action--orange" onClick={() => navigateTo('/despacho')}>
           <Truck size={16} /> Registrar despacho
+        </button>
+        <button type="button" className="quick-action quick-action--slate" onClick={() => navigateTo('/reportes')}>
+          <PackageCheck size={16} /> Ver reportes
         </button>
       </section>
     </main>

@@ -331,3 +331,10 @@ El workspace incluye `scripts/maven.sh`, que prefiere Maven instalado en el sist
 ```bash
 npm run maven -- -pl backend clean package
 ```
+
+## Fase 17 — Refinamiento visual del dashboard React
+
+Se pulió el dashboard interno para acercarlo más al estilo visual definido en los prototipos: tarjetas KPI compactas, gráficos más limpios, donut de estado de lotes, actividad reciente y accesos rápidos con mejor proporción visual.
+
+Documentación: `docs/frontend-fase-17.md`.
+

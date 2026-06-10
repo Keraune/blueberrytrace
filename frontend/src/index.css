@@ -1719,3 +1719,237 @@ textarea {
     grid-template-columns: 1fr;
   }
 }
+
+/* Fase 17 — refinamiento visual del dashboard principal */
+.dashboard-screen--refined {
+  gap: 1rem;
+  padding: 1.05rem 1.25rem 1.5rem;
+}
+
+.dashboard-header-refined {
+  min-height: 3rem;
+  display: flex;
+  align-items: center;
+}
+
+.dashboard-header-refined h1 {
+  font-size: 1.42rem;
+  letter-spacing: -0.045em;
+}
+
+.dashboard-header-refined p {
+  font-size: 0.95rem;
+}
+
+.dashboard-metrics--refined {
+  gap: 0.9rem;
+}
+
+.dashboard-metrics--refined .stat-card {
+  min-height: 6.25rem;
+  border-radius: 0.92rem;
+  box-shadow: 0 8px 20px rgba(10, 36, 20, 0.06);
+}
+
+.dashboard-metrics--refined .stat-card span {
+  font-size: 0.73rem;
+}
+
+.dashboard-metrics--refined .stat-card strong {
+  font-size: clamp(1.6rem, 2.4vw, 2.05rem);
+}
+
+.dashboard-grid--main {
+  grid-template-columns: minmax(0, 2.1fr) minmax(22rem, 1fr);
+  align-items: stretch;
+}
+
+.refined-card {
+  border-radius: 1rem;
+  box-shadow: 0 10px 26px rgba(10, 36, 20, 0.055);
+}
+
+.refined-card__header {
+  margin-bottom: 0.5rem;
+}
+
+.refined-card__header h2 {
+  font-size: 1rem;
+  letter-spacing: -0.02em;
+}
+
+.refined-card__header p {
+  font-size: 0.86rem;
+}
+
+.soft-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  min-height: 2.25rem;
+}
+
+.chart-with-axis,
+.quality-chart-layout {
+  display: grid;
+  grid-template-columns: 3rem minmax(0, 1fr);
+  gap: 0.55rem;
+  align-items: stretch;
+}
+
+.chart-y-axis,
+.quality-axis {
+  display: grid;
+  align-content: space-between;
+  padding: 0.72rem 0 1.8rem;
+  color: #76877c;
+  font-size: 0.78rem;
+}
+
+.line-chart--refined svg {
+  height: 13.8rem;
+}
+
+.line-chart--refined .line-chart__area {
+  fill: url(#productionGradient);
+}
+
+.line-chart--refined polyline {
+  stroke-width: 2.5;
+}
+
+.chart-legend--right {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.25rem;
+}
+
+.donut-layout--refined {
+  grid-template-columns: 1fr;
+  justify-items: center;
+  gap: 0.85rem;
+}
+
+.donut-chart--refined {
+  width: 10rem;
+  height: 10rem;
+  display: grid;
+  place-items: center;
+}
+
+.donut-chart--refined::after {
+  inset: 2.05rem;
+}
+
+.donut-chart--refined span {
+  position: relative;
+  z-index: 1;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: var(--green);
+}
+
+.donut-legend--refined {
+  width: 100%;
+  gap: 0.55rem;
+  font-size: 0.88rem;
+}
+
+.chart-panel--bars {
+  min-height: 18.5rem;
+}
+
+.bar-chart--refined {
+  min-height: 13.2rem;
+  border-left: 0;
+  padding: 0 0.6rem 0.1rem;
+  background-image:
+    linear-gradient(to bottom, transparent calc(25% - 1px), rgba(219, 228, 221, 0.9) calc(25% - 1px), rgba(219, 228, 221, 0.9) 25%, transparent 25%),
+    linear-gradient(to bottom, transparent calc(50% - 1px), rgba(219, 228, 221, 0.9) calc(50% - 1px), rgba(219, 228, 221, 0.9) 50%, transparent 50%),
+    linear-gradient(to bottom, transparent calc(75% - 1px), rgba(219, 228, 221, 0.9) calc(75% - 1px), rgba(219, 228, 221, 0.9) 75%, transparent 75%);
+}
+
+.bar-chart--refined .bar-chart__bar {
+  max-width: 12rem;
+  border-radius: 0.48rem 0.48rem 0.12rem 0.12rem;
+  box-shadow: 0 8px 14px rgba(34, 120, 72, 0.08);
+}
+
+.bar-chart--refined .bar-chart__item {
+  justify-content: flex-end;
+}
+
+.activity-list--refined {
+  gap: 0.78rem;
+}
+
+.activity-list--refined li {
+  padding: 0.15rem 0;
+}
+
+.activity-list--refined strong {
+  font-size: 0.9rem;
+  line-height: 1.25;
+}
+
+.activity-list--refined small {
+  display: block;
+  margin-top: 0.16rem;
+  font-size: 0.82rem;
+}
+
+.activity-dot--green { background: var(--green-2); }
+.activity-dot--blue { background: var(--blue); }
+.activity-dot--slate { background: var(--slate); }
+.activity-dot--orange { background: var(--orange); }
+
+.quick-actions-grid--refined {
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+}
+
+.quick-action--slate {
+  color: #64748b;
+}
+
+.quick-actions-grid--refined .quick-action {
+  min-height: 3.1rem;
+  background: rgba(255, 255, 255, 0.72);
+}
+
+.quick-actions-grid--refined .quick-action:hover {
+  background: white;
+  transform: translateY(-1px);
+  box-shadow: 0 10px 22px rgba(10, 36, 20, 0.06);
+}
+
+@media (max-width: 1380px) {
+  .dashboard-grid--main {
+    grid-template-columns: minmax(0, 1.7fr) minmax(20rem, 0.95fr);
+  }
+
+  .quick-actions-grid--refined {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 1120px) {
+  .dashboard-grid--main,
+  .quick-actions-grid--refined {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 720px) {
+  .dashboard-screen--refined {
+    padding: 0.85rem;
+  }
+
+  .chart-with-axis,
+  .quality-chart-layout {
+    grid-template-columns: 2.4rem minmax(0, 1fr);
+  }
+
+  .line-chart--refined svg {
+    height: 11.5rem;
+  }
+}
