@@ -2,7 +2,7 @@
 
 Sistema web interno para el control, clasificación y trazabilidad de plantas de arándano para exportación en el área de frutales de Vivero Los Viñedos.
 
-El repositorio está organizado como workspace separado para backend y frontend. El backend Spring Boot mantiene el panel estable con Thymeleaf + HTMX y el frontend React/Vite avanza como cliente desacoplado para la migración progresiva.
+El repositorio está organizado como workspace separado para backend y frontend. El backend Spring Boot corre por defecto en modo API-first para React/Vite. El panel Thymeleaf + HTMX queda disponible únicamente como respaldo con el perfil `legacy-mvc`.
 
 ## Estructura del repositorio
 
@@ -10,7 +10,7 @@ El repositorio está organizado como workspace separado para backend y frontend.
 blueberrytrace/
 ├── pom.xml               # agregador Maven para que IntelliJ cargue backend como módulo
 ├── package.json          # scripts de workspace para frontend/backend
-├── backend/              # Spring Boot, Thymeleaf, HTMX, API REST, seguridad, JPA y MySQL
+├── backend/              # Spring Boot API, seguridad, servicios, JPA y MySQL
 ├── frontend/             # React + TypeScript + Vite
 ├── docs/                 # documentación técnica por fase
 ├── .gitignore
@@ -24,8 +24,8 @@ Stack principal:
 - Java 21
 - Spring Boot
 - Spring Security
-- Thymeleaf
-- HTMX
+- API REST JSON
+- Spring Security con sesión y CSRF
 - JPA / Hibernate
 - MySQL
 - Maven Wrapper
@@ -68,10 +68,10 @@ cd backend
 ./mvnw spring-boot:run
 ```
 
-Abrir:
+Verificar API:
 
 ```text
-http://localhost:8080
+http://localhost:8080/api/v1/health
 ```
 
 Credenciales iniciales:
@@ -149,10 +149,24 @@ El backend debe estar corriendo en:
 http://localhost:8080
 ```
 
-Para consumir endpoints protegidos desde React, inicia sesión primero en el backend:
+React ya incluye login propio usando `/api/v1/auth/login`, por eso no necesitas abrir `/auth/login` en el modo normal.
 
-```text
-http://localhost:8080/auth/login
+
+## Modo legacy Thymeleaf/HTMX
+
+El backend conserva las vistas Thymeleaf como respaldo, pero solo se activan con el perfil `legacy-mvc`:
+
+```bash
+npm run backend:run:legacy
+```
+
+En ese modo vuelven a estar disponibles rutas como `/auth/login`, `/dashboard`, `/lotes`, `/camas`, `/siembra`, `/procesos`, `/clasificacion`, `/despacho`, `/reportes` y `/usuarios`.
+
+En el modo normal recomendado, el uso principal es:
+
+```bash
+npm run backend:run
+npm run frontend:dev
 ```
 
 ## IntelliJ IDEA

@@ -2,12 +2,14 @@ package com.keraune.vlvblueberrysystem.controller;
 
 import com.keraune.vlvblueberrysystem.repository.UserRepository;
 import com.keraune.vlvblueberrysystem.web.HtmxRequestSupport;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+@Profile("legacy-mvc")
 @Controller
 @RequestMapping("/usuarios")
 public class UsuarioController {

@@ -1,10 +1,12 @@
 package com.keraune.vlvblueberrysystem.controller;
 
 import com.keraune.vlvblueberrysystem.service.DashboardMetricsService;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 
+@Profile("legacy-mvc")
 @Controller
 public class DashboardController {
 

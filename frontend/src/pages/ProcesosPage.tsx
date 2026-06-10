@@ -1,106 +1,90 @@
-import { useState } from 'react';
-import { Boxes, PackageCheck, PercentCircle, Plus, Sprout } from 'lucide-react';
-import { DataTable } from '../components/DataTable';
-import { MetricCard } from '../components/MetricCard';
+import { useMemo, useState } from 'react';
+import { Download, Plus } from 'lucide-react';
 import { Modal } from '../components/Modal';
 import { ModuleHeader } from '../components/ModuleHeader';
 import { ProcesoForm } from '../components/ProcesoForm';
 import { StatusBadge } from '../components/StatusBadge';
 import { blueberryApi } from '../lib/api';
 import { dateShort, numberCompact } from '../lib/format';
-import type {
-  CamaResponse,
-  FormalizacionFormPayload,
-  FormalizacionResponse,
-  ProcesoOperativoResponse,
-  ReferenceResponse,
-  UniformizacionFormPayload,
-  UniformizacionResponse
-} from '../types/api';
+import type { CamaResponse, FormalizacionFormPayload, ProcesoOperativoResponse, ReferenceResponse, SiembraResponse, UniformizacionFormPayload } from '../types/api';
 
 interface ProcesosPageProps {
   procesos: ProcesoOperativoResponse | null;
   lotes: ReferenceResponse[];
   camas: CamaResponse[];
-  onProcesosChange: (data: ProcesoOperativoResponse) => void;
+  siembras: SiembraResponse[];
+  onProcesosChange: (items: ProcesoOperativoResponse) => void;
 }
 
-export function ProcesosPage({ procesos, lotes, camas, onProcesosChange }: ProcesosPageProps) {
+export function ProcesosPage({ procesos, lotes, camas, siembras, onProcesosChange }: ProcesosPageProps) {
   const [modal, setModal] = useState<'uniformizacion' | 'formalizacion' | null>(null);
   const uniformizaciones = procesos?.uniformizaciones.items || [];
-  const formalizaciones = procesos?.formalizaciones.items || [];
-  const plantasUniformizadas = uniformizaciones.reduce((total, item) => total + (item.cantidadUniformizada || 0), 0);
-  const plantasFormalizadas = formalizaciones.reduce((total, item) => total + (item.cantidadPlantas || 0), 0);
-  const ratio = plantasUniformizadas === 0 ? 0 : Math.round((plantasFormalizadas / plantasUniformizadas) * 100);
+  const aggregated = useMemo(() => {
+    return lotes.map((lote) => {
+      const siembrasLote = siembras.filter((siembra) => siembra.lote?.id === lote.id);
+      const planted = siembrasLote.reduce((total, siembra) => total + (siembra.cantidadRegistrada || 0), 0);
+      const registros = uniformizaciones.filter((registro) => registro.lote?.id === lote.id);
+      const uniformized = registros.reduce((total, registro) => total + (registro.cantidadUniformizada || 0), 0);
+      const latest = registros[0];
+      const progress = planted === 0 ? 0 : Math.min(100, Math.round((uniformized / planted) * 100));
+      return {
+        lote,
+        planted,
+        uniformized,
+        progress,
+        latest,
+        status: progress >= 100 ? 'COMPLETADO' : progress > 0 ? 'EN PROCESO' : 'PENDIENTE'
+      };
+    }).filter((item) => item.planted > 0 || item.uniformized > 0).slice(0, 6);
+  }, [lotes, siembras, uniformizaciones]);
 
   async function createUniformizacion(payload: UniformizacionFormPayload | FormalizacionFormPayload) {
-    const response = await blueberryApi.createUniformizacion(payload as UniformizacionFormPayload);
-    onProcesosChange(response);
+    onProcesosChange(await blueberryApi.createUniformizacion(payload as UniformizacionFormPayload));
     setModal(null);
   }
 
   async function createFormalizacion(payload: UniformizacionFormPayload | FormalizacionFormPayload) {
-    const response = await blueberryApi.createFormalizacion(payload as FormalizacionFormPayload);
-    onProcesosChange(response);
+    onProcesosChange(await blueberryApi.createFormalizacion(payload as FormalizacionFormPayload));
     setModal(null);
-  }
-
-  async function toggleUniformizacion(id: number) {
-    onProcesosChange(await blueberryApi.toggleUniformizacionStatus(id));
-  }
-
-  async function toggleFormalizacion(id: number) {
-    onProcesosChange(await blueberryApi.toggleFormalizacionStatus(id));
   }
 
   return (
     <main className="content-grid">
       <ModuleHeader
         eyebrow="Proceso productivo"
-        title="Uniformización y formalización"
-        description="Control operativo de plantas uniformizadas y formalizadas antes de clasificación."
-        actions={
-          <div className="button-group">
-            <button type="button" className="ghost-button" onClick={() => setModal('uniformizacion')}><Plus size={15} /> Uniformización</button>
-            <button type="button" className="action-button" onClick={() => setModal('formalizacion')}><Plus size={15} /> Formalización</button>
-          </div>
-        }
+        title="Uniformización y Formalización"
+        description="Control del proceso de uniformización de plantas por lote."
+        actions={<div className="button-group"><button type="button" className="ghost-button" onClick={() => setModal('uniformizacion')}><Plus size={15} /> Uniformización</button><button type="button" className="action-button" onClick={() => setModal('formalizacion')}><Plus size={15} /> Formalización</button></div>}
       />
 
-      <section className="metrics-grid metrics-grid--four">
-        <MetricCard label="Uniformizaciones" value={uniformizaciones.length} detail="registros operativos" icon={<Boxes size={20} />} tone="green" />
-        <MetricCard label="Formalizaciones" value={formalizaciones.length} detail="registros operativos" icon={<PackageCheck size={20} />} tone="blue" />
-        <MetricCard label="Plantas uniformizadas" value={plantasUniformizadas} detail="cantidad procesada" icon={<Sprout size={20} />} tone="purple" />
-        <MetricCard label="Conversión" value={`${ratio}%`} detail="formalizadas sobre uniformizadas" icon={<PercentCircle size={20} />} tone="orange" />
-      </section>
+      <div className="module-utility-row">
+        <button type="button" className="ghost-button"><Download size={15} /> Exportar reporte</button>
+      </div>
 
-      <section className="tables-grid">
-        <DataTable<UniformizacionResponse>
-          title="Uniformizaciones"
-          description="Detalle por lote, cama y criterio aplicado."
-          items={uniformizaciones}
-          columns={[
-            { key: 'lote', label: 'Lote', render: (item) => item.lote?.codigo || 'Sin lote' },
-            { key: 'cama', label: 'Cama', render: (item) => item.cama?.codigo || 'Sin cama' },
-            { key: 'fechaUniformizacion', label: 'Fecha', render: (item) => dateShort(item.fechaUniformizacion) },
-            { key: 'cantidadUniformizada', label: 'Cantidad', render: (item) => numberCompact(item.cantidadUniformizada || 0) },
-            { key: 'estado', label: 'Estado', render: (item) => <StatusBadge value={item.estado} /> },
-            { key: 'acciones', label: 'Acciones', render: (item) => <button type="button" className="table-action" onClick={() => toggleUniformizacion(item.id)}>Cambiar</button> }
-          ]}
-        />
-        <DataTable<FormalizacionResponse>
-          title="Formalizaciones"
-          description="Detalle de bandejas y plantas formalizadas."
-          items={formalizaciones}
-          columns={[
-            { key: 'lote', label: 'Lote', render: (item) => item.lote?.codigo || 'Sin lote' },
-            { key: 'cama', label: 'Cama', render: (item) => item.cama?.codigo || 'Sin cama' },
-            { key: 'fechaFormalizacion', label: 'Fecha', render: (item) => dateShort(item.fechaFormalizacion) },
-            { key: 'cantidadPlantas', label: 'Plantas', render: (item) => numberCompact(item.cantidadPlantas || 0) },
-            { key: 'estado', label: 'Estado', render: (item) => <StatusBadge value={item.estado} /> },
-            { key: 'acciones', label: 'Acciones', render: (item) => <button type="button" className="table-action" onClick={() => toggleFormalizacion(item.id)}>Cambiar</button> }
-          ]}
-        />
+      <section className="stacked-process-list">
+        {aggregated.map((item) => (
+          <article className="process-card" key={item.lote.id}>
+            <div className="process-card__header">
+              <div className="process-card__identity">
+                <span className="process-card__icon">◎</span>
+                <div>
+                  <div className="process-card__title"><strong>{item.lote.codigo}</strong> <span>{item.lote.descripcion || 'Invernadero'}</span></div>
+                  <small>{numberCompact(item.planted)} plantas · Actualizado: {dateShort(item.latest?.fechaActualizacion || item.latest?.fechaCreacion || null)}</small>
+                </div>
+              </div>
+              <div className="process-card__meta">
+                <StatusBadge value={item.status} />
+                <strong>{item.progress}%</strong>
+              </div>
+            </div>
+            <span className="process-card__caption">Progreso de uniformización</span>
+            <div className="progress-track progress-track--wide"><span style={{ width: `${item.progress}%` }} /></div>
+            <div className="process-card__footer">
+              <span>{numberCompact(item.uniformized)} uniformizadas</span>
+              <span>{numberCompact(item.planted)} sembradas</span>
+            </div>
+          </article>
+        ))}
       </section>
 
       <Modal open={modal === 'uniformizacion'} title="Nueva uniformización" description="Registra cantidad inicial y cantidad uniformizada." onClose={() => setModal(null)}>

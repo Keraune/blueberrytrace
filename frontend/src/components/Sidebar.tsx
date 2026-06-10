@@ -1,6 +1,7 @@
-import { BarChart3, Boxes, ClipboardList, Factory, Home, Layers3, PackageCheck, Sprout, Truck, UsersRound } from 'lucide-react';
+import { BarChart3, Boxes, ClipboardList, Factory, Home, Layers3, LogOut, PackageCheck, Sprout, Truck, UsersRound } from 'lucide-react';
+import { initials } from '../lib/format';
 import { routeByKey } from '../lib/routes';
-import type { ModuleResponse } from '../types/api';
+import type { AuthenticatedUserResponse, ModuleResponse } from '../types/api';
 
 const icons = {
   dashboard: Home,
@@ -14,43 +15,84 @@ const icons = {
   usuarios: UsersRound
 } as const;
 
+const sections = [
+  { title: 'Principal', keys: ['dashboard', 'usuarios', 'lotes'] },
+  { title: 'Proceso Productivo', keys: ['siembra', 'procesos', 'camas', 'clasificacion', 'despacho'] },
+  { title: 'Análisis', keys: ['reportes'] }
+] as const;
+
 interface SidebarProps {
   modules: ModuleResponse[];
   activeKey: string;
+  user: AuthenticatedUserResponse | null;
   onSelect: (key: string) => void;
+  onLogout?: () => void | Promise<void>;
 }
 
-export function Sidebar({ modules, activeKey, onSelect }: SidebarProps) {
+export function Sidebar({ modules, activeKey, user, onSelect, onLogout }: SidebarProps) {
+  const modulesByKey = new Map(modules.map((module) => [module.key, module]));
+
   return (
     <aside className="sidebar">
-      <div className="brand">
+      <div className="brand brand--sidebar">
         <div className="brand__mark">BT</div>
         <div>
           <strong>BlueberryTrace</strong>
-          <span>Vivero Los Viñedos</span>
+          <span>Agro Intelligence</span>
         </div>
       </div>
 
-      <nav className="sidebar__nav" aria-label="Módulos principales">
-        {modules.map((module) => {
-          const Icon = icons[module.key as keyof typeof icons] || PackageCheck;
-          const route = routeByKey(module.key);
+      <div className="sidebar__sections">
+        {sections.map((section) => {
+          const sectionModules = section.keys
+            .map((key) => modulesByKey.get(key))
+            .filter((module): module is ModuleResponse => Boolean(module));
+
+          if (sectionModules.length === 0) {
+            return null;
+          }
+
           return (
-            <a
-              key={module.key}
-              className={module.key === activeKey ? 'sidebar__link sidebar__link--active' : 'sidebar__link'}
-              href={route.path}
-              onClick={(event) => {
-                event.preventDefault();
-                onSelect(module.key);
-              }}
-            >
-              <Icon size={18} />
-              <span>{module.label}</span>
-            </a>
+            <section key={section.title} className="sidebar__section">
+              <span className="sidebar__section-title">{section.title}</span>
+              <nav className="sidebar__nav" aria-label={section.title}>
+                {sectionModules.map((module) => {
+                  const Icon = icons[module.key as keyof typeof icons] || PackageCheck;
+                  const route = routeByKey(module.key);
+                  return (
+                    <a
+                      key={module.key}
+                      className={module.key === activeKey ? 'sidebar__link sidebar__link--active' : 'sidebar__link'}
+                      href={route.path}
+                      onClick={(event) => {
+                        event.preventDefault();
+                        onSelect(module.key);
+                      }}
+                    >
+                      <Icon size={17} />
+                      <span>{module.label}</span>
+                    </a>
+                  );
+                })}
+              </nav>
+            </section>
           );
         })}
-      </nav>
+      </div>
+
+      <div className="sidebar__footer">
+        <div className="sidebar-user-card">
+          <span>{initials(user?.nombreCompleto)}</span>
+          <div>
+            <strong>{user?.nombreCompleto || 'Sesión activa'}</strong>
+            <small>{user?.rol || user?.username || 'Operario'}</small>
+          </div>
+        </div>
+        <button type="button" className="sidebar-logout" onClick={onLogout}>
+          <LogOut size={16} />
+          Cerrar sesión
+        </button>
+      </div>
     </aside>
   );
 }

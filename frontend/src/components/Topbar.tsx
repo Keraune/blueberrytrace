@@ -1,39 +1,40 @@
-import { Bell, LogOut, Search } from 'lucide-react';
+import { Bell, ChevronRight, Leaf, RefreshCcw, Search } from 'lucide-react';
 import { initials } from '../lib/format';
 import type { AuthenticatedUserResponse } from '../types/api';
 
 interface TopbarProps {
   user: AuthenticatedUserResponse | null;
   activeModule: string;
-  onLogout?: () => void | Promise<void>;
+  onRefresh?: () => void | Promise<void>;
+  refreshing?: boolean;
 }
 
-export function Topbar({ user, activeModule, onLogout }: TopbarProps) {
+export function Topbar({ user, activeModule, onRefresh, refreshing = false }: TopbarProps) {
   return (
     <header className="topbar">
-      <div>
-        <span className="topbar__eyebrow">Panel operativo</span>
-        <h1>{activeModule}</h1>
+      <div className="topbar__breadcrumb">
+        <Leaf size={15} />
+        <ChevronRight size={15} />
+        <span>{activeModule}</span>
       </div>
 
       <div className="topbar__actions">
         <label className="search-box">
-          <Search size={17} />
-          <input placeholder="Buscar módulo o registro" />
+          <Search size={16} />
+          <input placeholder="Buscar en el sistema..." />
         </label>
-        <button className="icon-button" type="button" aria-label="Notificaciones">
-          <Bell size={18} />
+        {onRefresh ? (
+          <button className="icon-button" type="button" aria-label="Sincronizar" onClick={onRefresh} disabled={refreshing}>
+            <RefreshCcw className={refreshing ? 'spin' : undefined} size={17} />
+          </button>
+        ) : null}
+        <button className="icon-button notification-button" type="button" aria-label="Notificaciones">
+          <Bell size={17} />
+          <span />
         </button>
-        <div className="user-pill">
-          <span>{initials(user?.nombreCompleto)}</span>
-          <div>
-            <strong>{user?.nombreCompleto || 'Sesión activa'}</strong>
-            <small>{user?.rol || user?.username || 'Operador'}</small>
-          </div>
+        <div className="topbar-avatar" title={user?.nombreCompleto || 'Sesión activa'}>
+          {initials(user?.nombreCompleto)}
         </div>
-        <button className="icon-button icon-button--logout" type="button" aria-label="Cerrar sesión" onClick={onLogout}>
-          <LogOut size={18} />
-        </button>
       </div>
     </header>
   );

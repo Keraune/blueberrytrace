@@ -4,6 +4,7 @@ import com.keraune.vlvblueberrysystem.service.TrazabilidadQueryService;
 import com.keraune.vlvblueberrysystem.web.HtmxRequestSupport;
 import java.time.LocalDate;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+@Profile("legacy-mvc")
 @Controller
 @RequestMapping("/reportes")
 public class ReporteController {

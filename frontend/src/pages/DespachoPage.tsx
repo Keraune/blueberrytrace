@@ -1,10 +1,6 @@
 import { useMemo, useState } from 'react';
-import { MapPinned, PackageCheck, Plus, Truck } from 'lucide-react';
-import { DataTable } from '../components/DataTable';
+import { Download, Eye, Filter, Plus, Truck } from 'lucide-react';
 import { DespachoForm } from '../components/DespachoForm';
-import { FilterToolbar } from '../components/FilterToolbar';
-import { MetricCard } from '../components/MetricCard';
-import { Modal } from '../components/Modal';
 import { ModuleHeader } from '../components/ModuleHeader';
 import { StatusBadge } from '../components/StatusBadge';
 import { blueberryApi } from '../lib/api';
@@ -20,73 +16,97 @@ interface DespachoPageProps {
 }
 
 export function DespachoPage({ despachos, lotes, modalidades, validaciones, onDespachosChange }: DespachoPageProps) {
-  const [query, setQuery] = useState('');
-  const [creating, setCreating] = useState(false);
-  const filtered = useMemo(() => {
-    const term = query.trim().toLowerCase();
-    if (!term) {
-      return despachos;
-    }
-    return despachos.filter((item) => [item.lote?.codigo, item.modalidad, item.destino, item.guiaRemision, item.estado]
-      .some((value) => String(value || '').toLowerCase().includes(term)));
-  }, [despachos, query]);
-
+  const [tab, setTab] = useState<'historial' | 'nuevo'>('historial');
   const plantas = despachos.reduce((total, item) => total + (item.cantidadDespachada || 0), 0);
-  const destinos = new Set(despachos.map((item) => item.destino).filter(Boolean)).size;
-  const cerrados = despachos.filter((item) => item.estado === 'CERRADO').length;
+  const enTransito = despachos.filter((item) => /TRANSITO/i.test(item.estado || '')).reduce((total, item) => total + (item.cantidadDespachada || 0), 0);
+  const exportaciones = despachos.filter((item) => /EXPORT/i.test(item.modalidad || '')).length;
+  const locales = despachos.length - exportaciones;
 
   async function create(payload: DespachoFormPayload) {
     const response = await blueberryApi.createDespacho(payload);
     onDespachosChange(response.items);
-    setCreating(false);
+    setTab('historial');
   }
 
-  async function changeStatus(id: number, estado: string) {
-    const response = await blueberryApi.changeDespachoStatus(id, estado);
-    onDespachosChange(response.items);
-  }
+  const summary = [
+    { label: 'Total despachado', value: plantas, suffix: 'plantas', tone: 'green' },
+    { label: 'En tránsito ahora', value: enTransito, suffix: 'plantas', tone: 'blue' },
+    { label: 'Exportaciones', value: exportaciones, suffix: 'este mes', tone: 'purple' },
+    { label: 'Ventas locales', value: locales, suffix: 'este mes', tone: 'orange' }
+  ];
 
   return (
     <main className="content-grid">
       <ModuleHeader
         eyebrow="Salida"
-        title="Despachos"
-        description="Seguimiento de plantas despachadas por destino, modalidad, guía y validación de calidad."
-        actions={<button type="button" className="action-button" onClick={() => setCreating(true)}><Plus size={16} /> Nuevo despacho</button>}
+        title="Módulo de Despacho"
+        description="Registro y seguimiento de despachos de exportación."
       />
 
-      <section className="metrics-grid metrics-grid--three">
-        <MetricCard label="Despachos" value={despachos.length} detail="registrados" icon={<Truck size={20} />} tone="green" />
-        <MetricCard label="Plantas despachadas" value={plantas} detail="total enviado" icon={<PackageCheck size={20} />} tone="blue" />
-        <MetricCard label="Destinos" value={destinos} detail={`${cerrados} cerrados`} icon={<MapPinned size={20} />} tone="orange" />
+      <div className="tab-switcher">
+        <button type="button" className={tab === 'historial' ? 'tab-switcher__item tab-switcher__item--active' : 'tab-switcher__item'} onClick={() => setTab('historial')}>Historial de Despachos</button>
+        <button type="button" className={tab === 'nuevo' ? 'tab-switcher__item tab-switcher__item--active' : 'tab-switcher__item'} onClick={() => setTab('nuevo')}><Plus size={15} /> Nuevo Despacho</button>
+      </div>
+
+      <section className="summary-strip summary-strip--four">
+        {summary.map((card) => (
+          <article key={card.label} className={`summary-pill summary-pill--${card.tone}`}>
+            <span>{card.label}</span>
+            <strong>{numberCompact(card.value)}</strong>
+            <small>{card.suffix}</small>
+          </article>
+        ))}
       </section>
 
-      <section className="panel-card">
-        <FilterToolbar value={query} onChange={setQuery} placeholder="Buscar por lote, destino, guía o estado" />
-        <DataTable<DespachoResponse>
-          title="Historial de despachos"
-          description="Registros de salida para exportación o venta local."
-          items={filtered}
-          columns={[
-            { key: 'lote', label: 'Lote', render: (item) => item.lote?.codigo || 'Sin lote' },
-            { key: 'fechaDespacho', label: 'Fecha', render: (item) => dateShort(item.fechaDespacho) },
-            { key: 'modalidad', label: 'Modalidad' },
-            { key: 'cantidadDespachada', label: 'Cantidad', render: (item) => numberCompact(item.cantidadDespachada || 0) },
-            { key: 'destino', label: 'Destino' },
-            { key: 'estado', label: 'Estado', render: (item) => <StatusBadge value={item.estado} /> },
-            { key: 'acciones', label: 'Acciones', render: (item) => (
-              <div className="table-actions">
-                <button type="button" className="table-action" onClick={() => changeStatus(item.id, 'CERRADO')}>Cerrar</button>
-                <button type="button" className="table-action" onClick={() => changeStatus(item.id, 'OBSERVADO')}>Observar</button>
-              </div>
-            ) }
-          ]}
-        />
-      </section>
-
-      <Modal open={creating} title="Nuevo despacho" description="Registra salida de plantas y validación de calidad." onClose={() => setCreating(false)}>
-        <DespachoForm lotes={lotes} modalidades={modalidades} validaciones={validaciones} onSubmit={create} onCancel={() => setCreating(false)} />
-      </Modal>
+      {tab === 'historial' ? (
+        <section className="panel-card">
+          <div className="panel-card__header">
+            <div>
+              <h2>Historial de Despachos</h2>
+            </div>
+            <div className="button-group">
+              <button type="button" className="ghost-button"><Filter size={15} /> Filtrar</button>
+              <button type="button" className="ghost-button"><Download size={15} /> Excel</button>
+            </div>
+          </div>
+          <div className="data-table-wrap">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>ID despacho</th>
+                  <th>Lote</th>
+                  <th>Fecha</th>
+                  <th>Cantidad</th>
+                  <th>Modalidad</th>
+                  <th>Destino</th>
+                  <th>Estado</th>
+                  <th />
+                </tr>
+              </thead>
+              <tbody>
+                {despachos.map((item) => (
+                  <tr key={item.id}>
+                    <td><strong className="table-code">D-{String(item.id).padStart(4, '0')}</strong></td>
+                    <td>{item.lote?.codigo || 'Sin lote'}</td>
+                    <td>{dateShort(item.fechaDespacho)}</td>
+                    <td>{numberCompact(item.cantidadDespachada || 0)}</td>
+                    <td><StatusBadge value={item.modalidad} /></td>
+                    <td>{item.destino || 'Sin destino'}</td>
+                    <td><StatusBadge value={item.estado} /></td>
+                    <td><button type="button" className="icon-action"><Eye size={15} /></button></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="table-footer-note">{despachos.length} despachos registrados</div>
+        </section>
+      ) : (
+        <section className="panel-card panel-card--form-only">
+          <div className="panel-card__header"><div><h2>Nuevo Despacho</h2><p>Registro de salida y validación de calidad.</p></div></div>
+          <DespachoForm lotes={lotes} modalidades={modalidades} validaciones={validaciones} onSubmit={create} onCancel={() => setTab('historial')} />
+        </section>
+      )}
     </main>
   );
 }

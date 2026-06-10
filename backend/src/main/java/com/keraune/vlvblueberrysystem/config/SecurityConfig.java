@@ -3,6 +3,7 @@ package com.keraune.vlvblueberrysystem.config;
 import com.keraune.vlvblueberrysystem.security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -24,7 +25,34 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    @Profile("!legacy-mvc")
+    public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .authenticationProvider(authenticationProvider())
+                .cors(Customizer.withDefaults())
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/",
+                                "/api/v1/health",
+                                "/api/v1/auth/csrf",
+                                "/api/v1/auth/login",
+                                "/api/v1/frontend/bootstrap",
+                                "/favicon.ico",
+                                "/error")
+                        .permitAll()
+                        .anyRequest().authenticated())
+                .formLogin(form -> form.disable())
+                .logout(logout -> logout.disable())
+                .exceptionHandling(exceptions -> exceptions
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
+                .csrf(Customizer.withDefaults());
+
+        return http.build();
+    }
+
+    @Bean
+    @Profile("legacy-mvc")
+    public SecurityFilterChain legacyMvcSecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authenticationProvider(authenticationProvider())
                 .cors(Customizer.withDefaults())
@@ -32,6 +60,7 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/",
                                 "/auth/login",
+                                "/api/v1/health",
                                 "/api/v1/auth/csrf",
                                 "/api/v1/auth/login",
                                 "/api/v1/frontend/bootstrap",

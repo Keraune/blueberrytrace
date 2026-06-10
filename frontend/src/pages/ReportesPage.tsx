@@ -1,8 +1,5 @@
 import { useMemo, useState } from 'react';
-import { BarChart3, Boxes, Route, Truck } from 'lucide-react';
-import { DataTable } from '../components/DataTable';
-import { FilterToolbar } from '../components/FilterToolbar';
-import { MetricCard } from '../components/MetricCard';
+import { BarChart3, Download, Eye, FileText, Leaf, Tags, Truck } from 'lucide-react';
 import { ModuleHeader } from '../components/ModuleHeader';
 import { numberCompact } from '../lib/format';
 import type { TrazabilidadResponse } from '../types/api';
@@ -11,58 +8,102 @@ interface ReportesPageProps {
   trazabilidad: TrazabilidadResponse[];
 }
 
-export function ReportesPage({ trazabilidad }: ReportesPageProps) {
-  const [query, setQuery] = useState('');
-  const rows = useMemo(() => trazabilidad.map((item, index) => ({ ...item, id: item.lote?.id || index + 1 })), [trazabilidad]);
-  const filtered = useMemo(() => {
-    const term = query.trim().toLowerCase();
-    if (!term) {
-      return rows;
-    }
-    return rows.filter((item) => [item.lote?.codigo, item.lote?.descripcion, item.ultimoEvento]
-      .some((value) => String(value || '').toLowerCase().includes(term)));
-  }, [rows, query]);
+const reportTypes = ['Producción por Lote', 'Clasificación', 'Despachos'];
 
-  const plantasSembradas = rows.reduce((total, item) => total + item.plantasSembradas, 0);
-  const plantasDespachadas = rows.reduce((total, item) => total + item.plantasDespachadas, 0);
-  const avance = plantasSembradas === 0 ? 0 : Math.round((plantasDespachadas / plantasSembradas) * 100);
+export function ReportesPage({ trazabilidad }: ReportesPageProps) {
+  const [reportType, setReportType] = useState(reportTypes[0]);
+  const [lote, setLote] = useState('Todos los lotes');
+  const rows = useMemo(() => trazabilidad.map((item, index) => ({ ...item, id: item.lote?.id || index + 1 })), [trazabilidad]);
+  const monthly = useMemo(() => [45, 52, 60, 58, 67, 72], []);
+  const maxMonthly = Math.max(...monthly, 1);
+
+  const production = rows.reduce((total, item) => total + item.plantasSembradas, 0);
+  const classification = rows.reduce((total, item) => total + item.clasificaciones, 0);
+  const shipments = rows.reduce((total, item) => total + item.despachos, 0);
 
   return (
     <main className="content-grid">
       <ModuleHeader
         eyebrow="Análisis"
-        title="Reportes de trazabilidad"
-        description="Lectura consolidada por lote para seguimiento de siembra, proceso, clasificación y despacho."
+        title="Reportes y Análisis"
+        description="Generación y exportación de reportes por fecha, lote y clasificación."
       />
 
-      <section className="metrics-grid metrics-grid--three">
-        <MetricCard label="Lotes trazados" value={rows.length} detail="con movimiento operativo" icon={<Route size={20} />} tone="green" />
-        <MetricCard label="Plantas sembradas" value={plantasSembradas} detail="base productiva" icon={<Boxes size={20} />} tone="blue" />
-        <MetricCard label="Avance despacho" value={`${avance}%`} detail={`${numberCompact(plantasDespachadas)} plantas despachadas`} icon={<Truck size={20} />} tone="orange" />
+      <section className="panel-card report-parameter-card">
+        <div className="panel-card__header"><div><h2>Parámetros del Reporte</h2></div></div>
+        <div className="report-parameters-grid">
+          <label>
+            Tipo de reporte
+            <select value={reportType} onChange={(event) => setReportType(event.target.value)}>
+              {reportTypes.map((type) => <option key={type} value={type}>{type}</option>)}
+            </select>
+          </label>
+          <label>
+            Fecha inicio
+            <input type="date" defaultValue="2026-05-01" />
+          </label>
+          <label>
+            Fecha fin
+            <input type="date" defaultValue="2026-05-25" />
+          </label>
+          <label>
+            Lote
+            <select value={lote} onChange={(event) => setLote(event.target.value)}>
+              <option>Todos los lotes</option>
+              {rows.map((item) => <option key={item.id}>{item.lote?.codigo}</option>)}
+            </select>
+          </label>
+        </div>
+        <div className="button-group">
+          <button type="button" className="action-button"><BarChart3 size={15} /> Generar Reporte</button>
+          <button type="button" className="ghost-button"><Download size={15} /> Exportar Excel</button>
+          <button type="button" className="ghost-button"><FileText size={15} /> Exportar PDF</button>
+        </div>
       </section>
 
-      <section className="panel-card report-layout">
-        <FilterToolbar value={query} onChange={setQuery} placeholder="Buscar lote o último evento" />
-        <div className="trace-summary-card">
-          <BarChart3 size={22} />
-          <div>
-            <strong>Resumen operativo</strong>
-            <span>La información se consume desde `/api/v1/reportes/trazabilidad` y queda lista para visualizaciones más avanzadas.</span>
+      <section className="report-card-grid">
+        <article className="report-card">
+          <span className="report-card__icon"><Leaf size={18} /></span>
+          <h3>Reporte de Producción</h3>
+          <p>Detalle de plantas por lote e invernadero. Incluye siembras, crecimientos y uniformizaciones.</p>
+          <div className="report-card__footer"><span>{rows.length} lotes · {numberCompact(production)} plantas</span><div><button type="button" className="icon-action"><Download size={14} /></button><button type="button" className="icon-action"><Eye size={14} /></button></div></div>
+        </article>
+        <article className="report-card">
+          <span className="report-card__icon"><Tags size={18} /></span>
+          <h3>Reporte de Clasificación</h3>
+          <p>Distribución de calidad por lote y período seleccionado.</p>
+          <div className="report-card__footer"><span>{classification} registros · {numberCompact(production)} plantas</span><div><button type="button" className="icon-action"><Download size={14} /></button><button type="button" className="icon-action"><Eye size={14} /></button></div></div>
+        </article>
+        <article className="report-card">
+          <span className="report-card__icon"><Truck size={18} /></span>
+          <h3>Reporte de Despachos</h3>
+          <p>Historial de exportaciones y ventas locales con destinos, certificados y estado de cada envío.</p>
+          <div className="report-card__footer"><span>{shipments} despachos · {numberCompact(rows.reduce((total, item) => total + item.plantasDespachadas, 0))} plantas</span><div><button type="button" className="icon-action"><Download size={14} /></button><button type="button" className="icon-action"><Eye size={14} /></button></div></div>
+        </article>
+      </section>
+
+      <section className="dashboard-grid dashboard-grid--equal">
+        <article className="panel-card chart-panel chart-panel--bars chart-panel--tight">
+          <div className="panel-card__header"><div><h2>Producción Mensual {new Date().getFullYear()}</h2></div></div>
+          <div className="mini-bars">
+            {monthly.map((value, index) => <div key={index} className="mini-bars__item"><div className="mini-bars__bar" style={{ height: `${(value / maxMonthly) * 100}%` }} /><span>{['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun'][index]}</span></div>)}
           </div>
-        </div>
-        <DataTable<(TrazabilidadResponse & { id: number })>
-          title="Trazabilidad por lote"
-          description="Resumen de actividad productiva por lote registrado."
-          items={filtered}
-          columns={[
-            { key: 'lote', label: 'Lote', render: (item) => item.lote?.codigo || 'Sin lote' },
-            { key: 'camas', label: 'Camas' },
-            { key: 'plantasSembradas', label: 'Sembradas', render: (item) => numberCompact(item.plantasSembradas) },
-            { key: 'clasificaciones', label: 'Clasif.' },
-            { key: 'plantasDespachadas', label: 'Despachadas', render: (item) => numberCompact(item.plantasDespachadas) },
-            { key: 'ultimoEvento', label: 'Último evento' }
-          ]}
-        />
+        </article>
+        <article className="panel-card">
+          <div className="panel-card__header"><div><h2>Trazabilidad por Lote</h2></div></div>
+          <div className="trace-bars">
+            {rows.slice(0, 5).map((row) => {
+              const progress = row.plantasSembradas === 0 ? 0 : Math.round((row.plantasDespachadas / row.plantasSembradas) * 100);
+              return (
+                <div key={row.id} className="trace-bars__row">
+                  <div className="trace-bars__meta"><strong>{row.lote?.codigo || 'Lote'}</strong><span>{row.lote?.descripcion || 'Sin descripción'}</span></div>
+                  <div className="progress-track progress-track--wide"><span style={{ width: `${progress}%` }} /></div>
+                  <div className="trace-bars__summary"><strong>{numberCompact(row.plantasSembradas)}</strong><span>{progress}%</span></div>
+                </div>
+              );
+            })}
+          </div>
+        </article>
       </section>
     </main>
   );

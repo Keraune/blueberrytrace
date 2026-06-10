@@ -2,10 +2,12 @@ package com.keraune.vlvblueberrysystem.controller;
 
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+@Profile("legacy-mvc")
 @Controller
 @RequestMapping("/auth")
 public class AuthController {

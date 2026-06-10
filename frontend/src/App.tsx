@@ -202,19 +202,14 @@ export default function App() {
 
   return (
     <div className="app-shell">
-      <Sidebar modules={modules} activeKey={activeKey} onSelect={navigate} />
+      <Sidebar modules={modules} activeKey={activeKey} user={user} onSelect={navigate} onLogout={handleLogout} />
       <section className="main-shell">
-        <Topbar user={user} activeModule={activeModule?.label || 'Control de trazabilidad'} onLogout={handleLogout} />
-        <div className="refresh-row">
-          <button type="button" className="ghost-button" onClick={refresh} disabled={refreshing}>
-            <RefreshCcw className={refreshing ? 'spin' : undefined} size={15} /> Sincronizar datos
-          </button>
-        </div>
+        <Topbar user={user} activeModule={activeModule?.label || 'Control de trazabilidad'} onRefresh={refresh} refreshing={refreshing} />
         {activeKey === 'dashboard' && <DashboardPage dashboard={dashboard} lotes={lotes} camas={camas} />}
-        {activeKey === 'lotes' && <LotesPage lotes={lotes} onLotesChange={setLotes} />}
+        {activeKey === 'lotes' && <LotesPage lotes={lotes} camas={camas} siembras={siembras} onLotesChange={setLotes} />}
         {activeKey === 'camas' && <CamasPage camas={camas} lotes={loteReferences} onCamasChange={setCamas} />}
         {activeKey === 'siembra' && <SiembrasPage siembras={siembras} lotes={loteReferences} camas={camas} onSiembrasChange={setSiembras} />}
-        {activeKey === 'procesos' && <ProcesosPage procesos={procesos} lotes={loteReferences} camas={camas} onProcesosChange={setProcesos} />}
+        {activeKey === 'procesos' && <ProcesosPage procesos={procesos} lotes={loteReferences} camas={camas} siembras={siembras} onProcesosChange={setProcesos} />}
         {activeKey === 'clasificacion' && <ClasificacionPage clasificaciones={clasificaciones} lotes={loteReferences} camas={camas} onClasificacionesChange={setClasificaciones} />}
         {activeKey === 'despacho' && <DespachoPage despachos={despachos} lotes={loteReferences} modalidades={catalogs?.modalidadesDespacho || ['JABAS', 'BINS_MADERA']} validaciones={catalogs?.validacionesCalidad || ['APROBADO', 'OBSERVADO']} onDespachosChange={setDespachos} />}
         {activeKey === 'reportes' && <ReportesPage trazabilidad={trazabilidad} />}
