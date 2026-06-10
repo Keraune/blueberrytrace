@@ -246,6 +246,61 @@ export interface CamaFormPayload {
   loteId: number;
 }
 
+export interface SiembraFormPayload {
+  loteId: number;
+  camaId: number;
+  fechaSiembra: string;
+  cantidadRegistrada: number;
+  observacion?: string;
+  estado: string;
+}
+
+export interface UniformizacionFormPayload {
+  loteId: number;
+  camaId: number;
+  fechaUniformizacion: string;
+  criterio: string;
+  cantidadInicial: number;
+  cantidadUniformizada: number;
+  observacion?: string;
+  estado: string;
+}
+
+export interface FormalizacionFormPayload {
+  loteId: number;
+  camaId: number;
+  fechaFormalizacion: string;
+  detalle: string;
+  cantidadBandejas: number;
+  cantidadPlantas: number;
+  observacion?: string;
+  estado: string;
+}
+
+export interface ClasificacionFormPayload {
+  loteId: number;
+  camaId: number;
+  fechaClasificacion: string;
+  estadoPlanta: string;
+  tamano: string;
+  condicion: string;
+  cantidad: number;
+  observacion?: string;
+  estado: string;
+}
+
+export interface DespachoFormPayload {
+  loteId: number;
+  fechaDespacho: string;
+  modalidad: string;
+  cantidadDespachada: number;
+  destino?: string;
+  guiaRemision?: string;
+  validacionCalidad: string;
+  observacion?: string;
+  estado: string;
+}
+
 export interface CsrfResponse {
   headerName: string;
   parameterName: string;

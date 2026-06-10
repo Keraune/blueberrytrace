@@ -8,12 +8,14 @@
     "frontend:build": "npm --prefix frontend run build",
     "frontend:preview": "npm --prefix frontend run preview",
     "frontend:lint": "npm --prefix frontend run lint",
-    "backend:run": "./mvnw -pl backend spring-boot:run",
+    "backend:run": "bash scripts/run-backend.sh",
     "backend:test": "./mvnw -pl backend test",
     "backend:package": "./mvnw -pl backend clean package",
-    "backend:run:alt": "SERVER_PORT=8081 ./mvnw -pl backend spring-boot:run",
+    "backend:run:alt": "SERVER_PORT=8081 bash scripts/run-backend.sh",
     "dev": "npm run backend:run",
-    "dev:frontend": "npm run frontend:dev"
+    "dev:frontend": "npm run frontend:dev",
+    "backend:port": "bash scripts/check-backend-port.sh",
+    "backend:kill": "bash scripts/kill-backend-port.sh"
   },
   "workspaces": [
     "frontend"

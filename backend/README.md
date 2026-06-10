@@ -5,7 +5,7 @@ Aplicación Spring Boot del sistema BlueberryTrace. Mantiene el panel estable co
 ## Ejecutar desde backend
 
 ```bash
-./mvnw spring-boot:run
+../mvnw -pl backend spring-boot:run
 ```
 
 ## Ejecutar desde la raíz del repositorio
@@ -59,4 +59,20 @@ O identifica y cierra el proceso en Arch Linux:
 ```bash
 ss -ltnp 'sport = :8080'
 fuser -k 8080/tcp
+```
+
+
+## Scripts recomendados desde la raíz
+
+```bash
+npm run backend:run
+npm run backend:run:alt
+npm run backend:port
+npm run backend:kill
+```
+
+La configuración de MySQL acepta variables de entorno:
+
+```bash
+DB_USERNAME=root DB_PASSWORD=12345678 npm run backend:run
 ```

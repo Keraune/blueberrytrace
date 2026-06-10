@@ -14,6 +14,11 @@ import com.keraune.vlvblueberrysystem.api.dto.ApiPayloads.TrazabilidadResponse;
 import com.keraune.vlvblueberrysystem.api.dto.ApiPayloads.UniformizacionResponse;
 import com.keraune.vlvblueberrysystem.api.dto.ApiPayloads.UserReferenceResponse;
 import com.keraune.vlvblueberrysystem.api.mapper.ApiRecordMapper;
+import com.keraune.vlvblueberrysystem.dto.ClasificacionForm;
+import com.keraune.vlvblueberrysystem.dto.DespachoForm;
+import com.keraune.vlvblueberrysystem.dto.FormalizacionForm;
+import com.keraune.vlvblueberrysystem.dto.SiembraForm;
+import com.keraune.vlvblueberrysystem.dto.UniformizacionForm;
 import com.keraune.vlvblueberrysystem.dto.CamaForm;
 import com.keraune.vlvblueberrysystem.dto.LoteForm;
 import com.keraune.vlvblueberrysystem.entity.User;
@@ -157,6 +162,18 @@ public class ApiOperationsController {
         return ApiResponse.ok(ListResponse.from(items));
     }
 
+    @PostMapping("/siembras")
+    public ApiResponse<ListResponse<SiembraResponse>> crearSiembra(@Valid @RequestBody SiembraForm form, Principal principal) {
+        siembraService.crearSiembra(form, principal.getName());
+        return ApiResponse.ok("Siembra registrada correctamente.", siembras().data());
+    }
+
+    @PatchMapping("/siembras/{id}/estado")
+    public ApiResponse<ListResponse<SiembraResponse>> cambiarEstadoSiembra(@PathVariable Long id) {
+        siembraService.cambiarEstado(id);
+        return ApiResponse.ok("Estado de la siembra actualizado.", siembras().data());
+    }
+
     @GetMapping("/procesos")
     public ApiResponse<ProcesoOperativoResponse> procesos() {
         List<UniformizacionResponse> uniformizaciones = procesoOperativoService.listarUniformizaciones().stream()
@@ -180,12 +197,36 @@ public class ApiOperationsController {
         return ApiResponse.ok(ListResponse.from(items));
     }
 
+    @PostMapping("/procesos/uniformizaciones")
+    public ApiResponse<ProcesoOperativoResponse> crearUniformizacion(@Valid @RequestBody UniformizacionForm form, Principal principal) {
+        procesoOperativoService.crearUniformizacion(form, principal.getName());
+        return ApiResponse.ok("Uniformización registrada correctamente.", procesos().data());
+    }
+
+    @PatchMapping("/procesos/uniformizaciones/{id}/estado")
+    public ApiResponse<ProcesoOperativoResponse> cambiarEstadoUniformizacion(@PathVariable Long id) {
+        procesoOperativoService.cambiarEstadoUniformizacion(id);
+        return ApiResponse.ok("Estado de la uniformización actualizado.", procesos().data());
+    }
+
     @GetMapping("/procesos/formalizaciones")
     public ApiResponse<ListResponse<FormalizacionResponse>> formalizaciones() {
         List<FormalizacionResponse> items = procesoOperativoService.listarFormalizaciones().stream()
                 .map(mapper::toFormalizacionResponse)
                 .toList();
         return ApiResponse.ok(ListResponse.from(items));
+    }
+
+    @PostMapping("/procesos/formalizaciones")
+    public ApiResponse<ProcesoOperativoResponse> crearFormalizacion(@Valid @RequestBody FormalizacionForm form, Principal principal) {
+        procesoOperativoService.crearFormalizacion(form, principal.getName());
+        return ApiResponse.ok("Formalización registrada correctamente.", procesos().data());
+    }
+
+    @PatchMapping("/procesos/formalizaciones/{id}/estado")
+    public ApiResponse<ProcesoOperativoResponse> cambiarEstadoFormalizacion(@PathVariable Long id) {
+        procesoOperativoService.cambiarEstadoFormalizacion(id);
+        return ApiResponse.ok("Estado de la formalización actualizado.", procesos().data());
     }
 
     @GetMapping("/clasificaciones")
@@ -196,12 +237,42 @@ public class ApiOperationsController {
         return ApiResponse.ok(ListResponse.from(items));
     }
 
+    @PostMapping("/clasificaciones")
+    public ApiResponse<ListResponse<ClasificacionResponse>> crearClasificacion(@Valid @RequestBody ClasificacionForm form, Principal principal) {
+        clasificacionService.crearClasificacion(form, principal.getName());
+        return ApiResponse.ok("Clasificación registrada correctamente.", clasificaciones().data());
+    }
+
+    @PatchMapping("/clasificaciones/{id}/estado")
+    public ApiResponse<ListResponse<ClasificacionResponse>> cambiarEstadoClasificacion(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "VALIDADA") String estado
+    ) {
+        clasificacionService.cambiarEstado(id, estado);
+        return ApiResponse.ok("Estado de la clasificación actualizado.", clasificaciones().data());
+    }
+
     @GetMapping("/despachos")
     public ApiResponse<ListResponse<DespachoResponse>> despachos() {
         List<DespachoResponse> items = despachoService.listarTodos().stream()
                 .map(mapper::toDespachoResponse)
                 .toList();
         return ApiResponse.ok(ListResponse.from(items));
+    }
+
+    @PostMapping("/despachos")
+    public ApiResponse<ListResponse<DespachoResponse>> crearDespacho(@Valid @RequestBody DespachoForm form, Principal principal) {
+        despachoService.crearDespacho(form, principal.getName());
+        return ApiResponse.ok("Despacho registrado correctamente.", despachos().data());
+    }
+
+    @PatchMapping("/despachos/{id}/estado")
+    public ApiResponse<ListResponse<DespachoResponse>> cambiarEstadoDespacho(
+            @PathVariable Long id,
+            @RequestParam(defaultValue = "CERRADO") String estado
+    ) {
+        despachoService.cambiarEstado(id, estado);
+        return ApiResponse.ok("Estado del despacho actualizado.", despachos().data());
     }
 
     @GetMapping("/reportes/trazabilidad")

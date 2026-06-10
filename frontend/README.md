@@ -107,7 +107,7 @@ http://localhost:5173/lotes
 
 ## Operaciones conectadas a la API
 
-Actualmente el frontend React ya permite crear lotes e invernaderos y camas productivas usando la API Spring Boot protegida con sesión y CSRF.
+Actualmente el frontend React permite crear lotes, camas, siembras, uniformizaciones, formalizaciones, clasificaciones y despachos usando la API Spring Boot protegida con sesión y CSRF.
 
 Antes de usar React, inicia sesión en el backend:
 

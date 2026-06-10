@@ -1,19 +1,26 @@
 import { useMemo, useState } from 'react';
-import { BadgeCheck, Boxes, Scale } from 'lucide-react';
+import { BadgeCheck, Boxes, Plus, Scale } from 'lucide-react';
+import { ClasificacionForm } from '../components/ClasificacionForm';
 import { DataTable } from '../components/DataTable';
 import { FilterToolbar } from '../components/FilterToolbar';
 import { MetricCard } from '../components/MetricCard';
+import { Modal } from '../components/Modal';
 import { ModuleHeader } from '../components/ModuleHeader';
 import { StatusBadge } from '../components/StatusBadge';
+import { blueberryApi } from '../lib/api';
 import { dateShort, numberCompact } from '../lib/format';
-import type { ClasificacionResponse } from '../types/api';
+import type { CamaResponse, ClasificacionFormPayload, ClasificacionResponse, ReferenceResponse } from '../types/api';
 
 interface ClasificacionPageProps {
   clasificaciones: ClasificacionResponse[];
+  lotes: ReferenceResponse[];
+  camas: CamaResponse[];
+  onClasificacionesChange: (items: ClasificacionResponse[]) => void;
 }
 
-export function ClasificacionPage({ clasificaciones }: ClasificacionPageProps) {
+export function ClasificacionPage({ clasificaciones, lotes, camas, onClasificacionesChange }: ClasificacionPageProps) {
   const [query, setQuery] = useState('');
+  const [creating, setCreating] = useState(false);
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase();
     if (!term) {
@@ -27,12 +34,24 @@ export function ClasificacionPage({ clasificaciones }: ClasificacionPageProps) {
   const validadas = clasificaciones.filter((item) => item.estado === 'VALIDADA').length;
   const condiciones = new Set(clasificaciones.map((item) => item.condicion).filter(Boolean)).size;
 
+  async function create(payload: ClasificacionFormPayload) {
+    const response = await blueberryApi.createClasificacion(payload);
+    onClasificacionesChange(response.items);
+    setCreating(false);
+  }
+
+  async function changeStatus(id: number, estado: string) {
+    const response = await blueberryApi.changeClasificacionStatus(id, estado);
+    onClasificacionesChange(response.items);
+  }
+
   return (
     <main className="content-grid">
       <ModuleHeader
         eyebrow="Calidad"
         title="Clasificación de plantas"
         description="Distribución de plantas por condición, tamaño, estado y lote antes del despacho."
+        actions={<button type="button" className="action-button" onClick={() => setCreating(true)}><Plus size={16} /> Nueva clasificación</button>}
       />
 
       <section className="metrics-grid metrics-grid--three">
@@ -53,10 +72,20 @@ export function ClasificacionPage({ clasificaciones }: ClasificacionPageProps) {
             { key: 'estadoPlanta', label: 'Estado planta' },
             { key: 'tamano', label: 'Tamaño' },
             { key: 'cantidad', label: 'Cantidad', render: (item) => numberCompact(item.cantidad || 0) },
-            { key: 'estado', label: 'Estado', render: (item) => <StatusBadge value={item.estado} /> }
+            { key: 'estado', label: 'Estado', render: (item) => <StatusBadge value={item.estado} /> },
+            { key: 'acciones', label: 'Acciones', render: (item) => (
+              <div className="table-actions">
+                <button type="button" className="table-action" onClick={() => changeStatus(item.id, 'VALIDADA')}>Validar</button>
+                <button type="button" className="table-action" onClick={() => changeStatus(item.id, 'OBSERVADA')}>Observar</button>
+              </div>
+            ) }
           ]}
         />
       </section>
+
+      <Modal open={creating} title="Nueva clasificación" description="Registra el resultado de control de calidad por lote y cama." onClose={() => setCreating(false)}>
+        <ClasificacionForm lotes={lotes} camas={camas} onSubmit={create} onCancel={() => setCreating(false)} />
+      </Modal>
     </main>
   );
 }

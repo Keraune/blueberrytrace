@@ -99,11 +99,21 @@ POST /api/v1/camas
 PUT /api/v1/camas/{id}
 PATCH /api/v1/camas/{id}/estado
 GET /api/v1/siembras
+POST /api/v1/siembras
+PATCH /api/v1/siembras/{id}/estado
 GET /api/v1/procesos
 GET /api/v1/procesos/uniformizaciones
+POST /api/v1/procesos/uniformizaciones
+PATCH /api/v1/procesos/uniformizaciones/{id}/estado
 GET /api/v1/procesos/formalizaciones
+POST /api/v1/procesos/formalizaciones
+PATCH /api/v1/procesos/formalizaciones/{id}/estado
 GET /api/v1/clasificaciones
+POST /api/v1/clasificaciones
+PATCH /api/v1/clasificaciones/{id}/estado
 GET /api/v1/despachos
+POST /api/v1/despachos
+PATCH /api/v1/despachos/{id}/estado
 GET /api/v1/reportes/trazabilidad
 GET /api/v1/usuarios
 ```
@@ -177,6 +187,12 @@ Revisar credenciales en:
 backend/src/main/resources/application.properties
 ```
 
+También puedes usar variables de entorno sin editar el archivo:
+
+```bash
+DB_URL='jdbc:mysql://localhost:3306/vlv_blueberry_system?useSSL=false&serverTimezone=America/Lima&allowPublicKeyRetrieval=true' DB_USERNAME=root DB_PASSWORD=12345678 npm run backend:run
+```
+
 ## Comandos de build y prueba
 
 Backend desde la raíz:
@@ -208,6 +224,9 @@ Scripts de workspace desde la raíz:
 npm run frontend:dev
 npm run frontend:build
 npm run backend:run
+npm run backend:run:alt
+npm run backend:port
+npm run backend:kill
 npm run backend:test
 ```
 

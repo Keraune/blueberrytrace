@@ -1016,3 +1016,28 @@ button {
     flex-direction: column;
   }
 }
+
+.button-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.table-action {
+  border: 1px solid rgba(31, 122, 67, 0.18);
+  background: #f8fbf7;
+  color: var(--dark-green);
+  border-radius: 999px;
+  padding: 0.44rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+.table-action:hover {
+  border-color: rgba(31, 122, 67, 0.34);
+  box-shadow: 0 10px 24px rgba(8, 40, 23, 0.08);
+  transform: translateY(-1px);
+}

@@ -1,21 +1,57 @@
-import { Boxes, PackageCheck, PercentCircle, Sprout } from 'lucide-react';
+import { useState } from 'react';
+import { Boxes, PackageCheck, PercentCircle, Plus, Sprout } from 'lucide-react';
 import { DataTable } from '../components/DataTable';
 import { MetricCard } from '../components/MetricCard';
+import { Modal } from '../components/Modal';
 import { ModuleHeader } from '../components/ModuleHeader';
+import { ProcesoForm } from '../components/ProcesoForm';
 import { StatusBadge } from '../components/StatusBadge';
+import { blueberryApi } from '../lib/api';
 import { dateShort, numberCompact } from '../lib/format';
-import type { FormalizacionResponse, ProcesoOperativoResponse, UniformizacionResponse } from '../types/api';
+import type {
+  CamaResponse,
+  FormalizacionFormPayload,
+  FormalizacionResponse,
+  ProcesoOperativoResponse,
+  ReferenceResponse,
+  UniformizacionFormPayload,
+  UniformizacionResponse
+} from '../types/api';
 
 interface ProcesosPageProps {
   procesos: ProcesoOperativoResponse | null;
+  lotes: ReferenceResponse[];
+  camas: CamaResponse[];
+  onProcesosChange: (data: ProcesoOperativoResponse) => void;
 }
 
-export function ProcesosPage({ procesos }: ProcesosPageProps) {
+export function ProcesosPage({ procesos, lotes, camas, onProcesosChange }: ProcesosPageProps) {
+  const [modal, setModal] = useState<'uniformizacion' | 'formalizacion' | null>(null);
   const uniformizaciones = procesos?.uniformizaciones.items || [];
   const formalizaciones = procesos?.formalizaciones.items || [];
   const plantasUniformizadas = uniformizaciones.reduce((total, item) => total + (item.cantidadUniformizada || 0), 0);
   const plantasFormalizadas = formalizaciones.reduce((total, item) => total + (item.cantidadPlantas || 0), 0);
   const ratio = plantasUniformizadas === 0 ? 0 : Math.round((plantasFormalizadas / plantasUniformizadas) * 100);
+
+  async function createUniformizacion(payload: UniformizacionFormPayload | FormalizacionFormPayload) {
+    const response = await blueberryApi.createUniformizacion(payload as UniformizacionFormPayload);
+    onProcesosChange(response);
+    setModal(null);
+  }
+
+  async function createFormalizacion(payload: UniformizacionFormPayload | FormalizacionFormPayload) {
+    const response = await blueberryApi.createFormalizacion(payload as FormalizacionFormPayload);
+    onProcesosChange(response);
+    setModal(null);
+  }
+
+  async function toggleUniformizacion(id: number) {
+    onProcesosChange(await blueberryApi.toggleUniformizacionStatus(id));
+  }
+
+  async function toggleFormalizacion(id: number) {
+    onProcesosChange(await blueberryApi.toggleFormalizacionStatus(id));
+  }
 
   return (
     <main className="content-grid">
@@ -23,6 +59,12 @@ export function ProcesosPage({ procesos }: ProcesosPageProps) {
         eyebrow="Proceso productivo"
         title="Uniformización y formalización"
         description="Control operativo de plantas uniformizadas y formalizadas antes de clasificación."
+        actions={
+          <div className="button-group">
+            <button type="button" className="ghost-button" onClick={() => setModal('uniformizacion')}><Plus size={15} /> Uniformización</button>
+            <button type="button" className="action-button" onClick={() => setModal('formalizacion')}><Plus size={15} /> Formalización</button>
+          </div>
+        }
       />
 
       <section className="metrics-grid metrics-grid--four">
@@ -42,7 +84,8 @@ export function ProcesosPage({ procesos }: ProcesosPageProps) {
             { key: 'cama', label: 'Cama', render: (item) => item.cama?.codigo || 'Sin cama' },
             { key: 'fechaUniformizacion', label: 'Fecha', render: (item) => dateShort(item.fechaUniformizacion) },
             { key: 'cantidadUniformizada', label: 'Cantidad', render: (item) => numberCompact(item.cantidadUniformizada || 0) },
-            { key: 'estado', label: 'Estado', render: (item) => <StatusBadge value={item.estado} /> }
+            { key: 'estado', label: 'Estado', render: (item) => <StatusBadge value={item.estado} /> },
+            { key: 'acciones', label: 'Acciones', render: (item) => <button type="button" className="table-action" onClick={() => toggleUniformizacion(item.id)}>Cambiar</button> }
           ]}
         />
         <DataTable<FormalizacionResponse>
@@ -54,10 +97,18 @@ export function ProcesosPage({ procesos }: ProcesosPageProps) {
             { key: 'cama', label: 'Cama', render: (item) => item.cama?.codigo || 'Sin cama' },
             { key: 'fechaFormalizacion', label: 'Fecha', render: (item) => dateShort(item.fechaFormalizacion) },
             { key: 'cantidadPlantas', label: 'Plantas', render: (item) => numberCompact(item.cantidadPlantas || 0) },
-            { key: 'estado', label: 'Estado', render: (item) => <StatusBadge value={item.estado} /> }
+            { key: 'estado', label: 'Estado', render: (item) => <StatusBadge value={item.estado} /> },
+            { key: 'acciones', label: 'Acciones', render: (item) => <button type="button" className="table-action" onClick={() => toggleFormalizacion(item.id)}>Cambiar</button> }
           ]}
         />
       </section>
+
+      <Modal open={modal === 'uniformizacion'} title="Nueva uniformización" description="Registra cantidad inicial y cantidad uniformizada." onClose={() => setModal(null)}>
+        <ProcesoForm mode="uniformizacion" lotes={lotes} camas={camas} onSubmit={createUniformizacion} onCancel={() => setModal(null)} />
+      </Modal>
+      <Modal open={modal === 'formalizacion'} title="Nueva formalización" description="Registra bandejas y plantas formalizadas." onClose={() => setModal(null)}>
+        <ProcesoForm mode="formalizacion" lotes={lotes} camas={camas} onSubmit={createFormalizacion} onCancel={() => setModal(null)} />
+      </Modal>
     </main>
   );
 }
