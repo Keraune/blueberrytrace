@@ -257,3 +257,126 @@ document.body?.addEventListener('htmx:afterSwap', event => {
         }
     }
 });
+
+const openBlueberryModal = modal => {
+    if (!modal) {
+        return;
+    }
+    modal.hidden = false;
+    requestAnimationFrame(() => {
+        modal.classList.add('is-open');
+        document.body.classList.add('modal-open');
+        const focusable = modal.querySelector('input, select, textarea, button, a[href]');
+        focusable?.focus({ preventScroll: true });
+    });
+};
+
+const closeBlueberryModal = modal => {
+    if (!modal) {
+        return;
+    }
+    modal.classList.remove('is-open');
+    const finalize = () => {
+        modal.hidden = true;
+        if (!document.querySelector('[data-modal].is-open')) {
+            document.body.classList.remove('modal-open');
+        }
+    };
+    window.setTimeout(finalize, 180);
+};
+
+const initializeBlueberryModals = (scope = document) => {
+    scope.querySelectorAll('[data-modal-open]').forEach(trigger => {
+        if (trigger.dataset.modalTriggerReady === 'true') {
+            return;
+        }
+        trigger.dataset.modalTriggerReady = 'true';
+        trigger.addEventListener('click', () => {
+            const modal = document.getElementById(trigger.getAttribute('data-modal-open'));
+            openBlueberryModal(modal);
+        });
+    });
+
+    scope.querySelectorAll('[data-modal]').forEach(modal => {
+        if (modal.dataset.modalReady !== 'true') {
+            modal.dataset.modalReady = 'true';
+            modal.querySelectorAll('[data-modal-close]').forEach(closeButton => {
+                closeButton.addEventListener('click', () => closeBlueberryModal(modal));
+            });
+        }
+
+        const hasValidationError = Boolean(modal.querySelector('.field-error:not(:empty), .lote-alert.full-span'));
+        const shouldAutoOpen = modal.dataset.modalAutoload === 'true' || hasValidationError;
+        if (shouldAutoOpen && !modal.classList.contains('is-open')) {
+            openBlueberryModal(modal);
+        }
+    });
+};
+
+const showBlueberryConfirm = (message, onConfirm) => {
+    document.querySelectorAll('.bt-confirm-overlay').forEach(item => item.remove());
+    const overlay = document.createElement('div');
+    overlay.className = 'bt-confirm-overlay';
+    overlay.innerHTML = `
+        <article class="bt-confirm-card" role="dialog" aria-modal="true">
+            <span class="bt-confirm-icon">!</span>
+            <h3>Confirmar acción</h3>
+            <p></p>
+            <div class="bt-confirm-actions">
+                <button type="button" class="ghost-btn" data-confirm-cancel>Cancelar</button>
+                <button type="button" class="primary-btn" data-confirm-ok>Confirmar</button>
+            </div>
+        </article>
+    `;
+    overlay.querySelector('p').textContent = message || '¿Deseas continuar?';
+    document.body.appendChild(overlay);
+    document.body.classList.add('modal-open');
+
+    const close = () => {
+        overlay.classList.add('is-hiding');
+        window.setTimeout(() => {
+            overlay.remove();
+            if (!document.querySelector('[data-modal].is-open')) {
+                document.body.classList.remove('modal-open');
+            }
+        }, 160);
+    };
+
+    overlay.querySelector('[data-confirm-cancel]').addEventListener('click', close);
+    overlay.querySelector('[data-confirm-ok]').addEventListener('click', () => {
+        close();
+        onConfirm?.();
+    });
+    overlay.addEventListener('click', event => {
+        if (event.target === overlay) {
+            close();
+        }
+    });
+    overlay.querySelector('[data-confirm-ok]')?.focus({ preventScroll: true });
+};
+
+document.addEventListener('DOMContentLoaded', () => initializeBlueberryModals(document));
+document.body?.addEventListener('htmx:afterSwap', event => initializeBlueberryModals(event.detail.target || document));
+
+document.addEventListener('keydown', event => {
+    if (event.key !== 'Escape') {
+        return;
+    }
+    const activeModal = Array.from(document.querySelectorAll('[data-modal].is-open')).pop();
+    if (activeModal) {
+        closeBlueberryModal(activeModal);
+    }
+    const activeConfirm = document.querySelector('.bt-confirm-overlay');
+    if (activeConfirm) {
+        activeConfirm.querySelector('[data-confirm-cancel]')?.click();
+    }
+});
+
+document.body?.addEventListener('htmx:confirm', event => {
+    const question = event.detail?.question;
+    if (!question) {
+        return;
+    }
+    event.preventDefault();
+    showBlueberryConfirm(question, () => event.detail.issueRequest(true));
+});

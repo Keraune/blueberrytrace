@@ -162,3 +162,17 @@ Se incorporó actualización parcial en módulos operativos sin reemplazar Sprin
 - Indicadores visuales de carga, transición de contenido y toast de error.
 
 Documentación técnica: `docs/frontend-fase-4.md`.
+
+## Modales operativos y confirmaciones
+
+Se incorporó una capa de interacción productiva para operaciones frecuentes:
+
+- Botones superiores de acción por módulo.
+- Formularios de creación en modales para siembra, camas, uniformización, formalización, clasificación y despacho.
+- Edición de camas desde modal cuando se abre un registro existente.
+- Confirmaciones visuales para acciones críticas integradas con `hx-confirm`.
+- Reapertura automática de modales cuando Thymeleaf devuelve errores de validación.
+- Corrección del formulario de uniformización para usar `cantidadInicial` y `cantidadUniformizada`.
+- Corrección del formulario de formalización para incluir el campo obligatorio `detalle`.
+
+Documentación de esta etapa: `docs/frontend-fase-5.md`.
