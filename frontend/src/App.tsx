@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, Loader2, RefreshCcw } from 'lucide-react';
-import { CommandPalette } from './components/CommandPalette';
-import { FloatingActionDock } from './components/FloatingActionDock';
+import { CommandPalette, type CommandSearchItem } from './components/CommandPalette';
 import { Sidebar } from './components/Sidebar';
 import { ToastStack, type ToastItem, type ToastTone } from './components/ToastStack';
-import { Topbar } from './components/Topbar';
+import { Topbar, type TopbarNotification } from './components/Topbar';
 import { useAppRoute } from './hooks/useAppRoute';
 import { BLUEBERRY_TOAST_EVENT, type BlueberryToastDetail } from './lib/uiEvents';
 import { ApiError, blueberryApi } from './lib/api';
@@ -32,6 +31,145 @@ import type {
   TrazabilidadResponse,
   UserReferenceResponse
 } from './types/api';
+
+
+function sortByMostRecent<T>(items: T[], dateOf: (item: T) => string | null | undefined) {
+  return [...items].sort((left, right) => {
+    const leftDate = dateOf(left);
+    const rightDate = dateOf(right);
+    return new Date(rightDate || 0).getTime() - new Date(leftDate || 0).getTime();
+  });
+}
+
+function buildNotifications(
+  lotes: LoteResponse[],
+  camas: CamaResponse[],
+  clasificaciones: ClasificacionResponse[],
+  despachos: DespachoResponse[]
+): TopbarNotification[] {
+  const notifications: TopbarNotification[] = [];
+
+  const pendingClassifications = clasificaciones.filter((item) => /PENDIENTE|OBSERVADA/i.test(item.estado || ''));
+  if (pendingClassifications.length > 0) {
+    const first = sortByMostRecent(pendingClassifications, (item) => item.fechaActualizacion || item.fechaClasificacion)[0];
+    notifications.push({
+      id: `clasificaciones-${pendingClassifications.length}`,
+      tone: 'warning',
+      title: `${pendingClassifications.length} clasificaciones requieren revisión`,
+      description: first?.lote?.codigo ? `Último registro asociado al lote ${first.lote.codigo}.` : 'Hay registros pendientes de validación de calidad.',
+      createdAt: first?.fechaActualizacion || first?.fechaClasificacion,
+      moduleKey: 'clasificacion'
+    });
+  }
+
+  const observedDispatches = despachos.filter((item) => /OBSERVADO|ANULADO/i.test(item.estado || item.validacionCalidad || ''));
+  if (observedDispatches.length > 0) {
+    const first = sortByMostRecent(observedDispatches, (item) => item.fechaActualizacion || item.fechaDespacho)[0];
+    notifications.push({
+      id: `despachos-${observedDispatches.length}`,
+      tone: 'danger',
+      title: `${observedDispatches.length} despachos con observación`,
+      description: first?.destino ? `Último destino observado: ${first.destino}.` : 'Revisa el módulo de despacho.',
+      createdAt: first?.fechaActualizacion || first?.fechaDespacho,
+      moduleKey: 'despacho'
+    });
+  }
+
+  const inactiveBeds = camas.filter((item) => (item.estado || '').toUpperCase() !== 'ACTIVA');
+  if (inactiveBeds.length > 0) {
+    notifications.push({
+      id: `camas-${inactiveBeds.length}`,
+      tone: 'info',
+      title: `${inactiveBeds.length} camas no activas`,
+      description: 'Revisa disponibilidad y mantenimiento de camas productivas.',
+      createdAt: sortByMostRecent(inactiveBeds, (item) => item.fechaActualizacion || item.fechaCreacion)[0]?.fechaActualizacion,
+      moduleKey: 'camas'
+    });
+  }
+
+  const latestLot = sortByMostRecent(lotes, (item) => item.fechaActualizacion || item.fechaCreacion || item.fechaRegistro)[0];
+  if (latestLot) {
+    notifications.push({
+      id: `lote-${latestLot.id}`,
+      tone: 'success',
+      title: `Lote ${latestLot.codigo} disponible`,
+      description: latestLot.estado ? `Estado actual: ${latestLot.estado}.` : 'Registro cargado desde la base de datos.',
+      createdAt: latestLot.fechaActualizacion || latestLot.fechaCreacion || latestLot.fechaRegistro,
+      moduleKey: 'lotes'
+    });
+  }
+
+  return notifications.slice(0, 6);
+}
+
+function buildSearchItems(
+  lotes: LoteResponse[],
+  camas: CamaResponse[],
+  siembras: SiembraResponse[],
+  procesos: ProcesoOperativoResponse | null,
+  clasificaciones: ClasificacionResponse[],
+  despachos: DespachoResponse[],
+  usuarios: UserReferenceResponse[]
+): CommandSearchItem[] {
+  return [
+    ...lotes.map((item) => ({
+      id: `lote-${item.id}`,
+      label: `Lote ${item.codigo}`,
+      description: [item.descripcion, item.variedad, item.estado].filter(Boolean).join(' · '),
+      moduleKey: 'lotes',
+      type: 'Lote'
+    })),
+    ...camas.map((item) => ({
+      id: `cama-${item.id}`,
+      label: `Cama ${item.codigo}`,
+      description: [item.lote?.codigo, item.descripcion, item.estado].filter(Boolean).join(' · '),
+      moduleKey: 'camas',
+      type: 'Cama'
+    })),
+    ...siembras.map((item) => ({
+      id: `siembra-${item.id}`,
+      label: `Siembra #${item.id}`,
+      description: [item.lote?.codigo, item.cama?.codigo, item.estado].filter(Boolean).join(' · '),
+      moduleKey: 'siembra',
+      type: 'Siembra'
+    })),
+    ...(procesos?.uniformizaciones.items || []).map((item) => ({
+      id: `uniformizacion-${item.id}`,
+      label: `Uniformización #${item.id}`,
+      description: [item.lote?.codigo, item.cama?.codigo, item.estado].filter(Boolean).join(' · '),
+      moduleKey: 'procesos',
+      type: 'Proceso'
+    })),
+    ...(procesos?.formalizaciones.items || []).map((item) => ({
+      id: `formalizacion-${item.id}`,
+      label: `Formalización #${item.id}`,
+      description: [item.lote?.codigo, item.cama?.codigo, item.estado].filter(Boolean).join(' · '),
+      moduleKey: 'procesos',
+      type: 'Proceso'
+    })),
+    ...clasificaciones.map((item) => ({
+      id: `clasificacion-${item.id}`,
+      label: `Clasificación #${item.id}`,
+      description: [item.lote?.codigo, item.estadoPlanta, item.estado].filter(Boolean).join(' · '),
+      moduleKey: 'clasificacion',
+      type: 'Calidad'
+    })),
+    ...despachos.map((item) => ({
+      id: `despacho-${item.id}`,
+      label: `Despacho #${item.id}`,
+      description: [item.lote?.codigo, item.destino, item.estado].filter(Boolean).join(' · '),
+      moduleKey: 'despacho',
+      type: 'Despacho'
+    })),
+    ...usuarios.map((item) => ({
+      id: `usuario-${item.id}`,
+      label: item.nombreCompleto || item.username,
+      description: [item.email, item.rol, item.activo ? 'Activo' : 'Inactivo'].filter(Boolean).join(' · '),
+      moduleKey: 'usuarios',
+      type: 'Usuario'
+    }))
+  ];
+}
 
 export default function App() {
   const [bootstrap, setBootstrap] = useState<FrontendBootstrapResponse | null>(null);
@@ -215,6 +353,16 @@ export default function App() {
   const modules = useMemo(() => bootstrap?.modules || dashboard?.modules || [], [bootstrap, dashboard]);
   const activeModule = modules.find((module) => module.key === activeKey);
   const loteReferences = catalogs?.lotes || lotes.map((lote) => ({ id: lote.id, codigo: lote.codigo, descripcion: lote.descripcion }));
+  const notifications = useMemo(() => buildNotifications(lotes, camas, clasificaciones, despachos), [lotes, camas, clasificaciones, despachos]);
+  const searchItems = useMemo(() => buildSearchItems(lotes, camas, siembras, procesos, clasificaciones, despachos, usuarios), [
+    lotes,
+    camas,
+    siembras,
+    procesos,
+    clasificaciones,
+    despachos,
+    usuarios
+  ]);
 
   if (loading) {
     return (
@@ -248,9 +396,29 @@ export default function App() {
     <div className="app-shell">
       <Sidebar modules={modules} activeKey={activeKey} user={user} onSelect={navigate} onLogout={handleLogout} />
       <section className="main-shell">
-        <Topbar user={user} activeModule={activeModule?.label || 'Control de trazabilidad'} onRefresh={refresh} refreshing={refreshing} />
+        <Topbar
+          user={user}
+          activeModule={activeModule?.label || 'Control de trazabilidad'}
+          notifications={notifications}
+          onOpenSearch={() => setCommandOpen(true)}
+          onRefresh={refresh}
+          onNavigate={navigate}
+          onLogout={handleLogout}
+          refreshing={refreshing}
+        />
         <div key={activeKey} className="route-transition">
-          {activeKey === 'dashboard' && <DashboardPage dashboard={dashboard} lotes={lotes} camas={camas} />}
+          {activeKey === 'dashboard' && (
+            <DashboardPage
+              dashboard={dashboard}
+              lotes={lotes}
+              camas={camas}
+              siembras={siembras}
+              procesos={procesos}
+              clasificaciones={clasificaciones}
+              despachos={despachos}
+              trazabilidad={trazabilidad}
+            />
+          )}
           {activeKey === 'lotes' && <LotesPage lotes={lotes} camas={camas} siembras={siembras} onLotesChange={setLotes} />}
           {activeKey === 'camas' && <CamasPage camas={camas} lotes={loteReferences} onCamasChange={setCamas} />}
           {activeKey === 'siembra' && <SiembrasPage siembras={siembras} lotes={loteReferences} camas={camas} onSiembrasChange={setSiembras} />}
@@ -265,11 +433,11 @@ export default function App() {
         open={commandOpen}
         modules={modules}
         activeKey={activeKey}
+        searchItems={searchItems}
         onClose={() => setCommandOpen(false)}
         onSelect={navigate}
         onRefresh={refresh}
       />
-      <FloatingActionDock onOpenCommand={() => setCommandOpen(true)} onRefresh={refresh} refreshing={refreshing} />
       <ToastStack toasts={toasts} onDismiss={(id) => setToasts((current) => current.filter((toast) => toast.id !== id))} />
     </div>
   );

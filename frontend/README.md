@@ -190,3 +190,15 @@ Se mejoró el sistema de overlays del frontend React:
 - Drawers laterales en desktop y bottom sheet en móvil.
 - Checklist funcional para validar APF3 en `docs/functional-qa-checklist.md`.
 
+
+## Fase 23 - Corrección visual profunda y datos reales en frontend
+
+Se corrigió la experiencia visual principal del frontend React:
+
+- Buscador fijo oculto y reemplazado por botón/`Ctrl + K`.
+- Centro de búsqueda con registros reales cargados desde API.
+- Panel de notificaciones funcional derivado de datos reales.
+- Menú de perfil con nombre, correo, usuario y rol.
+- Dashboard sin series simuladas; las métricas visuales usan siembras, despachos, clasificaciones y registros reales.
+- Modales más centrados, compactos y responsive.
+- Confirmación de limpieza API-first sin Thymeleaf ni frontend legacy en backend.

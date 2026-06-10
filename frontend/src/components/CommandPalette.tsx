@@ -1,11 +1,20 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ArrowRight, Command, RefreshCcw, Search, Sparkles, X } from 'lucide-react';
+import { ArrowRight, Command, Database, RefreshCcw, Search, Sparkles, X } from 'lucide-react';
 import type { ModuleResponse } from '../types/api';
+
+export interface CommandSearchItem {
+  id: string;
+  label: string;
+  description: string;
+  moduleKey: string;
+  type: string;
+}
 
 interface CommandPaletteProps {
   open: boolean;
   modules: ModuleResponse[];
   activeKey: string;
+  searchItems?: CommandSearchItem[];
   onClose: () => void;
   onSelect: (key: string) => void;
   onRefresh: () => void | Promise<void>;
@@ -23,7 +32,7 @@ const hints: Record<string, string> = {
   usuarios: 'Administra usuarios, roles y accesos'
 };
 
-export function CommandPalette({ open, modules, activeKey, onClose, onSelect, onRefresh }: CommandPaletteProps) {
+export function CommandPalette({ open, modules, activeKey, searchItems = [], onClose, onSelect, onRefresh }: CommandPaletteProps) {
   const [query, setQuery] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -61,6 +70,18 @@ export function CommandPalette({ open, modules, activeKey, onClose, onSelect, on
       .some((value) => String(value || '').toLowerCase().includes(term)));
   }, [modules, query]);
 
+  const filteredItems = useMemo(() => {
+    const term = query.trim().toLowerCase();
+    if (!term) {
+      return searchItems.slice(0, 8);
+    }
+
+    return searchItems
+      .filter((item) => [item.label, item.description, item.type]
+        .some((value) => String(value || '').toLowerCase().includes(term)))
+      .slice(0, 10);
+  }, [searchItems, query]);
+
   if (!open) {
     return null;
   }
@@ -72,8 +93,8 @@ export function CommandPalette({ open, modules, activeKey, onClose, onSelect, on
           <div className="command-palette__brand">
             <span><Command size={18} /></span>
             <div>
-              <strong>Centro de acciones</strong>
-              <small>Navega, sincroniza y accede rápido al flujo operativo</small>
+              <strong>Centro de búsqueda</strong>
+              <small>Busca módulos y registros cargados desde la API</small>
             </div>
           </div>
           <button type="button" className="icon-button" aria-label="Cerrar buscador" onClick={onClose}>
@@ -83,7 +104,7 @@ export function CommandPalette({ open, modules, activeKey, onClose, onSelect, on
 
         <label className="command-search">
           <Search size={18} />
-          <input ref={inputRef} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar módulo o acción..." />
+          <input ref={inputRef} value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Buscar lote, cama, usuario, despacho o módulo..." />
           <kbd>ESC</kbd>
         </label>
 
@@ -100,10 +121,39 @@ export function CommandPalette({ open, modules, activeKey, onClose, onSelect, on
             <span className="command-item__icon"><RefreshCcw size={17} /></span>
             <div>
               <strong>Sincronizar datos</strong>
-              <small>Actualiza dashboard, lotes, procesos y reportes</small>
+              <small>Recarga la información desde Spring Boot y MySQL</small>
             </div>
             <ArrowRight size={16} />
           </button>
+        </div>
+
+        <div className="command-section">
+          <span className="command-section__title">Resultados de datos</span>
+          <div className="command-list">
+            {filteredItems.map((item) => (
+              <button
+                key={item.id}
+                type="button"
+                className="command-item command-item--data"
+                onClick={() => {
+                  onSelect(item.moduleKey);
+                  onClose();
+                }}
+              >
+                <span className="command-item__icon"><Database size={16} /></span>
+                <div>
+                  <strong>{item.label}</strong>
+                  <small>{item.description}</small>
+                </div>
+                <em>{item.type}</em>
+              </button>
+            ))}
+            {filteredItems.length === 0 ? (
+              <div className="command-empty">
+                No hay registros reales que coincidan con “{query || 'tu búsqueda'}”.
+              </div>
+            ) : null}
+          </div>
         </div>
 
         <div className="command-section">
@@ -129,7 +179,7 @@ export function CommandPalette({ open, modules, activeKey, onClose, onSelect, on
             ))}
             {filteredModules.length === 0 && (
               <div className="command-empty">
-                No encontré coincidencias para “{query}”.
+                No encontré módulos para “{query}”.
               </div>
             )}
           </div>

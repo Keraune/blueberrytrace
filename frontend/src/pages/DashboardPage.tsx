@@ -1,34 +1,78 @@
 import type { CSSProperties } from 'react';
 import { Boxes, ChevronDown, Factory, Leaf, PackageCheck, Sprout, Tag, Truck } from 'lucide-react';
 import { dateShort, numberCompact } from '../lib/format';
-import type { CamaResponse, DashboardApiResponse, LoteResponse } from '../types/api';
+import type {
+  CamaResponse,
+  ClasificacionResponse,
+  DashboardApiResponse,
+  DespachoResponse,
+  LoteResponse,
+  ProcesoOperativoResponse,
+  SiembraResponse,
+  TrazabilidadResponse
+} from '../types/api';
 
 interface DashboardPageProps {
   dashboard: DashboardApiResponse | null;
   lotes: LoteResponse[];
   camas: CamaResponse[];
+  siembras: SiembraResponse[];
+  procesos: ProcesoOperativoResponse | null;
+  clasificaciones: ClasificacionResponse[];
+  despachos: DespachoResponse[];
+  trazabilidad: TrazabilidadResponse[];
+}
+
+type ActivityTone = 'green' | 'blue' | 'orange' | 'purple' | 'slate' | 'red';
+
+interface ActivityEntry {
+  id: string;
+  tone: ActivityTone;
+  title: string;
+  meta: string;
+  date: string | null;
 }
 
 const monthLabels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
-const yAxisLabels = ['100k', '75k', '50k', '25k', '0k'];
 
-function buildLinePoints(values: number[], width = 760, height = 200, paddingX = 28, paddingY = 22) {
-  const max = Math.max(...values, 1);
-  const min = Math.min(...values, 0);
-  const range = Math.max(max - min, 1);
+function valueOf(value: number | null | undefined) {
+  return Number.isFinite(value || 0) ? Number(value || 0) : 0;
+}
+
+function monthIndex(value: string | null | undefined) {
+  if (!value) {
+    return -1;
+  }
+
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) {
+    return -1;
+  }
+
+  return parsed.getMonth();
+}
+
+function buildLinePoints(values: number[], maxValue: number, width = 760, height = 200, paddingX = 28, paddingY = 22) {
+  const safeMax = Math.max(maxValue, 1);
   return values.map((value, index) => {
-    const x = paddingX + (index * ((width - paddingX * 2) / (values.length - 1)));
-    const y = height - paddingY - (((value - min) / range) * (height - paddingY * 2));
+    const x = paddingX + (index * ((width - paddingX * 2) / Math.max(values.length - 1, 1)));
+    const y = height - paddingY - ((value / safeMax) * (height - paddingY * 2));
     return `${x},${y}`;
   }).join(' ');
 }
 
-function buildAreaPath(points: string, width = 760, height = 200, paddingY = 22) {
-  const first = points.split(' ')[0];
-  const last = points.split(' ').at(-1) || first;
+function buildAreaPath(points: string, height = 200, paddingY = 22) {
+  const parts = points.split(' ');
+  const first = parts[0];
+  const last = parts.at(-1) || first;
   const firstX = first.split(',')[0];
   const lastX = last.split(',')[0];
-  return `M ${first} L ${points.split(' ').slice(1).join(' L ')} L ${lastX},${height - paddingY} L ${firstX},${height - paddingY} Z`;
+  return `M ${first} L ${parts.slice(1).join(' L ')} L ${lastX},${height - paddingY} L ${firstX},${height - paddingY} Z`;
+}
+
+function axisLabels(maxValue: number) {
+  const safeMax = Math.max(maxValue, 1);
+  return [safeMax, safeMax * 0.75, safeMax * 0.5, safeMax * 0.25, 0].map((value) => numberCompact(Math.round(value)));
 }
 
 function navigateTo(path: string) {
@@ -36,7 +80,41 @@ function navigateTo(path: string) {
   window.dispatchEvent(new PopStateEvent('popstate'));
 }
 
-export function DashboardPage({ dashboard, lotes, camas }: DashboardPageProps) {
+function qualityBucket(item: ClasificacionResponse) {
+  const source = `${item.estadoPlanta || ''} ${item.condicion || ''} ${item.tamano || ''}`.toLowerCase();
+
+  if (/descarte|rechaz|no apt|dañ|enfer/i.test(source)) {
+    return 'Descarte';
+  }
+
+  if (/primera|óptimo|optimo|excelente|apta/i.test(source)) {
+    return 'Primera';
+  }
+
+  if (/segunda|bueno|media|mediano/i.test(source)) {
+    return 'Segunda';
+  }
+
+  if (/tercera|regular|bajo|pequeño|pequeno/i.test(source)) {
+    return 'Tercera';
+  }
+
+  return 'Sin clasificar';
+}
+
+function recordDate(...values: Array<string | null | undefined>) {
+  return values.find(Boolean) || null;
+}
+
+function actorName(value: { usuarioRegistro?: { nombreCompleto?: string | null } | null }) {
+  return value.usuarioRegistro?.nombreCompleto || 'Sistema';
+}
+
+function byRecent(left: ActivityEntry, right: ActivityEntry) {
+  return new Date(right.date || 0).getTime() - new Date(left.date || 0).getTime();
+}
+
+export function DashboardPage({ dashboard, lotes, camas, siembras, procesos, clasificaciones, despachos, trazabilidad }: DashboardPageProps) {
   const summary = dashboard?.summary;
   const updatedAt = new Date().toLocaleString('es-PE', {
     day: '2-digit',
@@ -46,18 +124,40 @@ export function DashboardPage({ dashboard, lotes, camas }: DashboardPageProps) {
     minute: '2-digit'
   });
 
-  const planted = summary?.plantasSembradas || 0;
-  const shipped = summary?.plantasDespachadas || 0;
-  const classifications = summary?.clasificacionesRegistradas || 0;
-  const validClassifications = summary?.clasificacionesValidadas || 0;
-  const pendingClassifications = summary?.clasificacionesPendientes || 0;
-  const activeLots = summary?.lotesActivos || 0;
+  const currentYear = new Date().getFullYear();
+  const currentMonth = new Date().getMonth();
+  const planted = summary?.plantasSembradas || siembras.reduce((total, item) => total + valueOf(item.cantidadRegistrada), 0);
+  const shipped = summary?.plantasDespachadas || despachos.reduce((total, item) => total + valueOf(item.cantidadDespachada), 0);
+  const classifications = summary?.clasificacionesRegistradas || clasificaciones.length;
+  const pendingClassifications = summary?.clasificacionesPendientes || clasificaciones.filter((item) => /PENDIENTE|OBSERVADA/i.test(item.estado || '')).length;
+  const activeLots = summary?.lotesActivos || lotes.filter((lote) => (lote.estado || '').toUpperCase() === 'ACTIVO').length;
   const totalLots = summary?.lotesRegistrados || lotes.length;
+  const newLotsThisMonth = lotes.filter((lote) => {
+    const date = new Date(lote.fechaRegistro || lote.fechaCreacion || '');
+    return !Number.isNaN(date.getTime()) && date.getMonth() === currentMonth && date.getFullYear() === currentYear;
+  }).length;
 
-  const productionSeries = [0.48, 0.56, 0.66, 0.62, 0.74, 0.79, 0.76, 0.86, 0.95, 0.91, 1.02, 1.08]
-    .map((factor, index) => Math.max(Math.round(planted * factor), 900 + index * 120));
-  const linePoints = buildLinePoints(productionSeries);
-  const areaPath = buildAreaPath(linePoints);
+  const plantedByMonth = Array.from({ length: 12 }, () => 0);
+  const shippedByMonth = Array.from({ length: 12 }, () => 0);
+  siembras.forEach((item) => {
+    const index = monthIndex(item.fechaSiembra || item.fechaCreacion);
+    if (index >= 0) {
+      plantedByMonth[index] += valueOf(item.cantidadRegistrada);
+    }
+  });
+  despachos.forEach((item) => {
+    const index = monthIndex(item.fechaDespacho || item.fechaCreacion);
+    if (index >= 0) {
+      shippedByMonth[index] += valueOf(item.cantidadDespachada);
+    }
+  });
+
+  const monthlyMax = Math.max(...plantedByMonth, ...shippedByMonth, 1);
+  const hasMonthlyData = plantedByMonth.some(Boolean) || shippedByMonth.some(Boolean);
+  const plantPoints = buildLinePoints(plantedByMonth, monthlyMax);
+  const dispatchPoints = buildLinePoints(shippedByMonth, monthlyMax);
+  const areaPath = buildAreaPath(plantPoints);
+  const yAxisLabels = axisLabels(monthlyMax);
 
   const lotStatusCounts = {
     activo: lotes.filter((lote) => (lote.estado || '').toUpperCase() === 'ACTIVO').length,
@@ -74,47 +174,57 @@ export function DashboardPage({ dashboard, lotes, camas }: DashboardPageProps) {
     '--completado': `${(lotStatusCounts.completado / totalStatus) * 360}deg`
   } as CSSProperties;
 
-  const totalClassifiedPlants = Math.max(validClassifications, Math.round(planted * 0.42), 1);
+  const qualityTotals = clasificaciones.reduce<Record<string, number>>((accumulator, item) => {
+    const bucket = qualityBucket(item);
+    accumulator[bucket] = (accumulator[bucket] || 0) + valueOf(item.cantidad);
+    return accumulator;
+  }, { Primera: 0, Segunda: 0, Tercera: 0, Descarte: 0 });
   const qualityBars = [
-    { label: 'Primera', value: Math.max(totalClassifiedPlants, 0), tone: 'green' },
-    { label: 'Segunda', value: Math.max(Math.round(totalClassifiedPlants * 0.32), 0), tone: 'blue' },
-    { label: 'Tercera', value: Math.max(Math.round(totalClassifiedPlants * 0.1), 0), tone: 'orange' },
-    { label: 'Descarte', value: Math.max(Math.round((pendingClassifications || 1) * 0.25), 0), tone: 'red' }
+    { label: 'Primera', value: qualityTotals.Primera || 0, tone: 'green' },
+    { label: 'Segunda', value: qualityTotals.Segunda || 0, tone: 'blue' },
+    { label: 'Tercera', value: qualityTotals.Tercera || 0, tone: 'orange' },
+    { label: 'Descarte', value: qualityTotals.Descarte || 0, tone: 'red' }
   ];
   const maxQuality = Math.max(...qualityBars.map((item) => item.value), 1);
+  const hasQualityData = qualityBars.some((item) => item.value > 0);
 
-  const recentActivity = [
-    {
-      tone: 'green',
-      title: classifications > 0 ? `Clasificación CL-${String(classifications).padStart(4, '0')} completada` : 'Clasificación lista para registrar',
-      meta: 'M. García · hace 2h'
-    },
-    {
-      tone: 'blue',
-      title: summary?.despachosRegistrados ? `Despacho D-${String(summary.despachosRegistrados).padStart(4, '0')} en tránsito` : 'Despacho pendiente de salida',
-      meta: 'Sistema · hace 3h'
-    },
-    {
-      tone: 'slate',
-      title: lotes[0] ? `Lote ${lotes[0].codigo} registrado en ${lotes[0].descripcion || 'invernadero'}` : 'Nuevo lote listo para registro',
-      meta: 'A. Torres · hace 5h'
-    },
-    {
-      tone: 'slate',
-      title: camas[0] ? `Cama ${camas[0].codigo} confirmada` : 'Cama productiva pendiente de asignación',
-      meta: 'L. Quispe · hace 1d'
-    },
-    {
-      tone: 'green',
-      title: summary?.uniformizacionesRegistradas ? `Uniformización #${summary.uniformizacionesRegistradas} aprobada` : 'Uniformización pendiente de revisión',
-      meta: 'R. Silva · hace 1d'
-    },
-    {
-      tone: 'orange',
-      title: pendingClassifications ? `${pendingClassifications} clasificaciones pendientes` : 'Validaciones de calidad al día',
-      meta: 'Control de calidad · hace 2d'
-    }
-  ];
+  const recentActivity: ActivityEntry[] = [
+    ...lotes.map((item) => ({
+      id: `lote-${item.id}`,
+      tone: 'green' as ActivityTone,
+      title: `Lote ${item.codigo} · ${item.estado || 'sin estado'}`,
+      meta: `${actorName(item)} · ${dateShort(recordDate(item.fechaActualizacion, item.fechaCreacion, item.fechaRegistro))}`,
+      date: recordDate(item.fechaActualizacion, item.fechaCreacion, item.fechaRegistro)
+    })),
+    ...siembras.map((item) => ({
+      id: `siembra-${item.id}`,
+      tone: 'blue' as ActivityTone,
+      title: `Siembra #${item.id} · ${numberCompact(item.cantidadRegistrada)} plantas`,
+      meta: `${actorName(item)} · ${dateShort(recordDate(item.fechaActualizacion, item.fechaCreacion, item.fechaSiembra))}`,
+      date: recordDate(item.fechaActualizacion, item.fechaCreacion, item.fechaSiembra)
+    })),
+    ...(procesos?.uniformizaciones.items || []).map((item) => ({
+      id: `uniformizacion-${item.id}`,
+      tone: 'purple' as ActivityTone,
+      title: `Uniformización #${item.id} · ${item.estado || 'sin estado'}`,
+      meta: `${actorName(item)} · ${dateShort(recordDate(item.fechaActualizacion, item.fechaCreacion, item.fechaUniformizacion))}`,
+      date: recordDate(item.fechaActualizacion, item.fechaCreacion, item.fechaUniformizacion)
+    })),
+    ...clasificaciones.map((item) => ({
+      id: `clasificacion-${item.id}`,
+      tone: (item.estado && /PENDIENTE|OBSERVADA/i.test(item.estado) ? 'orange' : 'green') as ActivityTone,
+      title: `Clasificación #${item.id} · ${item.estado || 'sin estado'}`,
+      meta: `${actorName(item)} · ${dateShort(recordDate(item.fechaActualizacion, item.fechaCreacion, item.fechaClasificacion))}`,
+      date: recordDate(item.fechaActualizacion, item.fechaCreacion, item.fechaClasificacion)
+    })),
+    ...despachos.map((item) => ({
+      id: `despacho-${item.id}`,
+      tone: 'blue' as ActivityTone,
+      title: `Despacho #${item.id} · ${numberCompact(item.cantidadDespachada)} plantas`,
+      meta: `${actorName(item)} · ${dateShort(recordDate(item.fechaActualizacion, item.fechaCreacion, item.fechaDespacho))}`,
+      date: recordDate(item.fechaActualizacion, item.fechaCreacion, item.fechaDespacho)
+    }))
+  ].sort(byRecent).slice(0, 6);
 
   return (
     <main className="content-grid dashboard-screen dashboard-screen--refined">
@@ -131,7 +241,7 @@ export function DashboardPage({ dashboard, lotes, camas }: DashboardPageProps) {
           <div>
             <span>Lotes activos</span>
             <strong>{activeLots}</strong>
-            <small>+{Math.max(totalLots - activeLots, 0)} registrados este mes</small>
+            <small>{newLotsThisMonth} registrados este mes · {totalLots} total</small>
           </div>
         </article>
         <article className="stat-card stat-card--purple">
@@ -139,14 +249,14 @@ export function DashboardPage({ dashboard, lotes, camas }: DashboardPageProps) {
           <div>
             <span>Total plantas</span>
             <strong>{numberCompact(planted)}</strong>
-            <small>En {activeLots || lotes.length} invernaderos activos</small>
+            <small>{summary?.siembrasRegistradas || siembras.length} siembras registradas</small>
           </div>
         </article>
         <article className="stat-card stat-card--blue">
           <div className="stat-card__icon"><Truck size={20} /></div>
           <div>
             <span>Despachos</span>
-            <strong>{summary?.despachosRegistrados || 0}</strong>
+            <strong>{summary?.despachosRegistrados || despachos.length}</strong>
             <small>{numberCompact(shipped)} plantas enviadas</small>
           </div>
         </article>
@@ -164,10 +274,10 @@ export function DashboardPage({ dashboard, lotes, camas }: DashboardPageProps) {
         <article className="panel-card chart-panel chart-panel--line refined-card">
           <div className="panel-card__header refined-card__header">
             <div>
-              <h2>Producción anual {new Date().getFullYear()}</h2>
-              <p>Plantas registradas vs. despachos mensuales.</p>
+              <h2>Producción anual {currentYear}</h2>
+              <p>Plantas registradas y despachadas según registros reales.</p>
             </div>
-            <button type="button" className="soft-chip">{new Date().getFullYear()} <ChevronDown size={14} /></button>
+            <button type="button" className="soft-chip">{currentYear} <ChevronDown size={14} /></button>
           </div>
           <div className="chart-with-axis">
             <div className="chart-y-axis">
@@ -188,14 +298,25 @@ export function DashboardPage({ dashboard, lotes, camas }: DashboardPageProps) {
                     <text x={28 + index * 64} y="203">{month}</text>
                   </g>
                 ))}
-                <path d={areaPath} className="line-chart__area" />
-                <polyline points={linePoints} />
+                {hasMonthlyData ? (
+                  <>
+                    <path d={areaPath} className="line-chart__area" />
+                    <polyline points={plantPoints} />
+                    <polyline points={dispatchPoints} className="line-chart__secondary" />
+                  </>
+                ) : null}
               </svg>
+              {!hasMonthlyData ? (
+                <div className="chart-empty-state">
+                  <strong>Sin datos mensuales suficientes</strong>
+                  <small>Registra siembras y despachos para construir la tendencia anual.</small>
+                </div>
+              ) : null}
             </div>
           </div>
           <div className="chart-legend chart-legend--right">
             <span><i className="legend-dot legend-dot--green" /> Plantas registradas</span>
-            <span><i className="legend-dot legend-dot--purple" /> Despachos</span>
+            <span><i className="legend-dot legend-dot--purple" /> Plantas despachadas</span>
           </div>
         </article>
 
@@ -225,20 +346,26 @@ export function DashboardPage({ dashboard, lotes, camas }: DashboardPageProps) {
         <article className="panel-card chart-panel chart-panel--bars refined-card">
           <div className="panel-card__header refined-card__header">
             <div>
-              <h2>Clasificación por calidad — {dateShort(new Date().toISOString())}</h2>
-              <p>Distribución total por categoría.</p>
+              <h2>Clasificación por calidad</h2>
+              <p>Totales por categoría calculados desde las clasificaciones registradas.</p>
             </div>
           </div>
           <div className="quality-chart-layout">
-            <div className="quality-axis"><span>60k</span><span>45k</span><span>30k</span><span>15k</span><span>0k</span></div>
+            <div className="quality-axis">{axisLabels(maxQuality).map((label) => <span key={label}>{label}</span>)}</div>
             <div className="bar-chart bar-chart--refined">
               {qualityBars.map((item) => (
                 <div className="bar-chart__item" key={item.label}>
-                  <div className={`bar-chart__bar bar-chart__bar--${item.tone}`} style={{ height: `${Math.max((item.value / maxQuality) * 100, 4)}%` }} />
+                  <div className={`bar-chart__bar bar-chart__bar--${item.tone}`} style={{ height: `${hasQualityData ? Math.max((item.value / maxQuality) * 100, 4) : 0}%` }} />
                   <span>{item.label}</span>
                 </div>
               ))}
             </div>
+            {!hasQualityData ? (
+              <div className="chart-empty-state chart-empty-state--compact">
+                <strong>Sin clasificación por calidad</strong>
+                <small>Los valores aparecerán al registrar clasificaciones reales.</small>
+              </div>
+            ) : null}
           </div>
         </article>
 
@@ -246,20 +373,28 @@ export function DashboardPage({ dashboard, lotes, camas }: DashboardPageProps) {
           <div className="panel-card__header refined-card__header">
             <div>
               <h2>Actividad reciente</h2>
-              <p>Últimos eventos del flujo productivo.</p>
+              <p>Últimos eventos cargados desde los registros del sistema.</p>
             </div>
           </div>
-          <ul className="activity-list activity-list--refined">
-            {recentActivity.map((entry) => (
-              <li key={`${entry.title}-${entry.meta}`}>
-                <span className={`activity-dot activity-dot--${entry.tone}`} />
-                <div>
-                  <strong>{entry.title}</strong>
-                  <small>{entry.meta}</small>
-                </div>
-              </li>
-            ))}
-          </ul>
+          {recentActivity.length > 0 ? (
+            <ul className="activity-list activity-list--refined">
+              {recentActivity.map((entry) => (
+                <li key={entry.id}>
+                  <span className={`activity-dot activity-dot--${entry.tone}`} />
+                  <div>
+                    <strong>{entry.title}</strong>
+                    <small>{entry.meta}</small>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <div className="empty-state empty-state--compact">
+              <PackageCheck size={24} />
+              <strong>Sin actividad reciente</strong>
+              <small>Los movimientos aparecerán cuando existan registros en MySQL.</small>
+            </div>
+          )}
         </article>
       </section>
 
@@ -279,6 +414,11 @@ export function DashboardPage({ dashboard, lotes, camas }: DashboardPageProps) {
         <button type="button" className="quick-action quick-action--slate" onClick={() => navigateTo('/reportes')}>
           <PackageCheck size={16} /> Ver reportes
         </button>
+      </section>
+
+      <section className="data-origin-note">
+        <strong>Fuente de datos</strong>
+        <span>{trazabilidad.length} registros de trazabilidad disponibles desde la API.</span>
       </section>
     </main>
   );
