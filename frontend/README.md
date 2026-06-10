@@ -114,3 +114,15 @@ Antes de usar React, inicia sesión en el backend:
 ```text
 http://localhost:8080/auth/login
 ```
+
+## Login React
+
+El cliente React ya no depende obligatoriamente de abrir primero `/auth/login` en Thymeleaf. Si no existe sesión activa, muestra su propia pantalla de acceso y consume:
+
+```http
+GET  /api/v1/auth/csrf
+POST /api/v1/auth/login
+POST /api/v1/auth/logout
+```
+
+Por ahora Thymeleaf se mantiene como respaldo hasta completar la migración total de módulos.

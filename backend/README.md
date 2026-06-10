@@ -76,3 +76,15 @@ La configuración de MySQL acepta variables de entorno:
 ```bash
 DB_USERNAME=root DB_PASSWORD=12345678 npm run backend:run
 ```
+
+## Autenticación API para React
+
+Además del login tradicional de Thymeleaf, el backend expone autenticación JSON para el frontend separado:
+
+```http
+GET  /api/v1/auth/csrf
+POST /api/v1/auth/login
+POST /api/v1/auth/logout
+```
+
+`/api/v1/frontend/bootstrap` es público para que React pueda inicializar configuración visual antes de requerir sesión. Los demás endpoints API continúan protegidos por Spring Security.

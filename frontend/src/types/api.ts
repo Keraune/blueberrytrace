@@ -306,3 +306,8 @@ export interface CsrfResponse {
   parameterName: string;
   token: string;
 }
+
+export interface LoginPayload {
+  username: string;
+  password: string;
+}

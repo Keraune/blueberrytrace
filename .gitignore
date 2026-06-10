@@ -1,33 +1,25 @@
-# Java / Spring Boot
+# Build outputs
+target/
 backend/target/
-backend/.mvn/wrapper/maven-wrapper.jar
-!backend/**/src/main/**/target/
-!backend/**/src/test/**/target/
-
-# Node / Vite
-frontend/node_modules/
 frontend/dist/
-frontend/.vite/
-frontend/*.tsbuildinfo
+frontend/node_modules/
+*.tsbuildinfo
+
+# Local environment
+.env
 frontend/.env
+*.local
 
-# Logs
-*.log
-
-# IDEs
+# IDE
 .idea/
 .vscode/
 *.iml
-*.iws
-*.ipr
-.classpath
-.project
-.settings/
 
-# OS
+# Maven wrapper binary cache
+.mvn/wrapper/maven-wrapper.jar
+backend/.mvn/wrapper/maven-wrapper.jar
+
+# Logs and temporary files
+*.log
+*.tmp
 .DS_Store
-Thumbs.db
-
-# IntelliJ IDEA
-*.iml
-.idea/

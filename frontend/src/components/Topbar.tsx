@@ -1,13 +1,14 @@
-import { Bell, Search } from 'lucide-react';
+import { Bell, LogOut, Search } from 'lucide-react';
 import { initials } from '../lib/format';
 import type { AuthenticatedUserResponse } from '../types/api';
 
 interface TopbarProps {
   user: AuthenticatedUserResponse | null;
   activeModule: string;
+  onLogout?: () => void | Promise<void>;
 }
 
-export function Topbar({ user, activeModule }: TopbarProps) {
+export function Topbar({ user, activeModule, onLogout }: TopbarProps) {
   return (
     <header className="topbar">
       <div>
@@ -30,6 +31,9 @@ export function Topbar({ user, activeModule }: TopbarProps) {
             <small>{user?.rol || user?.username || 'Operador'}</small>
           </div>
         </div>
+        <button className="icon-button icon-button--logout" type="button" aria-label="Cerrar sesión" onClick={onLogout}>
+          <LogOut size={18} />
+        </button>
       </div>
     </header>
   );

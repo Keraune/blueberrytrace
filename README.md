@@ -251,3 +251,15 @@ git add .
 git commit -m "refactor(workspace): registrar backend como modulo Maven"
 git push origin main
 ```
+
+## Fase 12 - Autenticación desde React
+
+El frontend React ya cuenta con login propio usando la API del backend:
+
+```http
+POST /api/v1/auth/login
+POST /api/v1/auth/logout
+GET  /api/v1/auth/csrf
+```
+
+Los HTML de Thymeleaf en `backend/src/main/resources/templates` se mantienen por ahora como respaldo estable del panel MVC/HTMX y del login tradicional. No conviene eliminarlos hasta que React cubra todos los flujos productivos y el backend pueda pasar a modo API-only.

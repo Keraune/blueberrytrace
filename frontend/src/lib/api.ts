@@ -13,6 +13,7 @@ import type {
   FormalizacionFormPayload,
   FrontendBootstrapResponse,
   ListResponse,
+  LoginPayload,
   LoteFormPayload,
   LoteResponse,
   ProcesoOperativoResponse,
@@ -95,6 +96,8 @@ async function mutateData<T>(path: string, method: string, body?: unknown): Prom
 
 export const blueberryApi = {
   csrf: () => getData<CsrfResponse>('/auth/csrf'),
+  login: (payload: LoginPayload) => mutateData<AuthenticatedUserResponse>('/auth/login', 'POST', payload),
+  logout: () => mutateData<void>('/auth/logout', 'POST'),
   bootstrap: () => getData<FrontendBootstrapResponse>('/frontend/bootstrap'),
   session: () => getData<AuthenticatedUserResponse>('/session/me'),
   dashboard: () => getData<DashboardApiResponse>('/dashboard/summary'),

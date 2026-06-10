@@ -3,11 +3,12 @@ import { AlertTriangle, Loader2, RefreshCcw } from 'lucide-react';
 import { Sidebar } from './components/Sidebar';
 import { Topbar } from './components/Topbar';
 import { useAppRoute } from './hooks/useAppRoute';
-import { blueberryApi } from './lib/api';
+import { ApiError, blueberryApi } from './lib/api';
 import { CamasPage } from './pages/CamasPage';
 import { ClasificacionPage } from './pages/ClasificacionPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { DespachoPage } from './pages/DespachoPage';
+import { LoginPage } from './pages/LoginPage';
 import { LotesPage } from './pages/LotesPage';
 import { ProcesosPage } from './pages/ProcesosPage';
 import { ReportesPage } from './pages/ReportesPage';
@@ -43,13 +44,17 @@ export default function App() {
   const [usuarios, setUsuarios] = useState<UserReferenceResponse[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [authRequired, setAuthRequired] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const { activeKey, navigate } = useAppRoute();
 
   async function load(signal?: AbortSignal) {
+    const [bootstrapResponse, userResponse] = await Promise.all([
+      blueberryApi.bootstrap(),
+      blueberryApi.session()
+    ]);
+
     const [
-      bootstrapResponse,
-      userResponse,
       dashboardResponse,
       catalogsResponse,
       lotesResponse,
@@ -61,8 +66,6 @@ export default function App() {
       trazabilidadResponse,
       usuariosResponse
     ] = await Promise.all([
-      blueberryApi.bootstrap(),
-      blueberryApi.session(),
       blueberryApi.dashboard(),
       blueberryApi.catalogs(),
       blueberryApi.lotes(),
@@ -91,6 +94,7 @@ export default function App() {
     setDespachos(despachosResponse.items);
     setTrazabilidad(trazabilidadResponse.items);
     setUsuarios(usuariosResponse.items);
+    setAuthRequired(false);
     setError(null);
   }
 
@@ -103,7 +107,12 @@ export default function App() {
         await load(controller.signal);
       } catch (exception) {
         if (!controller.signal.aborted) {
-          setError(exception instanceof Error ? exception.message : 'No se pudo cargar la información del panel.');
+          if (exception instanceof ApiError && exception.status === 401) {
+            setAuthRequired(true);
+            setError(null);
+          } else {
+            setError(exception instanceof Error ? exception.message : 'No se pudo cargar la información del panel.');
+          }
         }
       } finally {
         if (!controller.signal.aborted) {
@@ -121,9 +130,41 @@ export default function App() {
       setRefreshing(true);
       await load();
     } catch (exception) {
-      setError(exception instanceof Error ? exception.message : 'No se pudo actualizar la información.');
+      if (exception instanceof ApiError && exception.status === 401) {
+        setAuthRequired(true);
+        setUser(null);
+        setError(null);
+      } else {
+        setError(exception instanceof Error ? exception.message : 'No se pudo actualizar la información.');
+      }
     } finally {
       setRefreshing(false);
+    }
+  }
+
+  async function handleAuthenticated(authenticatedUser: AuthenticatedUserResponse) {
+    setUser(authenticatedUser);
+    setAuthRequired(false);
+    if (window.location.pathname === '/login') {
+      window.history.pushState({}, '', '/dashboard');
+    }
+    setLoading(true);
+    try {
+      await load();
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  async function handleLogout() {
+    try {
+      await blueberryApi.logout();
+    } finally {
+      setUser(null);
+      setAuthRequired(true);
+      setDashboard(null);
+      setCatalogs(null);
+      window.history.pushState({}, '', '/login');
     }
   }
 
@@ -141,6 +182,10 @@ export default function App() {
     );
   }
 
+  if (authRequired) {
+    return <LoginPage onAuthenticated={handleAuthenticated} />;
+  }
+
   if (error) {
     return (
       <div className="boot-screen boot-screen--error">
@@ -149,7 +194,7 @@ export default function App() {
         <span>{error}</span>
         <div className="boot-actions">
           <button type="button" className="action-button" onClick={refresh}><RefreshCcw size={16} /> Reintentar</button>
-          <a href="http://localhost:8080/auth/login">Iniciar sesión</a>
+          <button type="button" className="ghost-button" onClick={() => setAuthRequired(true)}>Iniciar sesión</button>
         </div>
       </div>
     );
@@ -159,7 +204,7 @@ export default function App() {
     <div className="app-shell">
       <Sidebar modules={modules} activeKey={activeKey} onSelect={navigate} />
       <section className="main-shell">
-        <Topbar user={user} activeModule={activeModule?.label || 'Control de trazabilidad'} />
+        <Topbar user={user} activeModule={activeModule?.label || 'Control de trazabilidad'} onLogout={handleLogout} />
         <div className="refresh-row">
           <button type="button" className="ghost-button" onClick={refresh} disabled={refreshing}>
             <RefreshCcw className={refreshing ? 'spin' : undefined} size={15} /> Sincronizar datos

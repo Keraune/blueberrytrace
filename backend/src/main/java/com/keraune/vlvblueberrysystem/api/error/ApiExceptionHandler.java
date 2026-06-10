@@ -3,6 +3,7 @@ package com.keraune.vlvblueberrysystem.api.error;
 import com.keraune.vlvblueberrysystem.api.dto.ApiPayloads.ApiResponse;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -21,6 +22,12 @@ public class ApiExceptionHandler {
             message = "Revisa los datos enviados antes de continuar.";
         }
         return ResponseEntity.badRequest().body(new ApiResponse<>(false, message, null));
+    }
+
+    @ExceptionHandler(AuthenticationException.class)
+    public ResponseEntity<ApiResponse<Object>> handleAuthentication(AuthenticationException exception) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ApiResponse<>(false, "Credenciales inválidas o sesión no autorizada.", null));
     }
 
     @ExceptionHandler(IllegalArgumentException.class)
