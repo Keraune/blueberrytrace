@@ -9,28 +9,32 @@ frontend/ -> React/Vite, UI, formularios y consumo de /api/v1/**
 
 ## Estado actual
 
-El backend corre en modo API-first por defecto. Thymeleaf/HTMX no desaparece, pero queda limitado al perfil `legacy-mvc`.
+La migración API-first ya fue consolidada en la Fase 20.
 
-## Cuándo eliminar Thymeleaf definitivamente
+El backend ya no contiene:
 
-Eliminar `backend/src/main/resources/templates` recién cuando se cumpla:
+```text
+backend/src/main/resources/templates/
+backend/src/main/resources/static/
+backend/src/main/java/com/keraune/vlvblueberrysystem/controller/
+```
 
-1. React tiene login/logout completo.
-2. React cubre dashboard, lotes, camas, siembra, procesos, clasificación, despacho, reportes y usuarios.
-3. Todas las acciones críticas tienen endpoints API equivalentes.
-4. Las rutas MVC ya no se usan para exposición ni pruebas.
-5. La seguridad está validada con sesión/CSRF/CORS desde React.
+El frontend React es la interfaz principal.
 
 ## Comandos
 
-API-first:
+Backend:
 
 ```bash
 npm run backend:run
 ```
 
-Legacy MVC temporal:
+Frontend:
 
 ```bash
-npm run backend:run:legacy
+npm run frontend:dev
 ```
+
+## Nota
+
+`backend/src/main/resources/application.properties` se conserva porque Spring Boot lo usa para configuración del servidor, base de datos, JPA y seguridad.

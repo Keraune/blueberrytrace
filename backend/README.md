@@ -1,125 +1,90 @@
 # BlueberryTrace Backend
 
-Aplicación Spring Boot del sistema BlueberryTrace. Por defecto funciona como backend API-first para React/Vue y expone `/api/v1/**`. El panel Thymeleaf + HTMX queda disponible solo con el perfil `legacy-mvc`.
+Backend Spring Boot de BlueberryTrace. Desde la Fase 20 funciona como **API-first** y ya no contiene plantillas HTML Thymeleaf.
 
-## Ejecutar desde backend
+## Responsabilidades
 
-```bash
-.bash ./mvnw -pl backend spring-boot:run
-```
+- Exponer `/api/v1/**`.
+- Autenticación JSON para React.
+- Seguridad con Spring Security, sesión y CSRF.
+- Servicios de negocio.
+- Repositorios JPA.
+- Conexión MySQL.
 
-## Ejecutar desde la raíz del repositorio
-
-```bash
-.bash ./mvnw -pl backend spring-boot:run
-```
-
-O desde la raíz:
+## Ejecutar desde la raíz
 
 ```bash
-bash ./mvnw -pl backend spring-boot:run
+npm run backend:run
 ```
 
-## Build y pruebas
+Puerto alternativo:
 
 ```bash
-./mvnw clean package
-./mvnw test
+npm run backend:run:alt
 ```
+
+Build y pruebas:
+
+```bash
+npm run backend:package
+npm run backend:test
+```
+
+## Ejecutar con Maven directamente
 
 Desde la raíz:
 
 ```bash
+bash ./mvnw -pl backend spring-boot:run
 bash ./mvnw -pl backend clean package
-bash ./mvnw -pl backend test
 ```
 
-## IntelliJ IDEA
-
-Abre el repositorio desde la raíz `blueberrytrace/` y carga el `pom.xml` raíz. El backend quedará registrado como módulo Maven y `backend/src/main/java` será detectado como source root.
-
-Si IntelliJ no lo detecta:
-
-```text
-Clic derecho en backend/pom.xml → Add as Maven Project
-```
-
-Luego usa **Reload All Maven Projects**.
-
-## Puerto ocupado
-
-Si aparece `java.net.BindException: La dirección ya se está usando`, otro proceso ya está utilizando el puerto 8080. Ejecuta el backend con otro puerto desde la raíz del workspace:
+Desde `backend/`:
 
 ```bash
-SERVER_PORT=8081 bash ./mvnw -pl backend spring-boot:run
+../mvnw spring-boot:run
 ```
 
-O identifica y cierra el proceso en Arch Linux:
-
-```bash
-ss -ltnp 'sport = :8080'
-fuser -k 8080/tcp
-```
-
-
-## Scripts recomendados desde la raíz
-
-```bash
-npm run backend:run
-npm run backend:run:alt
-npm run backend:port
-npm run backend:kill
-```
-
-La configuración de MySQL acepta variables de entorno:
-
-```bash
-DB_USERNAME=root DB_PASSWORD=12345678 npm run backend:run
-```
-
-## Autenticación API para React
-
-El backend expone autenticación JSON para el frontend separado:
+## API de autenticación
 
 ```http
 GET  /api/v1/auth/csrf
 POST /api/v1/auth/login
 POST /api/v1/auth/logout
+GET  /api/v1/session/me
 ```
 
-`/api/v1/frontend/bootstrap` es público para que React pueda inicializar configuración visual antes de requerir sesión. Los demás endpoints API continúan protegidos por Spring Security.
+## Health check
 
-## Perfil legacy MVC
-
-Para abrir temporalmente el panel Thymeleaf/HTMX antiguo:
-
-```bash
-SPRING_PROFILES_ACTIVE=legacy-mvc .bash ./mvnw -pl backend spring-boot:run
+```text
+http://localhost:8080/api/v1/health
 ```
 
-Desde la raíz también puedes usar:
+## Recursos del backend
 
-```bash
-npm run backend:run:legacy
+Se mantiene:
+
+```text
+backend/src/main/resources/application.properties
 ```
 
-Sin ese perfil, los controladores MVC no se cargan y el backend queda orientado a API.
+Se retiró:
 
-## Diagnóstico del workspace
+```text
+backend/src/main/resources/templates/
+backend/src/main/resources/static/
+```
 
-Desde la raíz del repositorio puedes ejecutar:
+## Diagnóstico
 
 ```bash
 npm run setup:permissions
 npm run doctor
 ```
 
-Esto restaura permisos del Maven Wrapper y muestra el estado de Java, Node, npm, puerto 8080 y configuración local.
-
-
 ## Maven seguro
 
-El workspace incluye `scripts/maven.sh`, que prefiere Maven instalado en el sistema y usa `./mvnw` como respaldo. Esto evita problemas de permisos o descarga del wrapper en entornos donde Maven ya está instalado.
+El workspace incluye `scripts/maven.sh`, que prefiere Maven instalado en el sistema y usa `./mvnw` como respaldo.
 
 ```bash
 npm run maven -- -pl backend clean package

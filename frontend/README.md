@@ -8,7 +8,7 @@ Cliente React/Vite separado para la migración progresiva del panel BlueberryTra
 - TypeScript
 - Vite
 - Lucide React
-- CSS propio con la misma paleta del panel Thymeleaf
+- CSS propio con identidad visual BlueberryTrace
 
 ## Variables
 
@@ -27,13 +27,7 @@ VITE_BLUEBERRYTRACE_BACKEND_ORIGIN=http://localhost:8080
 
 ## Ejecutar
 
-Primero inicia sesión en el backend:
-
-```text
-http://localhost:8080/auth/login
-```
-
-Luego ejecuta el frontend:
+El login se realiza directamente desde React usando la API del backend.
 
 ```bash
 npm install
@@ -109,15 +103,9 @@ http://localhost:5173/lotes
 
 Actualmente el frontend React permite crear lotes, camas, siembras, uniformizaciones, formalizaciones, clasificaciones y despachos usando la API Spring Boot protegida con sesión y CSRF.
 
-Antes de usar React, inicia sesión en el backend:
-
-```text
-http://localhost:8080/auth/login
-```
-
 ## Login React
 
-El cliente React ya no depende obligatoriamente de abrir primero `/auth/login` en Thymeleaf. Si no existe sesión activa, muestra su propia pantalla de acceso y consume:
+El cliente React muestra su propia pantalla de acceso y consume:
 
 ```http
 GET  /api/v1/auth/csrf
@@ -125,7 +113,7 @@ POST /api/v1/auth/login
 POST /api/v1/auth/logout
 ```
 
-Por ahora Thymeleaf se mantiene como respaldo hasta completar la migración total de módulos.
+El backend ya no contiene HTML Thymeleaf; React es la interfaz principal.
 
 
 ## Historial de fases
@@ -176,3 +164,7 @@ Se agregó una capa de microinteracciones al frontend React:
 
 Los prototipos compartidos se usan como guía visual, no como copia exacta. El diseño mantiene una identidad propia para BlueberryTrace.
 
+
+## Fase 20 - Backend API-only
+
+Se retiraron las vistas HTML del backend. El frontend React queda como única interfaz principal del sistema.

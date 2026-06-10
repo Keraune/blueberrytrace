@@ -16,7 +16,7 @@ public class ApiFrontendController {
         FrontendBootstrapResponse response = new FrontendBootstrapResponse(
                 "BlueberryTrace",
                 "v1",
-                "API-first backend para React/Vue. Thymeleaf/HTMX queda disponible solo con el perfil legacy-mvc",
+                "API-first backend para React/Vite. La interfaz principal vive en el workspace frontend",
                 List.of("React", "Vue"),
                 ApiModuleMetadata.endpoints(),
                 ApiModuleMetadata.modules(),

@@ -3,7 +3,6 @@ package com.keraune.vlvblueberrysystem.config;
 import com.keraune.vlvblueberrysystem.security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -25,7 +24,6 @@ public class SecurityConfig {
     }
 
     @Bean
-    @Profile("!legacy-mvc")
     public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
         http
                 .authenticationProvider(authenticationProvider())
@@ -45,46 +43,6 @@ public class SecurityConfig {
                 .logout(logout -> logout.disable())
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
-                .csrf(Customizer.withDefaults());
-
-        return http.build();
-    }
-
-    @Bean
-    @Profile("legacy-mvc")
-    public SecurityFilterChain legacyMvcSecurityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .authenticationProvider(authenticationProvider())
-                .cors(Customizer.withDefaults())
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/",
-                                "/auth/login",
-                                "/api/v1/health",
-                                "/api/v1/auth/csrf",
-                                "/api/v1/auth/login",
-                                "/api/v1/frontend/bootstrap",
-                                "/css/**",
-                                "/js/**",
-                                "/img/**",
-                                "/favicon.ico",
-                                "/error")
-                        .permitAll()
-                        .anyRequest().authenticated())
-                .formLogin(form -> form
-                        .loginPage("/auth/login")
-                        .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/dashboard", true)
-                        .failureUrl("/auth/login?error=true")
-                        .permitAll())
-                .logout(logout -> logout
-                        .logoutUrl("/logout")
-                        .logoutSuccessUrl("/auth/login?logout=true")
-                        .permitAll())
-                .exceptionHandling(exceptions -> exceptions
-                        .defaultAuthenticationEntryPointFor(
-                                new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
-                                request -> request.getRequestURI() != null && request.getRequestURI().startsWith("/api/")))
                 .csrf(Customizer.withDefaults());
 
         return http.build();

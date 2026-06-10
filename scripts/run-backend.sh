@@ -3,8 +3,6 @@ set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 PORT="${SERVER_PORT:-8080}"
-PROFILE="${SPRING_PROFILES_ACTIVE:-default}"
-
 cd "${ROOT_DIR}"
 
 if command -v ss >/dev/null 2>&1 && ss -ltn "sport = :${PORT}" | grep -q ":${PORT}"; then
@@ -31,7 +29,6 @@ for script in "${ROOT_DIR}"/scripts/*.sh; do
 done
 
 echo "Iniciando BlueberryTrace backend"
-echo "  Perfil: ${PROFILE}"
 echo "  Puerto: ${PORT}"
 echo "  Proyecto: ${ROOT_DIR}"
 
