@@ -71,6 +71,12 @@
         </a>
     </nav>
 
+    <div class="sidebar-status-card" aria-label="Estado técnico del avance">
+        <span>APF3 · Desarrollo</span>
+        <strong>Arquitectura MVC activa</strong>
+        <small>Java 21 · Spring Boot · JPA · MySQL</small>
+    </div>
+
     <div class="sidebar-account" data-account-menu>
         <button class="sidebar-user sidebar-user-button" type="button" data-account-toggle>
             <div class="avatar-mini">VLV</div>
@@ -98,8 +104,9 @@
         <p th:text="${subtitle}">Sistema interno del área de arándanos.</p>
     </div>
     <div class="topbar-meta">
+        <span class="topbar-pill topbar-pill-strong">APF3 · Desarrollo</span>
+        <span class="topbar-pill">MVC / JPA / MySQL</span>
         <span class="topbar-pill">Área: arándanos</span>
-        <span class="topbar-pill">Vivero Los Viñedos</span>
     </div>
 </header>
 </body>

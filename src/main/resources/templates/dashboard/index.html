@@ -1,11 +1,6 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard | BlueberryTrace</title>
-    <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
-</head>
+<head th:replace="~{fragments/layout :: head('Dashboard | BlueberryTrace')}"></head>
 <body class="app-body corporate-dashboard-body vlv-dashboard-body">
 <div class="app-shell corporate-app-shell">
     <div th:replace="~{fragments/app-shell :: sidebar('dashboard')}"></div>
@@ -34,6 +29,13 @@
                     <span th:style="'width:' + ${summary.porcentajePlantasDespachadas()} + '%'" style="width: 0%"></span>
                 </div>
             </div>
+        </section>
+
+        <section class="dashboard-dev-strip" aria-label="Resumen de desarrollo APF3">
+            <div><strong>Arquitectura MVC</strong><span>Controladores, servicios, repositorios y vistas Thymeleaf</span></div>
+            <div><strong>Persistencia JPA</strong><span>Entidades conectadas con MySQL para trazabilidad</span></div>
+            <div><strong>Seguridad</strong><span>Acceso con usuarios, roles y protección de sesión</span></div>
+            <div><strong>Avance funcional</strong><span>Dashboard y módulos operativos listos para demo</span></div>
         </section>
 
         <section class="kpi-dashboard-grid" aria-label="Indicadores principales del dashboard">
@@ -126,6 +128,6 @@
         </section>
     </main>
 </div>
-<script src="../static/js/app.js" th:src="@{/js/app.js}"></script>
+    <div th:replace="~{fragments/layout :: scripts}"></div>
 </body>
 </html>

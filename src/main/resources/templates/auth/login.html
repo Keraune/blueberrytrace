@@ -1,11 +1,6 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../static/css/style.css" th:href="@{/css/style.css}">
-    <title>BlueberryTrace | Acceso</title>
-</head>
+<head th:replace="~{fragments/layout :: head('Acceso | BlueberryTrace')}"></head>
 <body class="auth-clean-body vlv-auth-page">
 <div class="vlv-auth-layout">
     <section class="vlv-auth-side">
@@ -22,6 +17,11 @@
                 <li>Consultas y reportes para supervisión operativa</li>
                 <li>Acceso protegido por usuario y contraseña</li>
             </ul>
+            <div class="auth-status-grid" aria-label="Resumen técnico del sistema">
+                <div><strong>MVC</strong><span>Vista, controlador, servicio y datos separados</span></div>
+                <div><strong>MySQL</strong><span>Persistencia para trazabilidad por lote</span></div>
+                <div><strong>APF3</strong><span>Avance de desarrollo funcional</span></div>
+            </div>
         </div>
     </section>
 
@@ -55,5 +55,6 @@
         </div>
     </section>
 </div>
+    <div th:replace="~{fragments/layout :: scripts}"></div>
 </body>
 </html>

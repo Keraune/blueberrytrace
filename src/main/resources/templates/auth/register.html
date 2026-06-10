@@ -1,11 +1,6 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="../static/css/style.css" th:href="@{/css/style.css}">
-    <title>Registro | Sistema web de arándanos</title>
-</head>
+<head th:replace="~{fragments/layout :: head('Registro de usuarios | BlueberryTrace')}"></head>
 <body class="auth-clean-body vlv-auth-page">
 <div class="vlv-auth-layout">
     <section class="vlv-auth-side">
@@ -22,6 +17,11 @@
                 <li>Alta de usuarios activos e inactivos</li>
                 <li>Base preparada para seguridad del sistema</li>
             </ul>
+            <div class="auth-status-grid" aria-label="Resumen de seguridad">
+                <div><strong>Roles</strong><span>Acceso segmentado por perfil</span></div>
+                <div><strong>Security</strong><span>Autenticación con Spring Security</span></div>
+                <div><strong>Auditable</strong><span>Base para seguimiento interno</span></div>
+            </div>
         </div>
     </section>
 
@@ -80,5 +80,6 @@
         </div>
     </section>
 </div>
+    <div th:replace="~{fragments/layout :: scripts}"></div>
 </body>
 </html>

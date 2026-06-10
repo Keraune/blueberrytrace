@@ -1,12 +1,7 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${tituloFormulario}">Formulario de invernadero</title>
-    <link rel="stylesheet" href="/css/style.css" th:href="@{/css/style.css}">
-</head>
+<head th:replace="~{fragments/layout :: head('Formulario de invernadero | BlueberryTrace')}"></head>
 
 <body class="app-body">
     <div class="app-shell">
@@ -111,6 +106,7 @@
             </section>
         </main>
     </div>
+    <div th:replace="~{fragments/layout :: scripts}"></div>
 </body>
 
 </html>

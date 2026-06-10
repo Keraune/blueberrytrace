@@ -1,11 +1,6 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reportes y trazabilidad</title>
-    <link rel="stylesheet" href="../../static/css/style.css" th:href="@{/css/style.css}">
-</head>
+<head th:replace="~{fragments/layout :: head('Reportes y trazabilidad | BlueberryTrace')}"></head>
 <body class="app-body">
 <div class="app-shell">
     <div th:replace="~{fragments/app-shell :: sidebar('reportes')}"></div>
@@ -88,6 +83,6 @@
         </section>
     </main>
 </div>
-<script src="../../static/js/app.js" th:src="@{/js/app.js}"></script>
+    <div th:replace="~{fragments/layout :: scripts}"></div>
 </body>
 </html>
