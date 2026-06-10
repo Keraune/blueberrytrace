@@ -6,6 +6,7 @@ import { Sidebar } from './components/Sidebar';
 import { ToastStack, type ToastItem, type ToastTone } from './components/ToastStack';
 import { Topbar } from './components/Topbar';
 import { useAppRoute } from './hooks/useAppRoute';
+import { BLUEBERRY_TOAST_EVENT, type BlueberryToastDetail } from './lib/uiEvents';
 import { ApiError, blueberryApi } from './lib/api';
 import { CamasPage } from './pages/CamasPage';
 import { ClasificacionPage } from './pages/ClasificacionPage';
@@ -148,6 +149,18 @@ export default function App() {
 
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
+
+  useEffect(() => {
+    function onToast(event: Event) {
+      const detail = (event as CustomEvent<BlueberryToastDetail>).detail;
+      if (detail) {
+        pushToast(detail.tone, detail.title, detail.description);
+      }
+    }
+
+    window.addEventListener(BLUEBERRY_TOAST_EVENT, onToast);
+    return () => window.removeEventListener(BLUEBERRY_TOAST_EVENT, onToast);
   }, []);
 
   async function refresh() {

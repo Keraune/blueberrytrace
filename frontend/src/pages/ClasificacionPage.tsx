@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
-import { Download, Eye, Plus } from 'lucide-react';
+import { Download, Eye, Pencil, Plus, RefreshCcw } from 'lucide-react';
 import { ClasificacionForm } from '../components/ClasificacionForm';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 import { DetailDrawer } from '../components/DetailDrawer';
 import { FilterToolbar } from '../components/FilterToolbar';
 import { InfoGrid } from '../components/InfoGrid';
@@ -9,6 +10,7 @@ import { ModuleHeader } from '../components/ModuleHeader';
 import { StatusBadge } from '../components/StatusBadge';
 import { blueberryApi } from '../lib/api';
 import { dateShort, numberCompact } from '../lib/format';
+import { emitToast } from '../lib/uiEvents';
 import type { CamaResponse, ClasificacionFormPayload, ClasificacionResponse, ReferenceResponse } from '../types/api';
 
 interface ClasificacionPageProps {
@@ -27,10 +29,28 @@ function bucketOf(item: ClasificacionResponse, index: number) {
   return ['Primera Calidad', 'Segunda Calidad', 'Tercera Calidad', 'Descarte'][index % 4];
 }
 
+function toPayload(item: ClasificacionResponse): ClasificacionFormPayload {
+  return {
+    loteId: item.lote?.id || 0,
+    camaId: item.cama?.id || 0,
+    fechaClasificacion: item.fechaClasificacion || new Date().toISOString().slice(0, 10),
+    estadoPlanta: item.estadoPlanta || 'Apta',
+    tamano: item.tamano || 'Mediana',
+    condicion: item.condicion || 'Exportación',
+    cantidad: item.cantidad || 1,
+    observacion: item.observacion || '',
+    estado: item.estado || 'PENDIENTE'
+  };
+}
+
 export function ClasificacionPage({ clasificaciones, lotes, camas, onClasificacionesChange }: ClasificacionPageProps) {
   const [query, setQuery] = useState('');
   const [creating, setCreating] = useState(false);
   const [selectedClasificacion, setSelectedClasificacion] = useState<ClasificacionResponse | null>(null);
+  const [editingClasificacion, setEditingClasificacion] = useState<ClasificacionResponse | null>(null);
+  const [pendingStatus, setPendingStatus] = useState<{ item: ClasificacionResponse; estado: string } | null>(null);
+  const [confirming, setConfirming] = useState(false);
+
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase();
     return clasificaciones.filter((item) => !term || [item.lote?.codigo, item.estadoPlanta, item.tamano, item.condicion, item.estado]
@@ -50,6 +70,31 @@ export function ClasificacionPage({ clasificaciones, lotes, camas, onClasificaci
     const response = await blueberryApi.createClasificacion(payload);
     onClasificacionesChange(response.items);
     setCreating(false);
+    emitToast('success', 'Clasificación registrada', 'El control de calidad fue guardado correctamente.');
+  }
+
+  async function update(payload: ClasificacionFormPayload) {
+    if (!editingClasificacion) return;
+    const response = await blueberryApi.updateClasificacion(editingClasificacion.id, payload);
+    onClasificacionesChange(response.items);
+    setEditingClasificacion(null);
+    setSelectedClasificacion(null);
+    emitToast('success', 'Clasificación actualizada', 'Los datos de calidad fueron guardados.');
+  }
+
+  async function confirmChangeStatus() {
+    if (!pendingStatus) return;
+    try {
+      setConfirming(true);
+      const response = await blueberryApi.changeClasificacionStatus(pendingStatus.item.id, pendingStatus.estado);
+      onClasificacionesChange(response.items);
+      emitToast('success', 'Estado actualizado', `La clasificación cambió a ${pendingStatus.estado}.`);
+      setPendingStatus(null);
+    } catch (exception) {
+      emitToast('error', 'No se pudo actualizar', exception instanceof Error ? exception.message : 'Ocurrió un error inesperado.');
+    } finally {
+      setConfirming(false);
+    }
   }
 
   const cards = [
@@ -127,7 +172,13 @@ export function ClasificacionPage({ clasificaciones, lotes, camas, onClasificaci
                     <td><strong>{numberCompact(amount)}</strong></td>
                     <td>{item.usuarioRegistro?.nombreCompleto || 'Sin operario'}</td>
                     <td><StatusBadge value={item.estado} /></td>
-                    <td><button type="button" className="icon-action" onClick={() => setSelectedClasificacion(item)}><Eye size={15} /></button></td>
+                    <td>
+                      <div className="icon-actions">
+                        <button type="button" className="icon-action" onClick={() => setSelectedClasificacion(item)}><Eye size={15} /></button>
+                        <button type="button" className="icon-action" onClick={() => setEditingClasificacion(item)}><Pencil size={15} /></button>
+                        <button type="button" className="icon-action" onClick={() => setPendingStatus({ item, estado: 'VALIDADA' })}><RefreshCcw size={15} /></button>
+                      </div>
+                    </td>
                   </tr>
                 );
               })}
@@ -142,6 +193,7 @@ export function ClasificacionPage({ clasificaciones, lotes, camas, onClasificaci
         title={selectedClasificacion ? `CL-${String(selectedClasificacion.id).padStart(4, '0')}` : 'Detalle de clasificación'}
         subtitle={selectedClasificacion?.lote?.codigo || 'Control de calidad'}
         onClose={() => setSelectedClasificacion(null)}
+        actions={selectedClasificacion ? <button type="button" className="action-button" onClick={() => setEditingClasificacion(selectedClasificacion)}><Pencil size={15} /> Editar</button> : null}
       >
         {selectedClasificacion ? (
           <>
@@ -167,6 +219,21 @@ export function ClasificacionPage({ clasificaciones, lotes, camas, onClasificaci
       <Modal open={creating} title="Nueva clasificación" description="Registra el resultado de control de calidad por lote y cama." onClose={() => setCreating(false)}>
         <ClasificacionForm lotes={lotes} camas={camas} onSubmit={create} onCancel={() => setCreating(false)} />
       </Modal>
+
+      <Modal open={Boolean(editingClasificacion)} title="Editar clasificación" description="Actualiza datos de control de calidad." onClose={() => setEditingClasificacion(null)}>
+        {editingClasificacion ? <ClasificacionForm lotes={lotes} camas={camas} initialData={toPayload(editingClasificacion)} submitLabel="Guardar cambios" onSubmit={update} onCancel={() => setEditingClasificacion(null)} /> : null}
+      </Modal>
+
+      <ConfirmDialog
+        open={Boolean(pendingStatus)}
+        title="Validar clasificación"
+        description="Se actualizará el estado de la clasificación seleccionada."
+        confirmLabel="Validar"
+        tone="success"
+        loading={confirming}
+        onCancel={() => setPendingStatus(null)}
+        onConfirm={confirmChangeStatus}
+      />
     </main>
   );
 }

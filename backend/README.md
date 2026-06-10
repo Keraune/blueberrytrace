@@ -89,3 +89,14 @@ El workspace incluye `scripts/maven.sh`, que prefiere Maven instalado en el sist
 ```bash
 npm run maven -- -pl backend clean package
 ```
+
+## Fase 21 - Edición real avanzada desde React
+
+Se reemplazaron acciones visuales por operaciones reales de edición y confirmación:
+
+- Formularios reutilizables con datos iniciales para editar registros existentes.
+- Confirmaciones modernas con `ConfirmDialog` en lugar de `window.confirm`.
+- Toasts globales para operaciones exitosas, errores y cambios de estado.
+- Nuevos endpoints API-first `PUT` para siembras, procesos, clasificaciones y despachos.
+- Edición real desde React para lotes, camas, siembras, procesos, clasificación y despacho.
+

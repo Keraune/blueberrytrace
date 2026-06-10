@@ -4,12 +4,14 @@ import type { CamaFormPayload, ReferenceResponse } from '../types/api';
 
 interface CamaFormProps {
   lotes: ReferenceResponse[];
+  initialData?: CamaFormPayload;
+  submitLabel?: string;
   onSubmit: (payload: CamaFormPayload) => Promise<void>;
   onCancel: () => void;
 }
 
-export function CamaForm({ lotes, onSubmit, onCancel }: CamaFormProps) {
-  const [payload, setPayload] = useState<CamaFormPayload>({
+export function CamaForm({ lotes, initialData, submitLabel = 'Guardar', onSubmit, onCancel }: CamaFormProps) {
+  const [payload, setPayload] = useState<CamaFormPayload>(initialData || {
     codigo: '',
     descripcion: '',
     capacidadReferencial: 1,
@@ -64,7 +66,7 @@ export function CamaForm({ lotes, onSubmit, onCancel }: CamaFormProps) {
       <footer className="form-actions">
         <button type="button" className="ghost-button" onClick={onCancel}>Cancelar</button>
         <button type="submit" className="action-button" disabled={saving || payload.loteId === 0}>
-          {saving ? <Loader2 className="spin" size={16} /> : <Save size={16} />} Guardar
+          {saving ? <Loader2 className="spin" size={16} /> : <Save size={16} />} {submitLabel}
         </button>
       </footer>
     </form>

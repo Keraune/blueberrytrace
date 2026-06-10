@@ -87,6 +87,42 @@ public class ProcesoOperativoService {
     }
 
     @Transactional
+    public void actualizarUniformizacion(Long id, UniformizacionForm form) {
+        Uniformizacion uniformizacion = uniformizacionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró la uniformización solicitada."));
+        Lote lote = obtenerLote(form.getLoteId());
+        Cama cama = obtenerCamaValida(form.getCamaId(), lote.getId());
+
+        uniformizacion.setLote(lote);
+        uniformizacion.setCama(cama);
+        uniformizacion.setFechaUniformizacion(form.getFechaUniformizacion());
+        uniformizacion.setCriterio(normalizar(form.getCriterio()));
+        uniformizacion.setCantidadInicial(form.getCantidadInicial());
+        uniformizacion.setCantidadUniformizada(form.getCantidadUniformizada());
+        uniformizacion.setObservacion(normalizarOpcional(form.getObservacion()));
+        uniformizacion.setEstado(normalizarEstado(form.getEstado(), "REGISTRADA"));
+        uniformizacionRepository.save(uniformizacion);
+    }
+
+    @Transactional
+    public void actualizarFormalizacion(Long id, FormalizacionForm form) {
+        Formalizacion formalizacion = formalizacionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró la formalización solicitada."));
+        Lote lote = obtenerLote(form.getLoteId());
+        Cama cama = obtenerCamaValida(form.getCamaId(), lote.getId());
+
+        formalizacion.setLote(lote);
+        formalizacion.setCama(cama);
+        formalizacion.setFechaFormalizacion(form.getFechaFormalizacion());
+        formalizacion.setDetalle(normalizar(form.getDetalle()));
+        formalizacion.setCantidadBandejas(form.getCantidadBandejas());
+        formalizacion.setCantidadPlantas(form.getCantidadPlantas());
+        formalizacion.setObservacion(normalizarOpcional(form.getObservacion()));
+        formalizacion.setEstado(normalizarEstado(form.getEstado(), "REGISTRADA"));
+        formalizacionRepository.save(formalizacion);
+    }
+
+    @Transactional
     public void cambiarEstadoUniformizacion(Long id) {
         Uniformizacion uniformizacion = uniformizacionRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró la uniformización solicitada."));

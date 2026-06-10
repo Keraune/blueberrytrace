@@ -1,9 +1,13 @@
 import { useMemo, useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Pencil, RotateCcw } from 'lucide-react';
+import { ConfirmDialog } from '../components/ConfirmDialog';
+import { Modal } from '../components/Modal';
 import { ModuleHeader } from '../components/ModuleHeader';
+import { SiembraForm } from '../components/SiembraForm';
 import { StatusBadge } from '../components/StatusBadge';
 import { blueberryApi } from '../lib/api';
 import { dateShort, numberCompact } from '../lib/format';
+import { emitToast } from '../lib/uiEvents';
 import type { CamaResponse, ReferenceResponse, SiembraFormPayload, SiembraResponse } from '../types/api';
 
 interface SiembrasPageProps {
@@ -15,6 +19,17 @@ interface SiembrasPageProps {
 
 const today = new Date().toISOString().slice(0, 10);
 
+function toPayload(siembra: SiembraResponse): SiembraFormPayload {
+  return {
+    loteId: siembra.lote?.id || 0,
+    camaId: siembra.cama?.id || 0,
+    fechaSiembra: siembra.fechaSiembra || today,
+    cantidadRegistrada: siembra.cantidadRegistrada || 1,
+    observacion: siembra.observacion || '',
+    estado: siembra.estado || 'REGISTRADA'
+  };
+}
+
 export function SiembrasPage({ siembras, lotes, camas, onSiembrasChange }: SiembrasPageProps) {
   const [step, setStep] = useState(1);
   const [payload, setPayload] = useState<SiembraFormPayload>({
@@ -23,13 +38,16 @@ export function SiembrasPage({ siembras, lotes, camas, onSiembrasChange }: Siemb
     fechaSiembra: today,
     cantidadRegistrada: 1,
     observacion: '',
-    estado: 'REGISTRADO'
+    estado: 'REGISTRADA'
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [editingSiembra, setEditingSiembra] = useState<SiembraResponse | null>(null);
+  const [pendingStatus, setPendingStatus] = useState<SiembraResponse | null>(null);
+  const [confirming, setConfirming] = useState(false);
 
   const camasDisponibles = useMemo(() => camas.filter((cama) => cama.lote?.id === payload.loteId), [camas, payload.loteId]);
-  const recientes = siembras.slice(0, 6);
+  const recientes = siembras.slice(0, 10);
 
   async function submit() {
     try {
@@ -38,11 +56,35 @@ export function SiembrasPage({ siembras, lotes, camas, onSiembrasChange }: Siemb
       const response = await blueberryApi.createSiembra(payload);
       onSiembrasChange(response.items);
       setStep(1);
-      setPayload({ ...payload, camaId: 0, fechaSiembra: today, cantidadRegistrada: 1, observacion: '', estado: 'REGISTRADO' });
+      setPayload({ ...payload, camaId: 0, fechaSiembra: today, cantidadRegistrada: 1, observacion: '', estado: 'REGISTRADA' });
+      emitToast('success', 'Siembra registrada', 'El registro fue creado correctamente.');
     } catch (exception) {
       setError(exception instanceof Error ? exception.message : 'No se pudo registrar la siembra.');
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function updateSiembra(payload: SiembraFormPayload) {
+    if (!editingSiembra) return;
+    const response = await blueberryApi.updateSiembra(editingSiembra.id, payload);
+    onSiembrasChange(response.items);
+    setEditingSiembra(null);
+    emitToast('success', 'Siembra actualizada', 'Los datos de la siembra fueron guardados.');
+  }
+
+  async function confirmToggleStatus() {
+    if (!pendingStatus) return;
+    try {
+      setConfirming(true);
+      const response = await blueberryApi.toggleSiembraStatus(pendingStatus.id);
+      onSiembrasChange(response.items);
+      emitToast('success', 'Estado actualizado', 'El estado de la siembra fue modificado.');
+      setPendingStatus(null);
+    } catch (exception) {
+      emitToast('error', 'No se pudo cambiar el estado', exception instanceof Error ? exception.message : 'Ocurrió un error inesperado.');
+    } finally {
+      setConfirming(false);
     }
   }
 
@@ -51,7 +93,7 @@ export function SiembrasPage({ siembras, lotes, camas, onSiembrasChange }: Siemb
       <ModuleHeader
         eyebrow="Proceso productivo"
         title="Registro de Siembra"
-        description="Registrar plantas sembradas por cama y bandeja."
+        description="Registrar y editar plantas sembradas por cama y bandeja."
       />
 
       <section className="panel-card step-card">
@@ -149,6 +191,7 @@ export function SiembrasPage({ siembras, lotes, camas, onSiembrasChange }: Siemb
                 <th>Fecha</th>
                 <th>Cantidad</th>
                 <th>Estado</th>
+                <th />
               </tr>
             </thead>
             <tbody>
@@ -159,12 +202,32 @@ export function SiembrasPage({ siembras, lotes, camas, onSiembrasChange }: Siemb
                   <td>{dateShort(siembra.fechaSiembra)}</td>
                   <td>{numberCompact(siembra.cantidadRegistrada || 0)}</td>
                   <td><StatusBadge value={siembra.estado} /></td>
+                  <td>
+                    <div className="icon-actions">
+                      <button type="button" className="icon-action" title="Editar" onClick={() => setEditingSiembra(siembra)}><Pencil size={15} /></button>
+                      <button type="button" className="icon-action" title="Cambiar estado" onClick={() => setPendingStatus(siembra)}><RotateCcw size={15} /></button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
           </table>
         </div>
       </section>
+
+      <Modal open={Boolean(editingSiembra)} title="Editar siembra" description="Actualiza lote, cama, fecha, cantidad y estado." onClose={() => setEditingSiembra(null)}>
+        {editingSiembra ? <SiembraForm lotes={lotes} camas={camas} initialData={toPayload(editingSiembra)} submitLabel="Guardar cambios" onSubmit={updateSiembra} onCancel={() => setEditingSiembra(null)} /> : null}
+      </Modal>
+
+      <ConfirmDialog
+        open={Boolean(pendingStatus)}
+        title="Cambiar estado de siembra"
+        description="Se alternará el estado entre registrada y anulada."
+        confirmLabel="Cambiar estado"
+        loading={confirming}
+        onCancel={() => setPendingStatus(null)}
+        onConfirm={confirmToggleStatus}
+      />
     </main>
   );
 }

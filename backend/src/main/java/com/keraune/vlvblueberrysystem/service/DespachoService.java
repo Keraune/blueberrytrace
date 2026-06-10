@@ -53,6 +53,25 @@ public class DespachoService {
     }
 
     @Transactional
+    public void actualizarDespacho(Long id, DespachoForm form) {
+        Despacho despacho = despachoRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró el despacho solicitado."));
+        Lote lote = loteRepository.findById(form.getLoteId())
+                .orElseThrow(() -> new IllegalArgumentException("El invernadero seleccionado no existe."));
+
+        despacho.setLote(lote);
+        despacho.setFechaDespacho(form.getFechaDespacho());
+        despacho.setModalidad(normalizar(form.getModalidad()));
+        despacho.setCantidadDespachada(form.getCantidadDespachada());
+        despacho.setDestino(normalizarOpcional(form.getDestino()));
+        despacho.setGuiaRemision(normalizarOpcional(form.getGuiaRemision()));
+        despacho.setValidacionCalidad(normalizar(form.getValidacionCalidad()));
+        despacho.setObservacion(normalizarOpcional(form.getObservacion()));
+        despacho.setEstado(normalizarEstado(form.getEstado(), "REGISTRADO"));
+        despachoRepository.save(despacho);
+    }
+
+    @Transactional
     public void cambiarEstado(Long id, String nuevoEstado) {
         Despacho despacho = despachoRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró el despacho solicitado."));

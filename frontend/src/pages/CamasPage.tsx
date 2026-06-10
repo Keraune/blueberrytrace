@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
-import { Eye, Plus, RotateCcw } from 'lucide-react';
+import { Eye, Pencil, Plus, RotateCcw } from 'lucide-react';
 import { CamaForm } from '../components/CamaForm';
-import { DetailDrawer } from '../components/DetailDrawer';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 import { DataTable } from '../components/DataTable';
+import { DetailDrawer } from '../components/DetailDrawer';
 import { FilterToolbar } from '../components/FilterToolbar';
 import { InfoGrid } from '../components/InfoGrid';
 import { Modal } from '../components/Modal';
@@ -10,6 +11,7 @@ import { ModuleHeader } from '../components/ModuleHeader';
 import { StatusBadge } from '../components/StatusBadge';
 import { blueberryApi } from '../lib/api';
 import { numberCompact } from '../lib/format';
+import { emitToast } from '../lib/uiEvents';
 import type { CamaFormPayload, CamaResponse, ReferenceResponse } from '../types/api';
 
 interface CamasPageProps {
@@ -18,15 +20,27 @@ interface CamasPageProps {
   onCamasChange: (items: CamaResponse[]) => void;
 }
 
+function toPayload(cama: CamaResponse): CamaFormPayload {
+  return {
+    codigo: cama.codigo || '',
+    descripcion: cama.descripcion || '',
+    capacidadReferencial: cama.capacidadReferencial || 1,
+    estado: cama.estado || 'ACTIVA',
+    loteId: cama.lote?.id || 0
+  };
+}
+
 export function CamasPage({ camas, lotes, onCamasChange }: CamasPageProps) {
   const [query, setQuery] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedCama, setSelectedCama] = useState<CamaResponse | null>(null);
+  const [editingCama, setEditingCama] = useState<CamaResponse | null>(null);
+  const [pendingStatus, setPendingStatus] = useState<CamaResponse | null>(null);
+  const [confirming, setConfirming] = useState(false);
+
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase();
-    if (!term) {
-      return camas;
-    }
+    if (!term) return camas;
     return camas.filter((cama) => [cama.codigo, cama.descripcion, cama.estado, cama.lote?.codigo]
       .some((value) => String(value || '').toLowerCase().includes(term)));
   }, [camas, query]);
@@ -38,11 +52,31 @@ export function CamasPage({ camas, lotes, onCamasChange }: CamasPageProps) {
     const response = await blueberryApi.createCama(payload);
     onCamasChange(response.items);
     setModalOpen(false);
+    emitToast('success', 'Cama creada', `La cama ${payload.codigo} fue registrada correctamente.`);
   }
 
-  async function toggleStatus(id: number) {
-    const response = await blueberryApi.toggleCamaStatus(id);
+  async function updateCama(payload: CamaFormPayload) {
+    if (!editingCama) return;
+    const response = await blueberryApi.updateCama(editingCama.id, payload);
     onCamasChange(response.items);
+    setEditingCama(null);
+    setSelectedCama(null);
+    emitToast('success', 'Cama actualizada', `Los datos de ${payload.codigo} fueron guardados.`);
+  }
+
+  async function confirmToggleStatus() {
+    if (!pendingStatus) return;
+    try {
+      setConfirming(true);
+      const response = await blueberryApi.toggleCamaStatus(pendingStatus.id);
+      onCamasChange(response.items);
+      emitToast('success', 'Estado actualizado', `El estado de ${pendingStatus.codigo} fue modificado.`);
+      setPendingStatus(null);
+    } catch (exception) {
+      emitToast('error', 'No se pudo cambiar el estado', exception instanceof Error ? exception.message : 'Ocurrió un error inesperado.');
+    } finally {
+      setConfirming(false);
+    }
   }
 
   return (
@@ -75,41 +109,45 @@ export function CamasPage({ camas, lotes, onCamasChange }: CamasPageProps) {
             { key: 'acciones', label: 'Acciones', render: (item) => (
               <div className="icon-actions">
                 <button type="button" className="icon-action" title="Ver detalle" onClick={() => setSelectedCama(item)}><Eye size={15} /></button>
-                <button type="button" className="mini-button" onClick={() => toggleStatus(item.id)}><RotateCcw size={14} /> Estado</button>
+                <button type="button" className="icon-action" title="Editar" onClick={() => setEditingCama(item)}><Pencil size={15} /></button>
+                <button type="button" className="mini-button" onClick={() => setPendingStatus(item)}><RotateCcw size={14} /> Estado</button>
               </div>
             ) }
           ]}
         />
       </section>
 
-      <DetailDrawer
-        open={Boolean(selectedCama)}
-        title={selectedCama?.codigo || 'Detalle de cama'}
-        subtitle={selectedCama?.descripcion || selectedCama?.lote?.codigo || 'Capacidad operativa'}
-        onClose={() => setSelectedCama(null)}
-        actions={selectedCama ? <button type="button" className="action-button" onClick={() => toggleStatus(selectedCama.id)}><RotateCcw size={15} /> Cambiar estado</button> : null}
-      >
+      <DetailDrawer open={Boolean(selectedCama)} title={selectedCama?.codigo || 'Detalle de cama'} subtitle={selectedCama?.descripcion || 'Información de cama'} onClose={() => setSelectedCama(null)} actions={selectedCama ? <button type="button" className="action-button" onClick={() => setEditingCama(selectedCama)}><Pencil size={15} /> Editar cama</button> : null}>
         {selectedCama ? (
-          <>
-            <InfoGrid
-              items={[
-                { label: 'Código', value: selectedCama.codigo, tone: 'green' },
-                { label: 'Lote', value: selectedCama.lote?.codigo || 'Sin lote', tone: 'blue' },
-                { label: 'Capacidad', value: numberCompact(selectedCama.capacidadReferencial || 0), tone: 'orange' },
-                { label: 'Estado', value: <StatusBadge value={selectedCama.estado} /> }
-              ]}
-            />
-            <section className="drawer-section">
-              <h3>Descripción</h3>
-              <p>{selectedCama.descripcion || 'No se registró una descripción para esta cama.'}</p>
-            </section>
-          </>
+          <InfoGrid
+            items={[
+              { label: 'Código', value: selectedCama.codigo, tone: 'green' },
+              { label: 'Lote', value: selectedCama.lote?.codigo || 'Sin lote', tone: 'purple' },
+              { label: 'Capacidad', value: numberCompact(selectedCama.capacidadReferencial || 0), tone: 'blue' },
+              { label: 'Estado', value: <StatusBadge value={selectedCama.estado} />, tone: 'orange' },
+              { label: 'Responsable', value: selectedCama.usuarioRegistro?.nombreCompleto || 'Sin asignar' }
+            ]}
+          />
         ) : null}
       </DetailDrawer>
 
       <Modal open={modalOpen} title="Nueva cama" description="Asocia una cama productiva a un invernadero existente." onClose={() => setModalOpen(false)}>
         <CamaForm lotes={lotes} onSubmit={createCama} onCancel={() => setModalOpen(false)} />
       </Modal>
+
+      <Modal open={Boolean(editingCama)} title="Editar cama" description="Actualiza capacidad, estado y lote asociado." onClose={() => setEditingCama(null)}>
+        {editingCama ? <CamaForm lotes={lotes} initialData={toPayload(editingCama)} submitLabel="Guardar cambios" onSubmit={updateCama} onCancel={() => setEditingCama(null)} /> : null}
+      </Modal>
+
+      <ConfirmDialog
+        open={Boolean(pendingStatus)}
+        title="Cambiar estado de cama"
+        description={`Se alternará el estado operativo de ${pendingStatus?.codigo || 'la cama seleccionada'}.`}
+        confirmLabel="Cambiar estado"
+        loading={confirming}
+        onCancel={() => setPendingStatus(null)}
+        onConfirm={confirmToggleStatus}
+      />
     </main>
   );
 }

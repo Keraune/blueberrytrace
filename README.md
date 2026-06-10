@@ -217,3 +217,14 @@ DB_USERNAME=root DB_PASSWORD=12345678 npm run backend:run
 - Fase 18: vistas rápidas y drawers en módulos internos.
 - Fase 19: microinteracciones, centro de acciones y toasts.
 - Fase 20: limpieza API-first y retiro de HTML backend.
+
+## Fase 21 - Edición real avanzada desde React
+
+Se reemplazaron acciones visuales por operaciones reales de edición y confirmación:
+
+- Formularios reutilizables con datos iniciales para editar registros existentes.
+- Confirmaciones modernas con `ConfirmDialog` en lugar de `window.confirm`.
+- Toasts globales para operaciones exitosas, errores y cambios de estado.
+- Nuevos endpoints API-first `PUT` para siembras, procesos, clasificaciones y despachos.
+- Edición real desde React para lotes, camas, siembras, procesos, clasificación y despacho.
+

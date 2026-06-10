@@ -168,6 +168,12 @@ public class ApiOperationsController {
         return ApiResponse.ok("Siembra registrada correctamente.", siembras().data());
     }
 
+    @PutMapping("/siembras/{id}")
+    public ApiResponse<ListResponse<SiembraResponse>> actualizarSiembra(@PathVariable Long id, @Valid @RequestBody SiembraForm form) {
+        siembraService.actualizarSiembra(id, form);
+        return ApiResponse.ok("Siembra actualizada correctamente.", siembras().data());
+    }
+
     @PatchMapping("/siembras/{id}/estado")
     public ApiResponse<ListResponse<SiembraResponse>> cambiarEstadoSiembra(@PathVariable Long id) {
         siembraService.cambiarEstado(id);
@@ -203,6 +209,12 @@ public class ApiOperationsController {
         return ApiResponse.ok("Uniformización registrada correctamente.", procesos().data());
     }
 
+    @PutMapping("/procesos/uniformizaciones/{id}")
+    public ApiResponse<ProcesoOperativoResponse> actualizarUniformizacion(@PathVariable Long id, @Valid @RequestBody UniformizacionForm form) {
+        procesoOperativoService.actualizarUniformizacion(id, form);
+        return ApiResponse.ok("Uniformización actualizada correctamente.", procesos().data());
+    }
+
     @PatchMapping("/procesos/uniformizaciones/{id}/estado")
     public ApiResponse<ProcesoOperativoResponse> cambiarEstadoUniformizacion(@PathVariable Long id) {
         procesoOperativoService.cambiarEstadoUniformizacion(id);
@@ -223,6 +235,12 @@ public class ApiOperationsController {
         return ApiResponse.ok("Formalización registrada correctamente.", procesos().data());
     }
 
+    @PutMapping("/procesos/formalizaciones/{id}")
+    public ApiResponse<ProcesoOperativoResponse> actualizarFormalizacion(@PathVariable Long id, @Valid @RequestBody FormalizacionForm form) {
+        procesoOperativoService.actualizarFormalizacion(id, form);
+        return ApiResponse.ok("Formalización actualizada correctamente.", procesos().data());
+    }
+
     @PatchMapping("/procesos/formalizaciones/{id}/estado")
     public ApiResponse<ProcesoOperativoResponse> cambiarEstadoFormalizacion(@PathVariable Long id) {
         procesoOperativoService.cambiarEstadoFormalizacion(id);
@@ -241,6 +259,12 @@ public class ApiOperationsController {
     public ApiResponse<ListResponse<ClasificacionResponse>> crearClasificacion(@Valid @RequestBody ClasificacionForm form, Principal principal) {
         clasificacionService.crearClasificacion(form, principal.getName());
         return ApiResponse.ok("Clasificación registrada correctamente.", clasificaciones().data());
+    }
+
+    @PutMapping("/clasificaciones/{id}")
+    public ApiResponse<ListResponse<ClasificacionResponse>> actualizarClasificacion(@PathVariable Long id, @Valid @RequestBody ClasificacionForm form) {
+        clasificacionService.actualizarClasificacion(id, form);
+        return ApiResponse.ok("Clasificación actualizada correctamente.", clasificaciones().data());
     }
 
     @PatchMapping("/clasificaciones/{id}/estado")
@@ -264,6 +288,12 @@ public class ApiOperationsController {
     public ApiResponse<ListResponse<DespachoResponse>> crearDespacho(@Valid @RequestBody DespachoForm form, Principal principal) {
         despachoService.crearDespacho(form, principal.getName());
         return ApiResponse.ok("Despacho registrado correctamente.", despachos().data());
+    }
+
+    @PutMapping("/despachos/{id}")
+    public ApiResponse<ListResponse<DespachoResponse>> actualizarDespacho(@PathVariable Long id, @Valid @RequestBody DespachoForm form) {
+        despachoService.actualizarDespacho(id, form);
+        return ApiResponse.ok("Despacho actualizado correctamente.", despachos().data());
     }
 
     @PatchMapping("/despachos/{id}/estado")

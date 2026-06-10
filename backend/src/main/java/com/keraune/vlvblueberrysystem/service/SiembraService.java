@@ -59,6 +59,21 @@ public class SiembraService {
     }
 
     @Transactional
+    public void actualizarSiembra(Long id, SiembraForm form) {
+        Siembra siembra = obtenerPorId(id);
+        Lote lote = obtenerLote(form.getLoteId());
+        Cama cama = obtenerCamaValida(form.getCamaId(), lote.getId());
+
+        siembra.setLote(lote);
+        siembra.setCama(cama);
+        siembra.setFechaSiembra(form.getFechaSiembra());
+        siembra.setCantidadRegistrada(form.getCantidadRegistrada());
+        siembra.setObservacion(normalizarOpcional(form.getObservacion()));
+        siembra.setEstado(normalizarEstado(form.getEstado(), "REGISTRADA"));
+        siembraRepository.save(siembra);
+    }
+
+    @Transactional
     public void cambiarEstado(Long id) {
         Siembra siembra = obtenerPorId(id);
         siembra.setEstado("REGISTRADA".equalsIgnoreCase(siembra.getEstado()) ? "ANULADA" : "REGISTRADA");

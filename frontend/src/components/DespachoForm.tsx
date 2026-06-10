@@ -6,14 +6,16 @@ interface DespachoFormProps {
   lotes: ReferenceResponse[];
   modalidades: string[];
   validaciones: string[];
+  initialData?: DespachoFormPayload;
+  submitLabel?: string;
   onSubmit: (payload: DespachoFormPayload) => Promise<void>;
   onCancel: () => void;
 }
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-export function DespachoForm({ lotes, modalidades, validaciones, onSubmit, onCancel }: DespachoFormProps) {
-  const [payload, setPayload] = useState<DespachoFormPayload>({
+export function DespachoForm({ lotes, modalidades, validaciones, initialData, submitLabel = 'Guardar', onSubmit, onCancel }: DespachoFormProps) {
+  const [payload, setPayload] = useState<DespachoFormPayload>(initialData || {
     loteId: lotes[0]?.id || 0,
     fechaDespacho: today(),
     modalidad: modalidades[0] || 'JABAS',
@@ -34,7 +36,7 @@ export function DespachoForm({ lotes, modalidades, validaciones, onSubmit, onCan
       setError(null);
       await onSubmit(payload);
     } catch (exception) {
-      setError(exception instanceof Error ? exception.message : 'No se pudo registrar el despacho.');
+      setError(exception instanceof Error ? exception.message : 'No se pudo guardar el despacho.');
     } finally {
       setSaving(false);
     }
@@ -84,6 +86,7 @@ export function DespachoForm({ lotes, modalidades, validaciones, onSubmit, onCan
           <option value="REGISTRADO">Registrado</option>
           <option value="CERRADO">Cerrado</option>
           <option value="OBSERVADO">Observado</option>
+          <option value="ANULADO">Anulado</option>
         </select>
       </label>
       <label className="form-grid__full">
@@ -93,7 +96,7 @@ export function DespachoForm({ lotes, modalidades, validaciones, onSubmit, onCan
       <footer className="form-actions">
         <button type="button" className="ghost-button" onClick={onCancel}>Cancelar</button>
         <button type="submit" className="action-button" disabled={saving || payload.loteId === 0}>
-          {saving ? <Loader2 className="spin" size={16} /> : <Save size={16} />} Guardar
+          {saving ? <Loader2 className="spin" size={16} /> : <Save size={16} />} {submitLabel}
         </button>
       </footer>
     </form>

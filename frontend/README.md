@@ -168,3 +168,14 @@ Los prototipos compartidos se usan como guía visual, no como copia exacta. El d
 ## Fase 20 - Backend API-only
 
 Se retiraron las vistas HTML del backend. El frontend React queda como única interfaz principal del sistema.
+
+## Fase 21 - Edición real avanzada desde React
+
+Se reemplazaron acciones visuales por operaciones reales de edición y confirmación:
+
+- Formularios reutilizables con datos iniciales para editar registros existentes.
+- Confirmaciones modernas con `ConfirmDialog` en lugar de `window.confirm`.
+- Toasts globales para operaciones exitosas, errores y cambios de estado.
+- Nuevos endpoints API-first `PUT` para siembras, procesos, clasificaciones y despachos.
+- Edición real desde React para lotes, camas, siembras, procesos, clasificación y despacho.
+

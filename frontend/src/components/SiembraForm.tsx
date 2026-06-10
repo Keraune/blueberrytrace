@@ -5,14 +5,16 @@ import type { CamaResponse, ReferenceResponse, SiembraFormPayload } from '../typ
 interface SiembraFormProps {
   lotes: ReferenceResponse[];
   camas: CamaResponse[];
+  initialData?: SiembraFormPayload;
+  submitLabel?: string;
   onSubmit: (payload: SiembraFormPayload) => Promise<void>;
   onCancel: () => void;
 }
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-export function SiembraForm({ lotes, camas, onSubmit, onCancel }: SiembraFormProps) {
-  const [payload, setPayload] = useState<SiembraFormPayload>({
+export function SiembraForm({ lotes, camas, initialData, submitLabel = 'Guardar', onSubmit, onCancel }: SiembraFormProps) {
+  const [payload, setPayload] = useState<SiembraFormPayload>(initialData || {
     loteId: lotes[0]?.id || 0,
     camaId: 0,
     fechaSiembra: today(),
@@ -35,7 +37,7 @@ export function SiembraForm({ lotes, camas, onSubmit, onCancel }: SiembraFormPro
       setError(null);
       await onSubmit(payload);
     } catch (exception) {
-      setError(exception instanceof Error ? exception.message : 'No se pudo registrar la siembra.');
+      setError(exception instanceof Error ? exception.message : 'No se pudo guardar la siembra.');
     } finally {
       setSaving(false);
     }
@@ -66,6 +68,13 @@ export function SiembraForm({ lotes, camas, onSubmit, onCancel }: SiembraFormPro
         Cantidad registrada
         <input type="number" min={1} value={payload.cantidadRegistrada} onChange={(event) => setPayload({ ...payload, cantidadRegistrada: Number(event.target.value) })} required />
       </label>
+      <label>
+        Estado
+        <select value={payload.estado} onChange={(event) => setPayload({ ...payload, estado: event.target.value })}>
+          <option value="REGISTRADA">Registrada</option>
+          <option value="ANULADA">Anulada</option>
+        </select>
+      </label>
       <label className="form-grid__full">
         Observación
         <textarea value={payload.observacion} onChange={(event) => setPayload({ ...payload, observacion: event.target.value })} maxLength={255} placeholder="Detalle operativo opcional" />
@@ -73,7 +82,7 @@ export function SiembraForm({ lotes, camas, onSubmit, onCancel }: SiembraFormPro
       <footer className="form-actions">
         <button type="button" className="ghost-button" onClick={onCancel}>Cancelar</button>
         <button type="submit" className="action-button" disabled={saving || payload.loteId === 0 || payload.camaId === 0}>
-          {saving ? <Loader2 className="spin" size={16} /> : <Save size={16} />} Guardar
+          {saving ? <Loader2 className="spin" size={16} /> : <Save size={16} />} {submitLabel}
         </button>
       </footer>
     </form>

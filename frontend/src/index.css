@@ -2692,3 +2692,109 @@ textarea {
     width: calc(100vw - 1rem);
   }
 }
+
+/* Phase 21 — advanced CRUD feedback */
+.confirm-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(8, 24, 16, 0.48);
+  backdrop-filter: blur(12px);
+  animation: overlayFade 180ms ease both;
+}
+
+.confirm-dialog {
+  position: relative;
+  width: min(30rem, 100%);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.98);
+  border-radius: 1.25rem;
+  padding: 1.2rem;
+  box-shadow: 0 34px 90px rgba(8, 24, 16, 0.28);
+  display: grid;
+  gap: 0.9rem;
+  animation: modalRise 280ms cubic-bezier(.2, .8, .2, 1) both;
+}
+
+.confirm-dialog__close {
+  position: absolute;
+  right: 0.8rem;
+  top: 0.8rem;
+  width: 2rem;
+  height: 2rem;
+  border: 0;
+  border-radius: 0.65rem;
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+  background: transparent;
+}
+
+.confirm-dialog__close:hover {
+  background: #f3f6f3;
+}
+
+.confirm-dialog__icon {
+  width: 3.1rem;
+  height: 3.1rem;
+  border-radius: 1rem;
+  display: grid;
+  place-items: center;
+  color: #b86d03;
+  background: #fff3d7;
+}
+
+.confirm-dialog--success .confirm-dialog__icon {
+  color: var(--green);
+  background: #dbf5df;
+}
+
+.confirm-dialog--danger .confirm-dialog__icon {
+  color: #c32626;
+  background: #ffe1e1;
+}
+
+.confirm-dialog h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.confirm-dialog p {
+  margin: 0.25rem 0 0;
+  color: var(--muted);
+  line-height: 1.55;
+}
+
+.confirm-dialog__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.65rem;
+  flex-wrap: wrap;
+}
+
+.action-button--danger {
+  background: #dc2626;
+  border-color: #dc2626;
+  color: white;
+}
+
+.icon-action--danger {
+  color: #c32626;
+}
+
+.icon-action--danger:hover {
+  background: #fff0f0;
+  border-color: #ffc7c7;
+}
+
+.form-grid input:focus,
+.form-grid select:focus,
+.form-grid textarea:focus,
+.report-parameters-grid input:focus,
+.report-parameters-grid select:focus {
+  border-color: rgba(34, 122, 67, 0.55);
+  box-shadow: 0 0 0 4px rgba(34, 122, 67, 0.1);
+}

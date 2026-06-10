@@ -1,12 +1,15 @@
 import { useMemo, useState } from 'react';
-import { Download, Plus } from 'lucide-react';
+import { Download, Pencil, Plus, RotateCcw } from 'lucide-react';
+import { ConfirmDialog } from '../components/ConfirmDialog';
+import { DataTable } from '../components/DataTable';
 import { Modal } from '../components/Modal';
 import { ModuleHeader } from '../components/ModuleHeader';
 import { ProcesoForm } from '../components/ProcesoForm';
 import { StatusBadge } from '../components/StatusBadge';
 import { blueberryApi } from '../lib/api';
 import { dateShort, numberCompact } from '../lib/format';
-import type { CamaResponse, FormalizacionFormPayload, ProcesoOperativoResponse, ReferenceResponse, SiembraResponse, UniformizacionFormPayload } from '../types/api';
+import { emitToast } from '../lib/uiEvents';
+import type { CamaResponse, FormalizacionFormPayload, FormalizacionResponse, ProcesoOperativoResponse, ReferenceResponse, SiembraResponse, UniformizacionFormPayload, UniformizacionResponse } from '../types/api';
 
 interface ProcesosPageProps {
   procesos: ProcesoOperativoResponse | null;
@@ -18,7 +21,14 @@ interface ProcesosPageProps {
 
 export function ProcesosPage({ procesos, lotes, camas, siembras, onProcesosChange }: ProcesosPageProps) {
   const [modal, setModal] = useState<'uniformizacion' | 'formalizacion' | null>(null);
+  const [editingUniformizacion, setEditingUniformizacion] = useState<UniformizacionResponse | null>(null);
+  const [editingFormalizacion, setEditingFormalizacion] = useState<FormalizacionResponse | null>(null);
+  const [pendingStatus, setPendingStatus] = useState<{ type: 'uniformizacion' | 'formalizacion'; id: number; code: string } | null>(null);
+  const [confirming, setConfirming] = useState(false);
+
   const uniformizaciones = procesos?.uniformizaciones.items || [];
+  const formalizaciones = procesos?.formalizaciones.items || [];
+
   const aggregated = useMemo(() => {
     return lotes.map((lote) => {
       const siembrasLote = siembras.filter((siembra) => siembra.lote?.id === lote.id);
@@ -41,11 +51,45 @@ export function ProcesosPage({ procesos, lotes, camas, siembras, onProcesosChang
   async function createUniformizacion(payload: UniformizacionFormPayload | FormalizacionFormPayload) {
     onProcesosChange(await blueberryApi.createUniformizacion(payload as UniformizacionFormPayload));
     setModal(null);
+    emitToast('success', 'Uniformización registrada', 'El proceso fue guardado correctamente.');
   }
 
   async function createFormalizacion(payload: UniformizacionFormPayload | FormalizacionFormPayload) {
     onProcesosChange(await blueberryApi.createFormalizacion(payload as FormalizacionFormPayload));
     setModal(null);
+    emitToast('success', 'Formalización registrada', 'El proceso fue guardado correctamente.');
+  }
+
+  async function updateUniformizacion(payload: UniformizacionFormPayload | FormalizacionFormPayload) {
+    if (!editingUniformizacion) return;
+    onProcesosChange(await blueberryApi.updateUniformizacion(editingUniformizacion.id, payload as UniformizacionFormPayload));
+    setEditingUniformizacion(null);
+    emitToast('success', 'Uniformización actualizada', 'Los cambios fueron guardados.');
+  }
+
+  async function updateFormalizacion(payload: UniformizacionFormPayload | FormalizacionFormPayload) {
+    if (!editingFormalizacion) return;
+    onProcesosChange(await blueberryApi.updateFormalizacion(editingFormalizacion.id, payload as FormalizacionFormPayload));
+    setEditingFormalizacion(null);
+    emitToast('success', 'Formalización actualizada', 'Los cambios fueron guardados.');
+  }
+
+  async function confirmToggleStatus() {
+    if (!pendingStatus) return;
+    try {
+      setConfirming(true);
+      if (pendingStatus.type === 'uniformizacion') {
+        onProcesosChange(await blueberryApi.toggleUniformizacionStatus(pendingStatus.id));
+      } else {
+        onProcesosChange(await blueberryApi.toggleFormalizacionStatus(pendingStatus.id));
+      }
+      emitToast('success', 'Estado actualizado', `El registro ${pendingStatus.code} fue actualizado.`);
+      setPendingStatus(null);
+    } catch (exception) {
+      emitToast('error', 'No se pudo cambiar el estado', exception instanceof Error ? exception.message : 'Ocurrió un error inesperado.');
+    } finally {
+      setConfirming(false);
+    }
   }
 
   return (
@@ -53,7 +97,7 @@ export function ProcesosPage({ procesos, lotes, camas, siembras, onProcesosChang
       <ModuleHeader
         eyebrow="Proceso productivo"
         title="Uniformización y Formalización"
-        description="Control del proceso de uniformización de plantas por lote."
+        description="Control, edición y seguimiento del proceso productivo por lote."
         actions={<div className="button-group"><button type="button" className="ghost-button" onClick={() => setModal('uniformizacion')}><Plus size={15} /> Uniformización</button><button type="button" className="action-button" onClick={() => setModal('formalizacion')}><Plus size={15} /> Formalización</button></div>}
       />
 
@@ -87,12 +131,68 @@ export function ProcesosPage({ procesos, lotes, camas, siembras, onProcesosChang
         ))}
       </section>
 
+      <section className="tables-grid">
+        <DataTable<UniformizacionResponse>
+          title="Uniformizaciones"
+          description="Registros editables por lote y cama."
+          items={uniformizaciones}
+          columns={[
+            { key: 'lote', label: 'Lote', render: (item) => item.lote?.codigo || 'Sin lote' },
+            { key: 'cama', label: 'Cama', render: (item) => item.cama?.codigo || 'Sin cama' },
+            { key: 'fechaUniformizacion', label: 'Fecha', render: (item) => dateShort(item.fechaUniformizacion) },
+            { key: 'cantidadUniformizada', label: 'Cantidad', render: (item) => numberCompact(item.cantidadUniformizada || 0) },
+            { key: 'estado', label: 'Estado', render: (item) => <StatusBadge value={item.estado} /> },
+            { key: 'acciones', label: 'Acciones', render: (item) => (
+              <div className="icon-actions">
+                <button type="button" className="icon-action" onClick={() => setEditingUniformizacion(item)}><Pencil size={15} /></button>
+                <button type="button" className="icon-action" onClick={() => setPendingStatus({ type: 'uniformizacion', id: item.id, code: item.lote?.codigo || `UNI-${item.id}` })}><RotateCcw size={15} /></button>
+              </div>
+            ) }
+          ]}
+        />
+        <DataTable<FormalizacionResponse>
+          title="Formalizaciones"
+          description="Bandejas y plantas formalizadas con edición directa."
+          items={formalizaciones}
+          columns={[
+            { key: 'lote', label: 'Lote', render: (item) => item.lote?.codigo || 'Sin lote' },
+            { key: 'cama', label: 'Cama', render: (item) => item.cama?.codigo || 'Sin cama' },
+            { key: 'fechaFormalizacion', label: 'Fecha', render: (item) => dateShort(item.fechaFormalizacion) },
+            { key: 'cantidadPlantas', label: 'Plantas', render: (item) => numberCompact(item.cantidadPlantas || 0) },
+            { key: 'estado', label: 'Estado', render: (item) => <StatusBadge value={item.estado} /> },
+            { key: 'acciones', label: 'Acciones', render: (item) => (
+              <div className="icon-actions">
+                <button type="button" className="icon-action" onClick={() => setEditingFormalizacion(item)}><Pencil size={15} /></button>
+                <button type="button" className="icon-action" onClick={() => setPendingStatus({ type: 'formalizacion', id: item.id, code: item.lote?.codigo || `FOR-${item.id}` })}><RotateCcw size={15} /></button>
+              </div>
+            ) }
+          ]}
+        />
+      </section>
+
       <Modal open={modal === 'uniformizacion'} title="Nueva uniformización" description="Registra cantidad inicial y cantidad uniformizada." onClose={() => setModal(null)}>
         <ProcesoForm mode="uniformizacion" lotes={lotes} camas={camas} onSubmit={createUniformizacion} onCancel={() => setModal(null)} />
       </Modal>
       <Modal open={modal === 'formalizacion'} title="Nueva formalización" description="Registra bandejas y plantas formalizadas." onClose={() => setModal(null)}>
         <ProcesoForm mode="formalizacion" lotes={lotes} camas={camas} onSubmit={createFormalizacion} onCancel={() => setModal(null)} />
       </Modal>
+
+      <Modal open={Boolean(editingUniformizacion)} title="Editar uniformización" description="Actualiza cantidades y criterio del proceso." onClose={() => setEditingUniformizacion(null)}>
+        {editingUniformizacion ? <ProcesoForm mode="uniformizacion" lotes={lotes} camas={camas} initialData={editingUniformizacion} submitLabel="Guardar cambios" onSubmit={updateUniformizacion} onCancel={() => setEditingUniformizacion(null)} /> : null}
+      </Modal>
+      <Modal open={Boolean(editingFormalizacion)} title="Editar formalización" description="Actualiza bandejas y plantas formalizadas." onClose={() => setEditingFormalizacion(null)}>
+        {editingFormalizacion ? <ProcesoForm mode="formalizacion" lotes={lotes} camas={camas} initialData={editingFormalizacion} submitLabel="Guardar cambios" onSubmit={updateFormalizacion} onCancel={() => setEditingFormalizacion(null)} /> : null}
+      </Modal>
+
+      <ConfirmDialog
+        open={Boolean(pendingStatus)}
+        title="Cambiar estado del proceso"
+        description="Se alternará el estado entre registrado y anulado."
+        confirmLabel="Cambiar estado"
+        loading={confirming}
+        onCancel={() => setPendingStatus(null)}
+        onConfirm={confirmToggleStatus}
+      />
     </main>
   );
 }

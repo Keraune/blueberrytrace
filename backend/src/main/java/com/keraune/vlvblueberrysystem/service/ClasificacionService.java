@@ -56,6 +56,25 @@ public class ClasificacionService {
     }
 
     @Transactional
+    public void actualizarClasificacion(Long id, ClasificacionForm form) {
+        Clasificacion clasificacion = clasificacionRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró la clasificación solicitada."));
+        Lote lote = obtenerLote(form.getLoteId());
+        Cama cama = obtenerCamaValida(form.getCamaId(), lote.getId());
+
+        clasificacion.setLote(lote);
+        clasificacion.setCama(cama);
+        clasificacion.setFechaClasificacion(form.getFechaClasificacion());
+        clasificacion.setEstadoPlanta(normalizar(form.getEstadoPlanta()));
+        clasificacion.setTamano(normalizar(form.getTamano()));
+        clasificacion.setCondicion(normalizar(form.getCondicion()));
+        clasificacion.setCantidad(form.getCantidad());
+        clasificacion.setObservacion(normalizarOpcional(form.getObservacion()));
+        clasificacion.setEstado(normalizarEstado(form.getEstado(), "PENDIENTE"));
+        clasificacionRepository.save(clasificacion);
+    }
+
+    @Transactional
     public void cambiarEstado(Long id, String nuevoEstado) {
         Clasificacion clasificacion = clasificacionRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("No se encontró la clasificación solicitada."));

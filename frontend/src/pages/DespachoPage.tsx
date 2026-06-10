@@ -1,12 +1,15 @@
-import { useMemo, useState } from 'react';
-import { Download, Eye, Filter, Plus, Truck } from 'lucide-react';
+import { useState } from 'react';
+import { Download, Eye, Filter, Pencil, Plus, RefreshCcw } from 'lucide-react';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 import { DespachoForm } from '../components/DespachoForm';
 import { DetailDrawer } from '../components/DetailDrawer';
 import { InfoGrid } from '../components/InfoGrid';
+import { Modal } from '../components/Modal';
 import { ModuleHeader } from '../components/ModuleHeader';
 import { StatusBadge } from '../components/StatusBadge';
 import { blueberryApi } from '../lib/api';
 import { dateShort, numberCompact } from '../lib/format';
+import { emitToast } from '../lib/uiEvents';
 import type { DespachoFormPayload, DespachoResponse, ReferenceResponse } from '../types/api';
 
 interface DespachoPageProps {
@@ -17,9 +20,27 @@ interface DespachoPageProps {
   onDespachosChange: (items: DespachoResponse[]) => void;
 }
 
+function toPayload(item: DespachoResponse): DespachoFormPayload {
+  return {
+    loteId: item.lote?.id || 0,
+    fechaDespacho: item.fechaDespacho || new Date().toISOString().slice(0, 10),
+    modalidad: item.modalidad || 'JABAS',
+    cantidadDespachada: item.cantidadDespachada || 1,
+    destino: item.destino || '',
+    guiaRemision: item.guiaRemision || '',
+    validacionCalidad: item.validacionCalidad || 'APROBADO',
+    observacion: item.observacion || '',
+    estado: item.estado || 'REGISTRADO'
+  };
+}
+
 export function DespachoPage({ despachos, lotes, modalidades, validaciones, onDespachosChange }: DespachoPageProps) {
   const [tab, setTab] = useState<'historial' | 'nuevo'>('historial');
   const [selectedDespacho, setSelectedDespacho] = useState<DespachoResponse | null>(null);
+  const [editingDespacho, setEditingDespacho] = useState<DespachoResponse | null>(null);
+  const [pendingStatus, setPendingStatus] = useState<{ item: DespachoResponse; estado: string } | null>(null);
+  const [confirming, setConfirming] = useState(false);
+
   const plantas = despachos.reduce((total, item) => total + (item.cantidadDespachada || 0), 0);
   const enTransito = despachos.filter((item) => /TRANSITO/i.test(item.estado || '')).reduce((total, item) => total + (item.cantidadDespachada || 0), 0);
   const exportaciones = despachos.filter((item) => /EXPORT/i.test(item.modalidad || '')).length;
@@ -29,6 +50,31 @@ export function DespachoPage({ despachos, lotes, modalidades, validaciones, onDe
     const response = await blueberryApi.createDespacho(payload);
     onDespachosChange(response.items);
     setTab('historial');
+    emitToast('success', 'Despacho registrado', 'La salida fue creada correctamente.');
+  }
+
+  async function update(payload: DespachoFormPayload) {
+    if (!editingDespacho) return;
+    const response = await blueberryApi.updateDespacho(editingDespacho.id, payload);
+    onDespachosChange(response.items);
+    setEditingDespacho(null);
+    setSelectedDespacho(null);
+    emitToast('success', 'Despacho actualizado', 'Los datos del despacho fueron guardados.');
+  }
+
+  async function confirmChangeStatus() {
+    if (!pendingStatus) return;
+    try {
+      setConfirming(true);
+      const response = await blueberryApi.changeDespachoStatus(pendingStatus.item.id, pendingStatus.estado);
+      onDespachosChange(response.items);
+      emitToast('success', 'Estado actualizado', `El despacho cambió a ${pendingStatus.estado}.`);
+      setPendingStatus(null);
+    } catch (exception) {
+      emitToast('error', 'No se pudo actualizar', exception instanceof Error ? exception.message : 'Ocurrió un error inesperado.');
+    } finally {
+      setConfirming(false);
+    }
   }
 
   const summary = [
@@ -43,7 +89,7 @@ export function DespachoPage({ despachos, lotes, modalidades, validaciones, onDe
       <ModuleHeader
         eyebrow="Salida"
         title="Módulo de Despacho"
-        description="Registro y seguimiento de despachos de exportación."
+        description="Registro, edición y seguimiento de despachos de exportación."
       />
 
       <div className="tab-switcher">
@@ -96,7 +142,13 @@ export function DespachoPage({ despachos, lotes, modalidades, validaciones, onDe
                     <td><StatusBadge value={item.modalidad} /></td>
                     <td>{item.destino || 'Sin destino'}</td>
                     <td><StatusBadge value={item.estado} /></td>
-                    <td><button type="button" className="icon-action" onClick={() => setSelectedDespacho(item)}><Eye size={15} /></button></td>
+                    <td>
+                      <div className="icon-actions">
+                        <button type="button" className="icon-action" onClick={() => setSelectedDespacho(item)}><Eye size={15} /></button>
+                        <button type="button" className="icon-action" onClick={() => setEditingDespacho(item)}><Pencil size={15} /></button>
+                        <button type="button" className="icon-action" onClick={() => setPendingStatus({ item, estado: 'CERRADO' })}><RefreshCcw size={15} /></button>
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -110,11 +162,13 @@ export function DespachoPage({ despachos, lotes, modalidades, validaciones, onDe
           <DespachoForm lotes={lotes} modalidades={modalidades} validaciones={validaciones} onSubmit={create} onCancel={() => setTab('historial')} />
         </section>
       )}
+
       <DetailDrawer
         open={Boolean(selectedDespacho)}
         title={selectedDespacho ? `D-${String(selectedDespacho.id).padStart(4, '0')}` : 'Detalle de despacho'}
         subtitle={selectedDespacho?.destino || selectedDespacho?.lote?.codigo || 'Registro de salida'}
         onClose={() => setSelectedDespacho(null)}
+        actions={selectedDespacho ? <button type="button" className="action-button" onClick={() => setEditingDespacho(selectedDespacho)}><Pencil size={15} /> Editar despacho</button> : null}
       >
         {selectedDespacho ? (
           <>
@@ -137,6 +191,20 @@ export function DespachoPage({ despachos, lotes, modalidades, validaciones, onDe
         ) : null}
       </DetailDrawer>
 
+      <Modal open={Boolean(editingDespacho)} title="Editar despacho" description="Actualiza salida, destino, guía y validación." onClose={() => setEditingDespacho(null)}>
+        {editingDespacho ? <DespachoForm lotes={lotes} modalidades={modalidades} validaciones={validaciones} initialData={toPayload(editingDespacho)} submitLabel="Guardar cambios" onSubmit={update} onCancel={() => setEditingDespacho(null)} /> : null}
+      </Modal>
+
+      <ConfirmDialog
+        open={Boolean(pendingStatus)}
+        title="Cerrar despacho"
+        description="Se marcará este despacho como cerrado."
+        confirmLabel="Cerrar despacho"
+        tone="success"
+        loading={confirming}
+        onCancel={() => setPendingStatus(null)}
+        onConfirm={confirmChangeStatus}
+      />
     </main>
   );
 }

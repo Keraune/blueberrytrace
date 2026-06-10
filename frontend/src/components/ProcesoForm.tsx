@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Loader2, Save } from 'lucide-react';
-import type { CamaResponse, FormalizacionFormPayload, ReferenceResponse, UniformizacionFormPayload } from '../types/api';
+import type { CamaResponse, FormalizacionFormPayload, FormalizacionResponse, ReferenceResponse, UniformizacionFormPayload, UniformizacionResponse } from '../types/api';
 
 type ProcessMode = 'uniformizacion' | 'formalizacion';
 
@@ -8,29 +8,35 @@ interface ProcesoFormProps {
   mode: ProcessMode;
   lotes: ReferenceResponse[];
   camas: CamaResponse[];
+  initialData?: UniformizacionResponse | FormalizacionResponse;
+  submitLabel?: string;
   onSubmit: (payload: UniformizacionFormPayload | FormalizacionFormPayload) => Promise<void>;
   onCancel: () => void;
 }
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-export function ProcesoForm({ mode, lotes, camas, onSubmit, onCancel }: ProcesoFormProps) {
-  const [loteId, setLoteId] = useState(lotes[0]?.id || 0);
-  const [camaId, setCamaId] = useState(0);
-  const [fecha, setFecha] = useState(today());
-  const [criterio, setCriterio] = useState('Tamaño y vigor de planta');
-  const [detalle, setDetalle] = useState('Ordenamiento y formalización de bandejas');
-  const [cantidadInicial, setCantidadInicial] = useState(1);
-  const [cantidadUniformizada, setCantidadUniformizada] = useState(1);
-  const [cantidadBandejas, setCantidadBandejas] = useState(1);
-  const [cantidadPlantas, setCantidadPlantas] = useState(1);
-  const [observacion, setObservacion] = useState('');
-  const [estado, setEstado] = useState('REGISTRADA');
+function isUniformizacionData(data?: UniformizacionResponse | FormalizacionResponse): data is UniformizacionResponse {
+  return Boolean(data && 'fechaUniformizacion' in data);
+}
+
+export function ProcesoForm({ mode, lotes, camas, initialData, submitLabel = 'Guardar', onSubmit, onCancel }: ProcesoFormProps) {
+  const isUniformizacion = mode === 'uniformizacion';
+  const [loteId, setLoteId] = useState(initialData?.lote?.id || lotes[0]?.id || 0);
+  const [camaId, setCamaId] = useState(initialData?.cama?.id || 0);
+  const [fecha, setFecha] = useState(isUniformizacionData(initialData) ? initialData.fechaUniformizacion || today() : initialData && 'fechaFormalizacion' in initialData ? initialData.fechaFormalizacion || today() : today());
+  const [criterio, setCriterio] = useState(isUniformizacionData(initialData) ? initialData.criterio || 'Tamaño y vigor de planta' : 'Tamaño y vigor de planta');
+  const [detalle, setDetalle] = useState(initialData && 'detalle' in initialData ? initialData.detalle || 'Ordenamiento y formalización de bandejas' : 'Ordenamiento y formalización de bandejas');
+  const [cantidadInicial, setCantidadInicial] = useState(isUniformizacionData(initialData) ? initialData.cantidadInicial || 0 : 1);
+  const [cantidadUniformizada, setCantidadUniformizada] = useState(isUniformizacionData(initialData) ? initialData.cantidadUniformizada || 0 : 1);
+  const [cantidadBandejas, setCantidadBandejas] = useState(initialData && 'cantidadBandejas' in initialData ? initialData.cantidadBandejas || 0 : 1);
+  const [cantidadPlantas, setCantidadPlantas] = useState(initialData && 'cantidadPlantas' in initialData ? initialData.cantidadPlantas || 0 : 1);
+  const [observacion, setObservacion] = useState(initialData?.observacion || '');
+  const [estado, setEstado] = useState(initialData?.estado || 'REGISTRADA');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const camasDisponibles = useMemo(() => camas.filter((cama) => cama.lote?.id === loteId), [camas, loteId]);
-  const isUniformizacion = mode === 'uniformizacion';
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -117,7 +123,7 @@ export function ProcesoForm({ mode, lotes, camas, onSubmit, onCancel }: ProcesoF
       <footer className="form-actions">
         <button type="button" className="ghost-button" onClick={onCancel}>Cancelar</button>
         <button type="submit" className="action-button" disabled={saving || loteId === 0 || camaId === 0}>
-          {saving ? <Loader2 className="spin" size={16} /> : <Save size={16} />} Guardar
+          {saving ? <Loader2 className="spin" size={16} /> : <Save size={16} />} {submitLabel}
         </button>
       </footer>
     </form>

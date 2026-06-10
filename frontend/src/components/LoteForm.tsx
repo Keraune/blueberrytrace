@@ -4,21 +4,25 @@ import type { LoteFormPayload } from '../types/api';
 
 const today = new Date().toISOString().slice(0, 10);
 
+const defaultPayload: LoteFormPayload = {
+  codigo: '',
+  descripcion: '',
+  cultivo: 'Arándano',
+  variedad: '',
+  fechaRegistro: today,
+  observacion: '',
+  estado: 'ACTIVO'
+};
+
 interface LoteFormProps {
+  initialData?: LoteFormPayload;
+  submitLabel?: string;
   onSubmit: (payload: LoteFormPayload) => Promise<void>;
   onCancel: () => void;
 }
 
-export function LoteForm({ onSubmit, onCancel }: LoteFormProps) {
-  const [payload, setPayload] = useState<LoteFormPayload>({
-    codigo: '',
-    descripcion: '',
-    cultivo: 'Arándano',
-    variedad: '',
-    fechaRegistro: today,
-    observacion: '',
-    estado: 'ACTIVO'
-  });
+export function LoteForm({ initialData, submitLabel = 'Guardar', onSubmit, onCancel }: LoteFormProps) {
+  const [payload, setPayload] = useState<LoteFormPayload>(initialData || defaultPayload);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -64,6 +68,7 @@ export function LoteForm({ onSubmit, onCancel }: LoteFormProps) {
           <option value="ACTIVO">Activo</option>
           <option value="INACTIVO">Inactivo</option>
           <option value="MANTENIMIENTO">Mantenimiento</option>
+          <option value="ELIMINADO">Eliminado</option>
         </select>
       </label>
       <label className="form-grid__full">
@@ -73,7 +78,7 @@ export function LoteForm({ onSubmit, onCancel }: LoteFormProps) {
       <footer className="form-actions">
         <button type="button" className="ghost-button" onClick={onCancel}>Cancelar</button>
         <button type="submit" className="action-button" disabled={saving}>
-          {saving ? <Loader2 className="spin" size={16} /> : <Save size={16} />} Guardar
+          {saving ? <Loader2 className="spin" size={16} /> : <Save size={16} />} {submitLabel}
         </button>
       </footer>
     </form>

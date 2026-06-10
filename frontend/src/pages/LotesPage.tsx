@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { Eye, Pencil, Plus } from 'lucide-react';
+import { Eye, Pencil, Plus, RefreshCcw, Trash2 } from 'lucide-react';
+import { ConfirmDialog } from '../components/ConfirmDialog';
 import { DetailDrawer } from '../components/DetailDrawer';
 import { FilterToolbar } from '../components/FilterToolbar';
 import { InfoGrid } from '../components/InfoGrid';
@@ -9,6 +10,7 @@ import { ModuleHeader } from '../components/ModuleHeader';
 import { StatusBadge } from '../components/StatusBadge';
 import { blueberryApi } from '../lib/api';
 import { dateShort, numberCompact } from '../lib/format';
+import { emitToast } from '../lib/uiEvents';
 import type { CamaResponse, LoteFormPayload, LoteResponse, SiembraResponse } from '../types/api';
 
 interface LotesPageProps {
@@ -18,13 +20,36 @@ interface LotesPageProps {
   onLotesChange: (items: LoteResponse[]) => void;
 }
 
+interface PendingAction {
+  title: string;
+  description: string;
+  confirmLabel: string;
+  tone?: 'warning' | 'danger' | 'success';
+  run: () => Promise<void>;
+}
+
 const statusTabs = ['TODOS', 'ACTIVO', 'EN PROCESO', 'COSECHA', 'COMPLETADO', 'PENDIENTE'] as const;
+
+function toPayload(lote: LoteResponse): LoteFormPayload {
+  return {
+    codigo: lote.codigo || '',
+    descripcion: lote.descripcion || '',
+    cultivo: lote.cultivo || 'Arándano',
+    variedad: lote.variedad || '',
+    fechaRegistro: lote.fechaRegistro || new Date().toISOString().slice(0, 10),
+    observacion: lote.observacion || '',
+    estado: lote.estado || 'ACTIVO'
+  };
+}
 
 export function LotesPage({ lotes, camas, siembras, onLotesChange }: LotesPageProps) {
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState<(typeof statusTabs)[number]>('TODOS');
   const [modalOpen, setModalOpen] = useState(false);
+  const [editingLote, setEditingLote] = useState<LoteResponse | null>(null);
   const [selectedLote, setSelectedLote] = useState<LoteResponse | null>(null);
+  const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
+  const [confirming, setConfirming] = useState(false);
 
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase();
@@ -40,6 +65,58 @@ export function LotesPage({ lotes, camas, siembras, onLotesChange }: LotesPagePr
     const response = await blueberryApi.createLote(payload);
     onLotesChange(response.items);
     setModalOpen(false);
+    emitToast('success', 'Lote creado', `El lote ${payload.codigo} fue registrado correctamente.`);
+  }
+
+  async function updateLote(payload: LoteFormPayload) {
+    if (!editingLote) return;
+    const response = await blueberryApi.updateLote(editingLote.id, payload);
+    onLotesChange(response.items);
+    setEditingLote(null);
+    setSelectedLote(null);
+    emitToast('success', 'Lote actualizado', `Los datos de ${payload.codigo} fueron guardados.`);
+  }
+
+  function confirmToggleStatus(lote: LoteResponse) {
+    setPendingAction({
+      title: 'Cambiar estado del lote',
+      description: `Se actualizará el estado operativo de ${lote.codigo}. Esta acción quedará reflejada en la trazabilidad.`,
+      confirmLabel: 'Cambiar estado',
+      tone: 'warning',
+      run: async () => {
+        const response = await blueberryApi.toggleLoteStatus(lote.id);
+        onLotesChange(response.items);
+        emitToast('success', 'Estado actualizado', `El estado de ${lote.codigo} fue modificado.`);
+      }
+    });
+  }
+
+  function confirmDelete(lote: LoteResponse) {
+    setPendingAction({
+      title: 'Enviar lote a eliminados',
+      description: `El lote ${lote.codigo} será marcado como eliminado. Puedes mantener la trazabilidad histórica, pero dejará de verse como activo.`,
+      confirmLabel: 'Enviar a eliminados',
+      tone: 'danger',
+      run: async () => {
+        const response = await blueberryApi.deleteLote(lote.id);
+        onLotesChange(response.items);
+        setSelectedLote(null);
+        emitToast('warning', 'Lote eliminado lógicamente', `${lote.codigo} fue enviado a eliminados.`);
+      }
+    });
+  }
+
+  async function runPendingAction() {
+    if (!pendingAction) return;
+    try {
+      setConfirming(true);
+      await pendingAction.run();
+      setPendingAction(null);
+    } catch (exception) {
+      emitToast('error', 'No se pudo completar la acción', exception instanceof Error ? exception.message : 'Ocurrió un error inesperado.');
+    } finally {
+      setConfirming(false);
+    }
   }
 
   const cards = [
@@ -112,7 +189,9 @@ export function LotesPage({ lotes, camas, siembras, onLotesChange }: LotesPagePr
                     <td>
                       <div className="icon-actions">
                         <button type="button" className="icon-action" title="Visualizar" onClick={() => setSelectedLote(lote)}><Eye size={15} /></button>
-                        <button type="button" className="icon-action" title="Editar estado" onClick={async () => onLotesChange((await blueberryApi.toggleLoteStatus(lote.id)).items)}><Pencil size={15} /></button>
+                        <button type="button" className="icon-action" title="Editar" onClick={() => setEditingLote(lote)}><Pencil size={15} /></button>
+                        <button type="button" className="icon-action" title="Cambiar estado" onClick={() => confirmToggleStatus(lote)}><RefreshCcw size={15} /></button>
+                        <button type="button" className="icon-action icon-action--danger" title="Eliminar" onClick={() => confirmDelete(lote)}><Trash2 size={15} /></button>
                       </div>
                     </td>
                   </tr>
@@ -130,9 +209,10 @@ export function LotesPage({ lotes, camas, siembras, onLotesChange }: LotesPagePr
         subtitle={selectedLote?.descripcion || 'Información operativa del lote'}
         onClose={() => setSelectedLote(null)}
         actions={selectedLote ? (
-          <button type="button" className="action-button" onClick={async () => onLotesChange((await blueberryApi.toggleLoteStatus(selectedLote.id)).items)}>
-            <Pencil size={15} /> Cambiar estado
-          </button>
+          <div className="button-group">
+            <button type="button" className="ghost-button" onClick={() => setEditingLote(selectedLote)}><Pencil size={15} /> Editar</button>
+            <button type="button" className="action-button" onClick={() => confirmToggleStatus(selectedLote)}><RefreshCcw size={15} /> Cambiar estado</button>
+          </div>
         ) : null}
       >
         {selectedLote ? (
@@ -158,6 +238,21 @@ export function LotesPage({ lotes, camas, siembras, onLotesChange }: LotesPagePr
       <Modal open={modalOpen} title="Nuevo lote" description="Registra un lote productivo o invernadero." onClose={() => setModalOpen(false)}>
         <LoteForm onSubmit={createLote} onCancel={() => setModalOpen(false)} />
       </Modal>
+
+      <Modal open={Boolean(editingLote)} title="Editar lote" description="Actualiza datos operativos del invernadero." onClose={() => setEditingLote(null)}>
+        {editingLote ? <LoteForm initialData={toPayload(editingLote)} submitLabel="Guardar cambios" onSubmit={updateLote} onCancel={() => setEditingLote(null)} /> : null}
+      </Modal>
+
+      <ConfirmDialog
+        open={Boolean(pendingAction)}
+        title={pendingAction?.title || ''}
+        description={pendingAction?.description || ''}
+        confirmLabel={pendingAction?.confirmLabel}
+        tone={pendingAction?.tone}
+        loading={confirming}
+        onCancel={() => setPendingAction(null)}
+        onConfirm={runPendingAction}
+      />
     </main>
   );
 }

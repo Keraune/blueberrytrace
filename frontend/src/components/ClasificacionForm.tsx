@@ -5,14 +5,16 @@ import type { CamaResponse, ClasificacionFormPayload, ReferenceResponse } from '
 interface ClasificacionFormProps {
   lotes: ReferenceResponse[];
   camas: CamaResponse[];
+  initialData?: ClasificacionFormPayload;
+  submitLabel?: string;
   onSubmit: (payload: ClasificacionFormPayload) => Promise<void>;
   onCancel: () => void;
 }
 
 const today = () => new Date().toISOString().slice(0, 10);
 
-export function ClasificacionForm({ lotes, camas, onSubmit, onCancel }: ClasificacionFormProps) {
-  const [payload, setPayload] = useState<ClasificacionFormPayload>({
+export function ClasificacionForm({ lotes, camas, initialData, submitLabel = 'Guardar', onSubmit, onCancel }: ClasificacionFormProps) {
+  const [payload, setPayload] = useState<ClasificacionFormPayload>(initialData || {
     loteId: lotes[0]?.id || 0,
     camaId: 0,
     fechaClasificacion: today(),
@@ -35,7 +37,7 @@ export function ClasificacionForm({ lotes, camas, onSubmit, onCancel }: Clasific
       setError(null);
       await onSubmit(payload);
     } catch (exception) {
-      setError(exception instanceof Error ? exception.message : 'No se pudo registrar la clasificación.');
+      setError(exception instanceof Error ? exception.message : 'No se pudo guardar la clasificación.');
     } finally {
       setSaving(false);
     }
@@ -84,6 +86,7 @@ export function ClasificacionForm({ lotes, camas, onSubmit, onCancel }: Clasific
           <option value="PENDIENTE">Pendiente</option>
           <option value="VALIDADA">Validada</option>
           <option value="OBSERVADA">Observada</option>
+          <option value="ANULADA">Anulada</option>
         </select>
       </label>
       <label className="form-grid__full">
@@ -93,7 +96,7 @@ export function ClasificacionForm({ lotes, camas, onSubmit, onCancel }: Clasific
       <footer className="form-actions">
         <button type="button" className="ghost-button" onClick={onCancel}>Cancelar</button>
         <button type="submit" className="action-button" disabled={saving || payload.loteId === 0 || payload.camaId === 0}>
-          {saving ? <Loader2 className="spin" size={16} /> : <Save size={16} />} Guardar
+          {saving ? <Loader2 className="spin" size={16} /> : <Save size={16} />} {submitLabel}
         </button>
       </footer>
     </form>
