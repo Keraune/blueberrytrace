@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, Loader2, RefreshCcw } from 'lucide-react';
+import { CommandPalette } from './components/CommandPalette';
+import { FloatingActionDock } from './components/FloatingActionDock';
 import { Sidebar } from './components/Sidebar';
+import { ToastStack, type ToastItem, type ToastTone } from './components/ToastStack';
 import { Topbar } from './components/Topbar';
 import { useAppRoute } from './hooks/useAppRoute';
 import { ApiError, blueberryApi } from './lib/api';
@@ -46,7 +49,17 @@ export default function App() {
   const [refreshing, setRefreshing] = useState(false);
   const [authRequired, setAuthRequired] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [commandOpen, setCommandOpen] = useState(false);
+  const [toasts, setToasts] = useState<ToastItem[]>([]);
   const { activeKey, navigate } = useAppRoute();
+
+  function pushToast(tone: ToastTone, title: string, description?: string) {
+    const id = Date.now() + Math.floor(Math.random() * 1000);
+    setToasts((current) => [...current.slice(-3), { id, tone, title, description }]);
+    window.setTimeout(() => {
+      setToasts((current) => current.filter((toast) => toast.id !== id));
+    }, 4200);
+  }
 
   async function load(signal?: AbortSignal) {
     const [bootstrapResponse, userResponse] = await Promise.all([
@@ -125,17 +138,33 @@ export default function App() {
     return () => controller.abort();
   }, []);
 
+  useEffect(() => {
+    function onKeyDown(event: KeyboardEvent) {
+      if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault();
+        setCommandOpen(true);
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
+
   async function refresh() {
     try {
       setRefreshing(true);
       await load();
+      pushToast('success', 'Datos sincronizados', 'La información operativa fue actualizada correctamente.');
     } catch (exception) {
       if (exception instanceof ApiError && exception.status === 401) {
         setAuthRequired(true);
         setUser(null);
         setError(null);
+        pushToast('warning', 'Sesión expirada', 'Inicia sesión nuevamente para continuar.');
       } else {
-        setError(exception instanceof Error ? exception.message : 'No se pudo actualizar la información.');
+        const message = exception instanceof Error ? exception.message : 'No se pudo actualizar la información.';
+        setError(message);
+        pushToast('error', 'No se pudo sincronizar', message);
       }
     } finally {
       setRefreshing(false);
@@ -151,6 +180,7 @@ export default function App() {
     setLoading(true);
     try {
       await load();
+      pushToast('success', 'Sesión iniciada', `Bienvenido, ${authenticatedUser.nombreCompleto || authenticatedUser.username}.`);
     } finally {
       setLoading(false);
     }
@@ -165,6 +195,7 @@ export default function App() {
       setDashboard(null);
       setCatalogs(null);
       window.history.pushState({}, '', '/login');
+      pushToast('info', 'Sesión cerrada', 'Puedes iniciar sesión nuevamente cuando lo necesites.');
     }
   }
 
@@ -205,16 +236,28 @@ export default function App() {
       <Sidebar modules={modules} activeKey={activeKey} user={user} onSelect={navigate} onLogout={handleLogout} />
       <section className="main-shell">
         <Topbar user={user} activeModule={activeModule?.label || 'Control de trazabilidad'} onRefresh={refresh} refreshing={refreshing} />
-        {activeKey === 'dashboard' && <DashboardPage dashboard={dashboard} lotes={lotes} camas={camas} />}
-        {activeKey === 'lotes' && <LotesPage lotes={lotes} camas={camas} siembras={siembras} onLotesChange={setLotes} />}
-        {activeKey === 'camas' && <CamasPage camas={camas} lotes={loteReferences} onCamasChange={setCamas} />}
-        {activeKey === 'siembra' && <SiembrasPage siembras={siembras} lotes={loteReferences} camas={camas} onSiembrasChange={setSiembras} />}
-        {activeKey === 'procesos' && <ProcesosPage procesos={procesos} lotes={loteReferences} camas={camas} siembras={siembras} onProcesosChange={setProcesos} />}
-        {activeKey === 'clasificacion' && <ClasificacionPage clasificaciones={clasificaciones} lotes={loteReferences} camas={camas} onClasificacionesChange={setClasificaciones} />}
-        {activeKey === 'despacho' && <DespachoPage despachos={despachos} lotes={loteReferences} modalidades={catalogs?.modalidadesDespacho || ['JABAS', 'BINS_MADERA']} validaciones={catalogs?.validacionesCalidad || ['APROBADO', 'OBSERVADO']} onDespachosChange={setDespachos} />}
-        {activeKey === 'reportes' && <ReportesPage trazabilidad={trazabilidad} />}
-        {activeKey === 'usuarios' && <UsuariosPage usuarios={usuarios} />}
+        <div key={activeKey} className="route-transition">
+          {activeKey === 'dashboard' && <DashboardPage dashboard={dashboard} lotes={lotes} camas={camas} />}
+          {activeKey === 'lotes' && <LotesPage lotes={lotes} camas={camas} siembras={siembras} onLotesChange={setLotes} />}
+          {activeKey === 'camas' && <CamasPage camas={camas} lotes={loteReferences} onCamasChange={setCamas} />}
+          {activeKey === 'siembra' && <SiembrasPage siembras={siembras} lotes={loteReferences} camas={camas} onSiembrasChange={setSiembras} />}
+          {activeKey === 'procesos' && <ProcesosPage procesos={procesos} lotes={loteReferences} camas={camas} siembras={siembras} onProcesosChange={setProcesos} />}
+          {activeKey === 'clasificacion' && <ClasificacionPage clasificaciones={clasificaciones} lotes={loteReferences} camas={camas} onClasificacionesChange={setClasificaciones} />}
+          {activeKey === 'despacho' && <DespachoPage despachos={despachos} lotes={loteReferences} modalidades={catalogs?.modalidadesDespacho || ['JABAS', 'BINS_MADERA']} validaciones={catalogs?.validacionesCalidad || ['APROBADO', 'OBSERVADO']} onDespachosChange={setDespachos} />}
+          {activeKey === 'reportes' && <ReportesPage trazabilidad={trazabilidad} />}
+          {activeKey === 'usuarios' && <UsuariosPage usuarios={usuarios} />}
+        </div>
       </section>
+      <CommandPalette
+        open={commandOpen}
+        modules={modules}
+        activeKey={activeKey}
+        onClose={() => setCommandOpen(false)}
+        onSelect={navigate}
+        onRefresh={refresh}
+      />
+      <FloatingActionDock onOpenCommand={() => setCommandOpen(true)} onRefresh={refresh} refreshing={refreshing} />
+      <ToastStack toasts={toasts} onDismiss={(id) => setToasts((current) => current.filter((toast) => toast.id !== id))} />
     </div>
   );
 }

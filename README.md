@@ -350,3 +350,16 @@ npm ci
 npm run build
 ```
 
+
+## Fase 19 - Experiencia visual creativa
+
+Se agregó una capa de microinteracciones al frontend React:
+
+- `Ctrl + K` abre el centro de acciones.
+- Dock flotante para búsqueda rápida y sincronización.
+- Notificaciones toast para sesión, errores y sincronización.
+- Transiciones entre módulos.
+- Animaciones suaves en modales, drawers, cards, tablas y gráficos.
+
+Los prototipos compartidos se usan como guía visual, no como copia exacta. El diseño mantiene una identidad propia para BlueberryTrace.
+
