@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef } from 'react';
 import { AlertTriangle, CheckCircle2, Loader2, X } from 'lucide-react';
+import { createPortal } from 'react-dom';
 
 interface ConfirmDialogProps {
   open: boolean;
@@ -57,7 +58,7 @@ export function ConfirmDialog({
 
   const Icon = tone === 'success' ? CheckCircle2 : AlertTriangle;
 
-  return (
+  return createPortal(
     <div className="confirm-backdrop" role="presentation" onMouseDown={loading ? undefined : onCancel}>
       <section
         className={`confirm-dialog confirm-dialog--${tone}`}
@@ -83,6 +84,7 @@ export function ConfirmDialog({
           </button>
         </footer>
       </section>
-    </div>
+    </div>,
+    document.body
   );
 }

@@ -426,7 +426,7 @@ export default function App() {
           {activeKey === 'clasificacion' && <ClasificacionPage clasificaciones={clasificaciones} lotes={loteReferences} camas={camas} onClasificacionesChange={setClasificaciones} />}
           {activeKey === 'despacho' && <DespachoPage despachos={despachos} lotes={loteReferences} modalidades={catalogs?.modalidadesDespacho || ['JABAS', 'BINS_MADERA']} validaciones={catalogs?.validacionesCalidad || ['APROBADO', 'OBSERVADO']} onDespachosChange={setDespachos} />}
           {activeKey === 'reportes' && <ReportesPage trazabilidad={trazabilidad} />}
-          {activeKey === 'usuarios' && <UsuariosPage usuarios={usuarios} />}
+          {activeKey === 'usuarios' && <UsuariosPage usuarios={usuarios} roles={catalogs?.roles || []} onUsuariosChange={setUsuarios} />}
         </div>
       </section>
       <CommandPalette

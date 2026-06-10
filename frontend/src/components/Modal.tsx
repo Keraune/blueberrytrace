@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef } from 'react';
 import { X } from 'lucide-react';
+import { createPortal } from 'react-dom';
 import type { ReactNode } from 'react';
 
 interface ModalProps {
@@ -44,7 +45,7 @@ export function Modal({ open, title, description, children, size = 'lg', closeOn
     return null;
   }
 
-  return (
+  return createPortal(
     <div className="modal-backdrop" role="presentation" onMouseDown={closeOnBackdrop ? onClose : undefined}>
       <section
         className={`modal-card modal-card--${size}`}
@@ -68,6 +69,7 @@ export function Modal({ open, title, description, children, size = 'lg', closeOn
           {children}
         </div>
       </section>
-    </div>
+    </div>,
+    document.body
   );
 }

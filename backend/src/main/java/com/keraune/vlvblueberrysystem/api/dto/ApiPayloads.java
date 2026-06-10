@@ -4,6 +4,9 @@ import com.keraune.vlvblueberrysystem.dto.DashboardSummary;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 public final class ApiPayloads {
 
@@ -46,7 +49,9 @@ public final class ApiPayloads {
             String nombreCompleto,
             String email,
             String rol,
-            Boolean activo
+            Boolean activo,
+            LocalDateTime fechaCreacion,
+            LocalDateTime fechaActualizacion
     ) {
     }
 
@@ -56,6 +61,30 @@ public final class ApiPayloads {
             String email,
             String rol,
             List<String> authorities
+    ) {
+    }
+
+    public record UserFormPayload(
+            @NotBlank(message = "El usuario es obligatorio.")
+            @Size(max = 50, message = "El usuario no debe superar 50 caracteres.")
+            String username,
+
+            @NotBlank(message = "El nombre completo es obligatorio.")
+            @Size(max = 150, message = "El nombre completo no debe superar 150 caracteres.")
+            String nombreCompleto,
+
+            @NotBlank(message = "El correo empresarial es obligatorio.")
+            @Email(message = "Ingresa un correo empresarial válido.")
+            @Size(max = 120, message = "El correo no debe superar 120 caracteres.")
+            String email,
+
+            @NotBlank(message = "El rol es obligatorio.")
+            String rol,
+
+            @Size(max = 120, message = "La contraseña no debe superar 120 caracteres.")
+            String password,
+
+            Boolean activo
     ) {
     }
 
@@ -190,6 +219,7 @@ public final class ApiPayloads {
     public record CatalogResponse(
             List<ReferenceResponse> lotes,
             List<ReferenceResponse> camas,
+            List<String> roles,
             List<String> estadosLote,
             List<String> estadosCama,
             List<String> estadosOperativos,

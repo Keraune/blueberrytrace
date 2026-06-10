@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import type { ReactNode } from 'react';
 import { X } from 'lucide-react';
 
@@ -42,7 +43,7 @@ export function DetailDrawer({ open, title, subtitle, children, actions, onClose
     return null;
   }
 
-  return (
+  return createPortal(
     <div className="drawer-backdrop" role="presentation" onMouseDown={onClose}>
       <aside className="detail-drawer" role="dialog" aria-modal="true" aria-labelledby={titleId} onMouseDown={(event) => event.stopPropagation()}>
         <header className="detail-drawer__header">
@@ -60,6 +61,7 @@ export function DetailDrawer({ open, title, subtitle, children, actions, onClose
         </div>
         {actions ? <footer className="detail-drawer__actions">{actions}</footer> : null}
       </aside>
-    </div>
+    </div>,
+    document.body
   );
 }

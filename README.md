@@ -251,3 +251,16 @@ Se corrigió la experiencia visual principal del frontend React:
 - Dashboard sin series simuladas; las métricas visuales usan siembras, despachos, clasificaciones y registros reales.
 - Modales más centrados, compactos y responsive.
 - Confirmación de limpieza API-first sin Thymeleaf ni frontend legacy en backend.
+
+## Fase 24 - Usuarios corporativos y modales por portal
+
+Se corrigió el sistema de overlays del frontend para que los modales, confirmaciones y drawers se rendericen fuera del layout principal mediante portal en `document.body`. Esto evita desplazamientos visuales causados por el sidebar, el topbar o las transiciones de ruta.
+
+También se avanzó el módulo de usuarios con operaciones reales conectadas al backend y MySQL:
+
+- crear usuario corporativo;
+- editar usuario;
+- activar/desactivar usuario;
+- validar correos `@vlv.com`;
+- consumir roles activos desde el backend.
+

@@ -56,7 +56,7 @@ public class DataInitializer {
                 admin.setNombreCompleto("Administrador del Sistema");
                 admin.setUsername("admin");
                 admin.setPassword(passwordEncoder.encode("admin123"));
-                admin.setEmail("admin@vlv.local");
+                admin.setEmail("admin@vlv.com");
                 admin.setEstado(true);
 
                 userRepository.save(admin);
@@ -65,6 +65,15 @@ public class DataInitializer {
             User admin = userRepository
                     .findByUsername("admin")
                     .orElseThrow(() -> new IllegalStateException("No existe el usuario administrador."));
+
+            if (!"admin@vlv.com".equalsIgnoreCase(admin.getEmail())) {
+                admin.setEmail("admin@vlv.com");
+                userRepository.save(admin);
+            }
+
+            createUserIfNotExists(userRepository, roleRepository, passwordEncoder, "supervisor", "Supervisor de Producción", "supervisor@vlv.com", "SUPERVISOR");
+            createUserIfNotExists(userRepository, roleRepository, passwordEncoder, "calidad", "Control de Calidad", "calidad@vlv.com", "CONTROL_CALIDAD");
+            createUserIfNotExists(userRepository, roleRepository, passwordEncoder, "despacho", "Responsable de Despacho", "despacho@vlv.com", "OPERARIO");
 
             if (loteRepository.count() == 0) {
                 Lote loteUno = new Lote();
@@ -202,5 +211,29 @@ public class DataInitializer {
             role.setEstado(true);
             roleRepository.save(role);
         }
+    }
+
+    private void createUserIfNotExists(UserRepository userRepository,
+                                      RoleRepository roleRepository,
+                                      PasswordEncoder passwordEncoder,
+                                      String username,
+                                      String nombreCompleto,
+                                      String email,
+                                      String roleName) {
+        if (userRepository.findByUsername(username).isPresent()) {
+            return;
+        }
+
+        Role role = roleRepository.findByNombre(roleName)
+                .orElseThrow(() -> new IllegalStateException("No existe el rol " + roleName));
+
+        User user = new User();
+        user.setRol(role);
+        user.setNombreCompleto(nombreCompleto);
+        user.setUsername(username);
+        user.setPassword(passwordEncoder.encode("Blueberry2026"));
+        user.setEmail(email);
+        user.setEstado(true);
+        userRepository.save(user);
     }
 }

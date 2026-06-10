@@ -64,7 +64,11 @@ final class ApiModuleMetadata {
                 new EndpointResponse("PUT", "/api/v1/despachos/{id}", "Actualización de despachos desde clientes React/Vue."),
                 new EndpointResponse("PATCH", "/api/v1/despachos/{id}/estado", "Cambio de estado de despachos."),
                 new EndpointResponse("GET", "/api/v1/reportes/trazabilidad", "Consulta de trazabilidad por código, variedad o fecha."),
-                new EndpointResponse("GET", "/api/v1/usuarios", "Listado de usuarios para administración.")
+                new EndpointResponse("GET", "/api/v1/roles", "Listado de roles corporativos activos."),
+                new EndpointResponse("GET", "/api/v1/usuarios", "Listado de usuarios para administración."),
+                new EndpointResponse("POST", "/api/v1/usuarios", "Creación de usuarios corporativos @vlv.com."),
+                new EndpointResponse("PUT", "/api/v1/usuarios/{id}", "Actualización de usuarios corporativos."),
+                new EndpointResponse("PATCH", "/api/v1/usuarios/{id}/estado", "Activación o desactivación de usuarios.")
         );
     }
 

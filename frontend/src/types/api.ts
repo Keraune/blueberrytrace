@@ -22,6 +22,8 @@ export interface UserReferenceResponse {
   email: string;
   rol: string | null;
   activo: boolean;
+  fechaCreacion: string | null;
+  fechaActualizacion: string | null;
 }
 
 export interface AuthenticatedUserResponse {
@@ -30,6 +32,15 @@ export interface AuthenticatedUserResponse {
   email: string;
   rol: string | null;
   authorities: string[];
+}
+
+export interface UserFormPayload {
+  username: string;
+  nombreCompleto: string;
+  email: string;
+  rol: string;
+  password?: string;
+  activo: boolean;
 }
 
 export interface DashboardSummary {
@@ -219,6 +230,7 @@ export interface TrazabilidadResponse {
 export interface CatalogResponse {
   lotes: ReferenceResponse[];
   camas: ReferenceResponse[];
+  roles: string[];
   estadosLote: string[];
   estadosCama: string[];
   estadosOperativos: string[];

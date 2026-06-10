@@ -21,6 +21,7 @@ import type {
   SiembraResponse,
   TrazabilidadResponse,
   UniformizacionFormPayload,
+  UserFormPayload,
   UserReferenceResponse
 } from '../types/api';
 
@@ -131,5 +132,9 @@ export const blueberryApi = {
   updateDespacho: (id: number, payload: DespachoFormPayload) => mutateData<ListResponse<DespachoResponse>>(`/despachos/${id}`, 'PUT', payload),
   changeDespachoStatus: (id: number, estado: string) => mutateData<ListResponse<DespachoResponse>>(`/despachos/${id}/estado?estado=${encodeURIComponent(estado)}`, 'PATCH'),
   trazabilidad: () => getData<ListResponse<TrazabilidadResponse>>('/reportes/trazabilidad'),
-  usuarios: () => getData<ListResponse<UserReferenceResponse>>('/usuarios')
+  usuarios: () => getData<ListResponse<UserReferenceResponse>>('/usuarios'),
+  roles: () => getData<string[]>('/roles'),
+  createUsuario: (payload: UserFormPayload) => mutateData<ListResponse<UserReferenceResponse>>('/usuarios', 'POST', payload),
+  updateUsuario: (id: number, payload: UserFormPayload) => mutateData<ListResponse<UserReferenceResponse>>(`/usuarios/${id}`, 'PUT', payload),
+  toggleUsuarioStatus: (id: number) => mutateData<ListResponse<UserReferenceResponse>>(`/usuarios/${id}/estado`, 'PATCH')
 };

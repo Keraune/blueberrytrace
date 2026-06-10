@@ -100,3 +100,15 @@ Se reemplazaron acciones visuales por operaciones reales de edición y confirmac
 - Nuevos endpoints API-first `PUT` para siembras, procesos, clasificaciones y despachos.
 - Edición real desde React para lotes, camas, siembras, procesos, clasificación y despacho.
 
+## Fase 24 - Usuarios corporativos y modales por portal
+
+Se corrigió el sistema de overlays del frontend para que los modales, confirmaciones y drawers se rendericen fuera del layout principal mediante portal en `document.body`. Esto evita desplazamientos visuales causados por el sidebar, el topbar o las transiciones de ruta.
+
+También se avanzó el módulo de usuarios con operaciones reales conectadas al backend y MySQL:
+
+- crear usuario corporativo;
+- editar usuario;
+- activar/desactivar usuario;
+- validar correos `@vlv.com`;
+- consumir roles activos desde el backend.
+

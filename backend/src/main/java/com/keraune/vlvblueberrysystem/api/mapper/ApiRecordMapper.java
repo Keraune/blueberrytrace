@@ -179,7 +179,9 @@ public class ApiRecordMapper {
                 user.getNombreCompleto(),
                 user.getEmail(),
                 roleName,
-                user.getEstado()
+                user.getEstado(),
+                user.getFechaCreacion(),
+                user.getFechaActualizacion()
         );
     }
 }

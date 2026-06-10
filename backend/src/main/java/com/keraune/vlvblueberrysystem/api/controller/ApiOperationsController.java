@@ -11,6 +11,7 @@ import com.keraune.vlvblueberrysystem.api.dto.ApiPayloads.LoteResponse;
 import com.keraune.vlvblueberrysystem.api.dto.ApiPayloads.ProcesoOperativoResponse;
 import com.keraune.vlvblueberrysystem.api.dto.ApiPayloads.SiembraResponse;
 import com.keraune.vlvblueberrysystem.api.dto.ApiPayloads.TrazabilidadResponse;
+import com.keraune.vlvblueberrysystem.api.dto.ApiPayloads.UserFormPayload;
 import com.keraune.vlvblueberrysystem.api.dto.ApiPayloads.UniformizacionResponse;
 import com.keraune.vlvblueberrysystem.api.dto.ApiPayloads.UserReferenceResponse;
 import com.keraune.vlvblueberrysystem.api.mapper.ApiRecordMapper;
@@ -21,7 +22,9 @@ import com.keraune.vlvblueberrysystem.dto.SiembraForm;
 import com.keraune.vlvblueberrysystem.dto.UniformizacionForm;
 import com.keraune.vlvblueberrysystem.dto.CamaForm;
 import com.keraune.vlvblueberrysystem.dto.LoteForm;
+import com.keraune.vlvblueberrysystem.entity.Role;
 import com.keraune.vlvblueberrysystem.entity.User;
+import com.keraune.vlvblueberrysystem.repository.RoleRepository;
 import com.keraune.vlvblueberrysystem.repository.UserRepository;
 import com.keraune.vlvblueberrysystem.service.CamaService;
 import com.keraune.vlvblueberrysystem.service.ClasificacionService;
@@ -32,9 +35,11 @@ import com.keraune.vlvblueberrysystem.service.SiembraService;
 import com.keraune.vlvblueberrysystem.service.TrazabilidadQueryService;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import jakarta.validation.Valid;
 import java.security.Principal;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
@@ -58,6 +63,8 @@ public class ApiOperationsController {
     private final DespachoService despachoService;
     private final TrazabilidadQueryService trazabilidadQueryService;
     private final UserRepository userRepository;
+    private final RoleRepository roleRepository;
+    private final PasswordEncoder passwordEncoder;
     private final ApiRecordMapper mapper;
 
     public ApiOperationsController(LoteService loteService,
@@ -68,6 +75,8 @@ public class ApiOperationsController {
                                    DespachoService despachoService,
                                    TrazabilidadQueryService trazabilidadQueryService,
                                    UserRepository userRepository,
+                                   RoleRepository roleRepository,
+                                   PasswordEncoder passwordEncoder,
                                    ApiRecordMapper mapper) {
         this.loteService = loteService;
         this.camaService = camaService;
@@ -77,6 +86,8 @@ public class ApiOperationsController {
         this.despachoService = despachoService;
         this.trazabilidadQueryService = trazabilidadQueryService;
         this.userRepository = userRepository;
+        this.roleRepository = roleRepository;
+        this.passwordEncoder = passwordEncoder;
         this.mapper = mapper;
     }
 
@@ -85,6 +96,7 @@ public class ApiOperationsController {
         CatalogResponse response = new CatalogResponse(
                 loteService.listarTodos().stream().map(mapper::toLoteReference).toList(),
                 camaService.listarTodas().stream().map(mapper::toCamaReference).toList(),
+                roleRepository.findAllByEstadoTrueOrderByNombreAsc().stream().map(Role::getNombre).toList(),
                 List.of("ACTIVO", "INACTIVO", "MANTENIMIENTO", "ELIMINADO"),
                 List.of("ACTIVA", "INACTIVA"),
                 List.of("REGISTRADA", "ANULADA"),
@@ -325,6 +337,98 @@ public class ApiOperationsController {
         return ApiResponse.ok(ListResponse.from(items));
     }
 
+    @GetMapping("/roles")
+    public ApiResponse<List<String>> roles() {
+        return ApiResponse.ok(roleRepository.findAllByEstadoTrueOrderByNombreAsc().stream()
+                .map(Role::getNombre)
+                .toList());
+    }
+
+    @PostMapping("/usuarios")
+    public ApiResponse<ListResponse<UserReferenceResponse>> crearUsuario(@Valid @RequestBody UserFormPayload payload) {
+        User user = new User();
+        applyUserPayload(user, payload, true);
+        userRepository.save(user);
+        return ApiResponse.ok("Usuario corporativo registrado correctamente.", usuarios().data());
+    }
+
+    @PutMapping("/usuarios/{id}")
+    public ApiResponse<ListResponse<UserReferenceResponse>> actualizarUsuario(@PathVariable Long id, @Valid @RequestBody UserFormPayload payload) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró el usuario solicitado."));
+        applyUserPayload(user, payload, false);
+        userRepository.save(user);
+        return ApiResponse.ok("Usuario corporativo actualizado correctamente.", usuarios().data());
+    }
+
+    @PatchMapping("/usuarios/{id}/estado")
+    public ApiResponse<ListResponse<UserReferenceResponse>> cambiarEstadoUsuario(@PathVariable Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("No se encontró el usuario solicitado."));
+        user.setEstado(!Boolean.TRUE.equals(user.getEstado()));
+        userRepository.save(user);
+        return ApiResponse.ok("Estado del usuario actualizado correctamente.", usuarios().data());
+    }
+
+    private void applyUserPayload(User user, UserFormPayload payload, boolean creating) {
+        String username = normalizeUsername(payload.username());
+        String email = normalizeEmail(payload.email());
+        String roleName = normalizeRole(payload.rol());
+
+        userRepository.findByUsernameIgnoreCase(username)
+                .filter(existing -> !existing.getId().equals(user.getId()))
+                .ifPresent(existing -> {
+                    throw new IllegalArgumentException("Ya existe un usuario con ese nombre de acceso.");
+                });
+
+        userRepository.findByEmailIgnoreCase(email)
+                .filter(existing -> !existing.getId().equals(user.getId()))
+                .ifPresent(existing -> {
+                    throw new IllegalArgumentException("Ya existe un usuario con ese correo empresarial.");
+                });
+
+        Role role = roleRepository.findByNombre(roleName)
+                .orElseThrow(() -> new IllegalArgumentException("El rol seleccionado no existe o no está activo."));
+
+        String password = payload.password() == null ? "" : payload.password().trim();
+        if (creating && password.length() < 8) {
+            throw new IllegalArgumentException("La contraseña inicial debe tener al menos 8 caracteres.");
+        }
+        if (!password.isBlank() && password.length() < 8) {
+            throw new IllegalArgumentException("La contraseña debe tener al menos 8 caracteres.");
+        }
+
+        user.setUsername(username);
+        user.setEmail(email);
+        user.setNombreCompleto(payload.nombreCompleto().trim());
+        user.setRol(role);
+        user.setEstado(payload.activo() == null || payload.activo());
+
+        if (!password.isBlank()) {
+            user.setPassword(passwordEncoder.encode(password));
+        }
+    }
+
+    private String normalizeUsername(String username) {
+        String value = username == null ? "" : username.trim().toLowerCase(Locale.ROOT);
+        if (!value.matches("^[a-z0-9._-]{3,50}$")) {
+            throw new IllegalArgumentException("El usuario solo puede usar letras, números, punto, guion o guion bajo, con mínimo 3 caracteres.");
+        }
+        return value;
+    }
+
+    private String normalizeEmail(String email) {
+        String value = email == null ? "" : email.trim().toLowerCase(Locale.ROOT);
+        if (!value.endsWith("@vlv.com")) {
+            throw new IllegalArgumentException("El correo debe pertenecer al dominio corporativo @vlv.com.");
+        }
+        return value;
+    }
+
+    private String normalizeRole(String role) {
+        return role == null ? "" : role.trim().toUpperCase(Locale.ROOT);
+    }
+
     private UserReferenceResponse toUserReference(User user) {
         return new UserReferenceResponse(
                 user.getId(),
@@ -332,7 +436,9 @@ public class ApiOperationsController {
                 user.getNombreCompleto(),
                 user.getEmail(),
                 user.getRol() == null ? null : user.getRol().getNombre(),
-                user.getEstado()
+                user.getEstado(),
+                user.getFechaCreacion(),
+                user.getFechaActualizacion()
         );
     }
 }
