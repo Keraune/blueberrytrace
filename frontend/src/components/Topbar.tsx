@@ -1,17 +1,18 @@
 import { Bell, Search } from 'lucide-react';
-import type { AuthenticatedUserResponse } from '../types/api';
 import { initials } from '../lib/format';
+import type { AuthenticatedUserResponse } from '../types/api';
 
 interface TopbarProps {
   user: AuthenticatedUserResponse | null;
+  activeModule: string;
 }
 
-export function Topbar({ user }: TopbarProps) {
+export function Topbar({ user, activeModule }: TopbarProps) {
   return (
     <header className="topbar">
       <div>
         <span className="topbar__eyebrow">Panel operativo</span>
-        <h1>Control de trazabilidad</h1>
+        <h1>{activeModule}</h1>
       </div>
 
       <div className="topbar__actions">

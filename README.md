@@ -2,15 +2,17 @@
 
 Sistema web interno para el control, clasificación y trazabilidad de plantas de arándano para exportación en el área de frutales de Vivero Los Viñedos.
 
-El proyecto quedó organizado como una base separada para backend y frontend, manteniendo estable el panel actual en Spring MVC + Thymeleaf + HTMX y dejando listo el cliente React/Vite para una migración progresiva.
+El repositorio está organizado como workspace separado para backend y frontend. El backend Spring Boot mantiene el panel estable con Thymeleaf + HTMX y el frontend React/Vite avanza como cliente desacoplado para la migración progresiva.
 
 ## Estructura del repositorio
 
 ```text
 blueberrytrace/
-├── backend/              # Spring Boot, Thymeleaf, HTMX, API REST y seguridad
+├── pom.xml               # agregador Maven para que IntelliJ cargue backend como módulo
+├── package.json          # scripts de workspace para frontend/backend
+├── backend/              # Spring Boot, Thymeleaf, HTMX, API REST, seguridad, JPA y MySQL
 ├── frontend/             # React + TypeScript + Vite
-├── docs/                 # Documentación técnica por etapa
+├── docs/                 # documentación técnica por fase
 ├── .gitignore
 └── README.md
 ```
@@ -28,7 +30,13 @@ Stack principal:
 - MySQL
 - Maven Wrapper
 
-Ejecución:
+Ejecución desde la raíz:
+
+```bash
+./mvnw -pl backend spring-boot:run
+```
+
+Ejecución desde backend:
 
 ```bash
 cd backend
@@ -75,7 +83,7 @@ Stack principal:
 - React
 - TypeScript
 - Vite
-- CSS modular por componentes
+- CSS por componentes
 - Consumo de API `/api/v1/**`
 
 Ejecución:
@@ -105,6 +113,24 @@ Para consumir endpoints protegidos desde React, inicia sesión primero en el bac
 http://localhost:8080/auth/login
 ```
 
+## IntelliJ IDEA
+
+Abre la carpeta raíz `blueberrytrace/` y carga el `pom.xml` raíz como proyecto Maven. Ese `pom.xml` es un agregador con el módulo `backend`, por eso IntelliJ debe marcar automáticamente `backend/src/main/java` como source root.
+
+Si aparece el aviso `Java file is located outside of the module source root`, revisa:
+
+```text
+docs/intellij-setup.md
+```
+
+Solución rápida:
+
+```text
+Clic derecho en backend/pom.xml → Add as Maven Project
+```
+
+Luego ejecuta **Reload All Maven Projects** desde la ventana Maven.
+
 ## Base de datos
 
 Crear la base de datos antes de ejecutar el backend:
@@ -121,7 +147,14 @@ backend/src/main/resources/application.properties
 
 ## Comandos de build y prueba
 
-Backend:
+Backend desde la raíz:
+
+```bash
+./mvnw -pl backend clean package
+./mvnw -pl backend test
+```
+
+Backend desde la carpeta del módulo:
 
 ```bash
 cd backend
@@ -135,6 +168,15 @@ Frontend:
 cd frontend
 npm run build
 npm run preview
+```
+
+Scripts de workspace desde la raíz:
+
+```bash
+npm run frontend:dev
+npm run frontend:build
+npm run backend:run
+npm run backend:test
 ```
 
 ## Estrategia de separación
@@ -155,6 +197,6 @@ Lote / Invernadero → Cama → Siembra → Uniformización → Formalización �
 ```bash
 git status
 git add .
-git commit -m "refactor(project): separar backend y frontend en workspaces"
+git commit -m "refactor(workspace): registrar backend como modulo Maven"
 git push origin main
 ```

@@ -4,7 +4,7 @@ import { numberCompact } from '../lib/format';
 
 interface MetricCardProps {
   label: string;
-  value: number;
+  value: number | string;
   detail: string;
   icon: ReactNode;
   tone?: 'green' | 'blue' | 'purple' | 'orange';
@@ -18,7 +18,7 @@ export function MetricCard({ label, value, detail, icon, tone = 'green' }: Metri
         <span className="metric-card__trend"><ArrowUpRight size={15} /> Operativo</span>
       </div>
       <p>{label}</p>
-      <strong>{numberCompact(value)}</strong>
+      <strong>{typeof value === 'number' ? numberCompact(value) : value}</strong>
       <small>{detail}</small>
     </article>
   );

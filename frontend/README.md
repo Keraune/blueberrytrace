@@ -1,41 +1,41 @@
 # BlueberryTrace Frontend
 
-Cliente React/Vite inicial para la separación progresiva del panel BlueberryTrace.
+Cliente React/Vite separado para la migración progresiva del panel BlueberryTrace.
 
-Este frontend consume la API JSON del backend Spring Boot bajo `/api/v1/**`. El panel Thymeleaf + HTMX sigue funcionando como versión estable mientras la migración se realiza por módulos.
+## Stack
 
-## Requisitos
+- React
+- TypeScript
+- Vite
+- Lucide React
+- CSS propio con la misma paleta del panel Thymeleaf
 
-- Node.js 20 o superior.
-- Backend Spring Boot ejecutándose en `http://localhost:8080`.
-- Usuario autenticado con la sesión de Spring Security.
+## Variables
 
-## Configuración
+Copia el archivo de ejemplo:
 
 ```bash
 cp .env.example .env
 ```
 
-Variables principales:
+Valor recomendado:
 
 ```env
 VITE_BLUEBERRYTRACE_API_BASE=http://localhost:8080/api/v1
 VITE_BLUEBERRYTRACE_BACKEND_ORIGIN=http://localhost:8080
 ```
 
-## Ejecución
+## Ejecutar
 
-Desde la raíz del repositorio:
+Primero inicia sesión en el backend:
 
-```bash
-cd backend
-./mvnw spring-boot:run
+```text
+http://localhost:8080/auth/login
 ```
 
-En otra terminal:
+Luego ejecuta el frontend:
 
 ```bash
-cd frontend
 npm install
 npm run dev
 ```
@@ -46,12 +46,6 @@ Abrir:
 http://localhost:5173
 ```
 
-Para consumir datos protegidos, inicia sesión primero en el backend:
-
-```text
-http://localhost:8080/auth/login
-```
-
 ## Build
 
 ```bash
@@ -59,9 +53,32 @@ npm run build
 npm run preview
 ```
 
-## Estrategia
+## Módulos integrados
 
-- Consumir primero endpoints GET desde React.
-- Migrar módulos por bloques: dashboard, lotes, camas, procesos, clasificación, despacho y reportes.
-- Reutilizar los DTOs de `/api/v1/**` sin exponer entidades JPA.
-- Mantener el backend como fuente central de seguridad, negocio y persistencia.
+El frontend ya consume datos reales para:
+
+- Dashboard
+- Lotes e invernaderos
+- Camas
+- Siembra
+- Uniformización y formalización
+- Clasificación
+- Despacho
+- Reportes de trazabilidad
+- Usuarios
+
+## API consumida
+
+```text
+/api/v1/frontend/bootstrap
+/api/v1/session/me
+/api/v1/dashboard/summary
+/api/v1/lotes
+/api/v1/camas
+/api/v1/siembras
+/api/v1/procesos
+/api/v1/clasificaciones
+/api/v1/despachos
+/api/v1/reportes/trazabilidad
+/api/v1/usuarios
+```

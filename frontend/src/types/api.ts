@@ -122,6 +122,100 @@ export interface CamaResponse {
   fechaActualizacion: string | null;
 }
 
+export interface SiembraResponse {
+  id: number;
+  lote: ReferenceResponse | null;
+  cama: ReferenceResponse | null;
+  fechaSiembra: string | null;
+  cantidadRegistrada: number | null;
+  observacion: string | null;
+  estado: string | null;
+  usuarioRegistro: UserReferenceResponse | null;
+  fechaCreacion: string | null;
+  fechaActualizacion: string | null;
+}
+
+export interface UniformizacionResponse {
+  id: number;
+  lote: ReferenceResponse | null;
+  cama: ReferenceResponse | null;
+  fechaUniformizacion: string | null;
+  criterio: string | null;
+  cantidadInicial: number | null;
+  cantidadUniformizada: number | null;
+  observacion: string | null;
+  estado: string | null;
+  usuarioRegistro: UserReferenceResponse | null;
+  fechaCreacion: string | null;
+  fechaActualizacion: string | null;
+}
+
+export interface FormalizacionResponse {
+  id: number;
+  lote: ReferenceResponse | null;
+  cama: ReferenceResponse | null;
+  fechaFormalizacion: string | null;
+  detalle: string | null;
+  cantidadBandejas: number | null;
+  cantidadPlantas: number | null;
+  observacion: string | null;
+  estado: string | null;
+  usuarioRegistro: UserReferenceResponse | null;
+  fechaCreacion: string | null;
+  fechaActualizacion: string | null;
+}
+
+export interface ProcesoOperativoResponse {
+  uniformizaciones: ListResponse<UniformizacionResponse>;
+  formalizaciones: ListResponse<FormalizacionResponse>;
+}
+
+export interface ClasificacionResponse {
+  id: number;
+  lote: ReferenceResponse | null;
+  cama: ReferenceResponse | null;
+  fechaClasificacion: string | null;
+  estadoPlanta: string | null;
+  tamano: string | null;
+  condicion: string | null;
+  cantidad: number | null;
+  observacion: string | null;
+  estado: string | null;
+  usuarioRegistro: UserReferenceResponse | null;
+  fechaCreacion: string | null;
+  fechaActualizacion: string | null;
+}
+
+export interface DespachoResponse {
+  id: number;
+  lote: ReferenceResponse | null;
+  fechaDespacho: string | null;
+  modalidad: string | null;
+  cantidadDespachada: number | null;
+  destino: string | null;
+  guiaRemision: string | null;
+  validacionCalidad: string | null;
+  observacion: string | null;
+  estado: string | null;
+  usuarioRegistro: UserReferenceResponse | null;
+  fechaCreacion: string | null;
+  fechaActualizacion: string | null;
+}
+
+export interface TrazabilidadResponse {
+  id?: number;
+  lote: ReferenceResponse | null;
+  camas: number;
+  siembras: number;
+  plantasSembradas: number;
+  uniformizaciones: number;
+  formalizaciones: number;
+  clasificaciones: number;
+  despachos: number;
+  plantasDespachadas: number;
+  ultimoEvento: string | null;
+}
+
 export interface CsrfResponse {
   headerName: string;
   parameterName: string;

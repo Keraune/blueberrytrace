@@ -1,0 +1,18 @@
+{
+  "name": "blueberrytrace-workspace",
+  "private": true,
+  "version": "0.0.1",
+  "description": "Workspace principal de BlueberryTrace con backend Spring Boot y frontend React/Vite.",
+  "scripts": {
+    "frontend:dev": "npm --prefix frontend run dev",
+    "frontend:build": "npm --prefix frontend run build",
+    "frontend:preview": "npm --prefix frontend run preview",
+    "frontend:lint": "npm --prefix frontend run lint",
+    "backend:run": "cd backend && ./mvnw spring-boot:run",
+    "backend:test": "cd backend && ./mvnw test",
+    "backend:package": "cd backend && ./mvnw clean package"
+  },
+  "workspaces": [
+    "frontend"
+  ]
+}

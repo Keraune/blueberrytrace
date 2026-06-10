@@ -2,11 +2,17 @@ import type {
   ApiResponse,
   AuthenticatedUserResponse,
   CamaResponse,
+  ClasificacionResponse,
   CsrfResponse,
   DashboardApiResponse,
+  DespachoResponse,
   FrontendBootstrapResponse,
   ListResponse,
-  LoteResponse
+  LoteResponse,
+  ProcesoOperativoResponse,
+  SiembraResponse,
+  TrazabilidadResponse,
+  UserReferenceResponse
 } from '../types/api';
 
 const apiBase = (import.meta.env.VITE_BLUEBERRYTRACE_API_BASE || '/api/v1').replace(/\/$/, '');
@@ -71,5 +77,11 @@ export const blueberryApi = {
   session: () => getData<AuthenticatedUserResponse>('/session/me'),
   dashboard: () => getData<DashboardApiResponse>('/dashboard/summary'),
   lotes: () => getData<ListResponse<LoteResponse>>('/lotes'),
-  camas: () => getData<ListResponse<CamaResponse>>('/camas')
+  camas: () => getData<ListResponse<CamaResponse>>('/camas'),
+  siembras: () => getData<ListResponse<SiembraResponse>>('/siembras'),
+  procesos: () => getData<ProcesoOperativoResponse>('/procesos'),
+  clasificaciones: () => getData<ListResponse<ClasificacionResponse>>('/clasificaciones'),
+  despachos: () => getData<ListResponse<DespachoResponse>>('/despachos'),
+  trazabilidad: () => getData<ListResponse<TrazabilidadResponse>>('/reportes/trazabilidad'),
+  usuarios: () => getData<ListResponse<UserReferenceResponse>>('/usuarios')
 };

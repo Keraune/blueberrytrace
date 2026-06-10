@@ -1,91 +1,47 @@
 # BlueberryTrace Backend
 
-Backend de BlueberryTrace desarrollado con Spring Boot, Spring Security, Thymeleaf, HTMX, JPA/Hibernate y MySQL.
+Aplicación Spring Boot del sistema BlueberryTrace. Mantiene el panel estable con Thymeleaf + HTMX y expone la API `/api/v1/**` para clientes React/Vue.
 
-## Módulos implementados
-
-- Autenticación y autorización.
-- Usuarios y roles.
-- Lotes / invernaderos.
-- Camas por invernadero.
-- Siembra.
-- Uniformización.
-- Formalización.
-- Clasificación.
-- Despacho.
-- Reportes de trazabilidad.
-- Dashboard con métricas operativas.
-- API `/api/v1/**` para integración con React/Vue.
-
-## Estructura interna
-
-```text
-src/main/java/com/keraune/vlvblueberrysystem
-├── api              # API JSON para clientes externos
-├── config           # Seguridad, CORS e inicialización
-├── controller       # Controladores MVC Thymeleaf
-├── dto              # Formularios y DTOs internos
-├── entity           # Entidades JPA
-├── enums            # Estados operativos
-├── repository       # Repositorios Spring Data JPA
-├── security         # UserDetailsService
-├── service          # Reglas de negocio
-└── web              # Soporte HTMX
-```
-
-## Configuración de base de datos
-
-Crear la base de datos:
-
-```sql
-CREATE DATABASE vlv_blueberry_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
-
-Editar credenciales en:
-
-```text
-src/main/resources/application.properties
-```
-
-## Ejecutar
+## Ejecutar desde backend
 
 ```bash
 ./mvnw spring-boot:run
 ```
 
-Abrir:
+## Ejecutar desde la raíz del repositorio
 
-```text
-http://localhost:8080
+```bash
+../mvnw -pl backend spring-boot:run
 ```
 
-Credenciales iniciales:
+O desde la raíz:
 
-```text
-Usuario: admin
-Contraseña: admin123
+```bash
+./mvnw -pl backend spring-boot:run
 ```
 
-## Compilar y probar
+## Build y pruebas
 
 ```bash
 ./mvnw clean package
 ./mvnw test
 ```
 
-## CORS para frontend local
+Desde la raíz:
 
-```properties
-blueberrytrace.api.cors.allowed-origins=http://localhost:5173,http://localhost:3000
+```bash
+./mvnw -pl backend clean package
+./mvnw -pl backend test
 ```
 
-## Endpoints iniciales para React/Vue
+## IntelliJ IDEA
+
+Abre el repositorio desde la raíz `blueberrytrace/` y carga el `pom.xml` raíz. El backend quedará registrado como módulo Maven y `backend/src/main/java` será detectado como source root.
+
+Si IntelliJ no lo detecta:
 
 ```text
-GET /api/v1/auth/csrf
-GET /api/v1/frontend/bootstrap
-GET /api/v1/session/me
-GET /api/v1/dashboard/summary
-GET /api/v1/lotes
-GET /api/v1/camas
+Clic derecho en backend/pom.xml → Add as Maven Project
 ```
+
+Luego usa **Reload All Maven Projects**.
