@@ -149,3 +149,62 @@ document.body?.addEventListener('htmx:afterRequest', () => {
 document.body?.addEventListener('htmx:afterSwap', event => {
     initializeBlueberryTraceUi(event.detail.target || document);
 });
+
+const initializeProductionTables = (scope = document) => {
+    const normalize = value => (value || '').toString().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+
+    scope.querySelectorAll('[data-table-search]').forEach(input => {
+        if (input.dataset.tableSearchReady === 'true') {
+            return;
+        }
+        input.dataset.tableSearchReady = 'true';
+        const tableSelector = input.getAttribute('data-table-search');
+        const table = document.querySelector(tableSelector);
+        if (!table) {
+            return;
+        }
+
+        const applySearch = () => {
+            const term = normalize(input.value);
+            table.querySelectorAll('tbody tr').forEach(row => {
+                const matchesText = normalize(row.textContent).includes(term);
+                const activeStatus = table.dataset.activeStatus || '';
+                const matchesStatus = !activeStatus || normalize(row.dataset.status) === normalize(activeStatus);
+                row.hidden = !(matchesText && matchesStatus);
+            });
+        };
+
+        input.addEventListener('input', applySearch);
+        applySearch();
+    });
+
+    scope.querySelectorAll('[data-table-filter]').forEach(group => {
+        if (group.dataset.tableFilterReady === 'true') {
+            return;
+        }
+        group.dataset.tableFilterReady = 'true';
+        const table = document.querySelector(group.getAttribute('data-table-filter'));
+        if (!table) {
+            return;
+        }
+
+        group.querySelectorAll('[data-status-filter]').forEach(button => {
+            button.addEventListener('click', () => {
+                group.querySelectorAll('[data-status-filter]').forEach(item => item.classList.remove('active'));
+                button.classList.add('active');
+                table.dataset.activeStatus = button.getAttribute('data-status-filter') || '';
+                const linkedSearch = document.querySelector(`[data-table-search="#${table.id}"]`);
+                linkedSearch?.dispatchEvent(new Event('input', { bubbles: true }));
+                if (!linkedSearch) {
+                    table.querySelectorAll('tbody tr').forEach(row => {
+                        const activeStatus = table.dataset.activeStatus || '';
+                        row.hidden = activeStatus && normalize(row.dataset.status) !== normalize(activeStatus);
+                    });
+                }
+            });
+        });
+    });
+};
+
+document.addEventListener('DOMContentLoaded', () => initializeProductionTables(document));
+document.body?.addEventListener('htmx:afterSwap', event => initializeProductionTables(event.detail.target || document));

@@ -5,7 +5,7 @@
 <div class="app-shell">
     <div th:replace="~{fragments/app-shell :: sidebar('cuenta')}"></div>
     <main class="main-content blueberry-main-content">
-        <div th:replace="~{fragments/app-shell :: topbar('Ajustes de la cuenta', 'Dashboard personal para actualizar datos del usuario con validación segura')}"></div>
+        <div th:replace="~{fragments/app-shell :: topbar('Ajustes de la cuenta', 'Configuración personal del usuario con validación segura')}"></div>
 
         <div class="lote-alert success" th:if="${successMessage}" th:text="${successMessage}"></div>
 

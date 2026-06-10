@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
 <aside class="sidebar blueberry-sidebar" th:fragment="sidebar(activePage)">
     <a class="brand-block" th:href="@{/dashboard}" aria-label="Ir al dashboard de BlueberryTrace">
@@ -56,10 +56,10 @@
 
     <div class="sidebar-account" data-account-menu>
         <button class="sidebar-user sidebar-user-button" type="button" data-account-toggle>
-            <div class="avatar-mini">CM</div>
+            <div class="avatar-mini">BT</div>
             <div>
-                <strong>Carlos Mendoza</strong>
-                <small>Administrador</small>
+                <strong sec:authentication="name">Usuario</strong>
+                <small>Usuario autenticado</small>
             </div>
             <span class="account-chevron">▾</span>
         </button>
@@ -95,7 +95,7 @@
                 <svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 22a2.5 2.5 0 0 0 2.45-2h-4.9A2.5 2.5 0 0 0 12 22m7-6v-5c0-3.1-1.64-5.64-4.5-6.32V4a2.5 2.5 0 0 0-5 0v.68C6.63 5.36 5 7.89 5 11v5l-2 2v1h18v-1z"/></svg>
                 <span></span>
             </button>
-            <a class="topbar-avatar" th:href="@{/cuenta/ajustes}" aria-label="Abrir ajustes de cuenta">CM</a>
+            <a class="topbar-avatar" th:href="@{/cuenta/ajustes}" aria-label="Abrir ajustes de cuenta">BT</a>
         </div>
     </header>
     <section class="page-heading">
