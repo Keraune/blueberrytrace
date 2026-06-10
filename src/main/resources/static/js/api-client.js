@@ -2,6 +2,7 @@
     'use strict';
 
     const endpoints = Object.freeze({
+        csrf: '/api/v1/auth/csrf',
         bootstrap: '/api/v1/frontend/bootstrap',
         session: '/api/v1/session/me',
         dashboard: '/api/v1/dashboard/summary',

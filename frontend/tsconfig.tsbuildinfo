@@ -1,0 +1,1 @@
+{"root":["./src/App.tsx","./src/main.tsx","./src/components/DataTable.tsx","./src/components/MetricCard.tsx","./src/components/Sidebar.tsx","./src/components/StatusBadge.tsx","./src/components/Topbar.tsx","./src/lib/api.ts","./src/lib/format.ts","./src/pages/DashboardPage.tsx","./src/types/api.ts"],"errors":true,"version":"6.0.3"}

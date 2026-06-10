@@ -212,3 +212,57 @@ blueberrytrace.api.cors.allowed-origins=http://localhost:5173,http://localhost:3
 ```
 
 Documentación de esta etapa: `docs/frontend-fase-6.md`.
+
+## Cliente React/Vite inicial
+
+Se agregó una primera aplicación separada en:
+
+```text
+frontend/
+```
+
+Esta aplicación permite iniciar la separación progresiva hacia React sin retirar el panel actual en Thymeleaf + HTMX.
+
+Comandos principales:
+
+```bash
+cd frontend
+cp .env.example .env
+npm install
+npm run dev
+```
+
+Abrir:
+
+```text
+http://localhost:5173
+```
+
+El backend debe estar ejecutándose en:
+
+```text
+http://localhost:8080
+```
+
+Para consumir endpoints protegidos desde React, inicia sesión primero en el panel actual:
+
+```text
+http://localhost:8080/auth/login
+```
+
+Endpoints consumidos inicialmente:
+
+```text
+GET /api/v1/auth/csrf
+GET /api/v1/frontend/bootstrap
+GET /api/v1/session/me
+GET /api/v1/dashboard/summary
+GET /api/v1/lotes
+GET /api/v1/camas
+```
+
+La documentación técnica de esta etapa está en:
+
+```text
+docs/frontend-fase-7.md
+```

@@ -26,6 +26,7 @@ final class ApiModuleMetadata {
 
     static List<EndpointResponse> endpoints() {
         return List.of(
+                new EndpointResponse("GET", "/api/v1/auth/csrf", "Token CSRF para clientes externos autorizados."),
                 new EndpointResponse("GET", "/api/v1/frontend/bootstrap", "Configuración inicial para clientes React o Vue."),
                 new EndpointResponse("GET", "/api/v1/session/me", "Usuario autenticado y autoridades activas."),
                 new EndpointResponse("GET", "/api/v1/dashboard/summary", "Resumen operativo del panel."),

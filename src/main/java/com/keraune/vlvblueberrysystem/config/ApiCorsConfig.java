@@ -4,6 +4,7 @@ import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.CorsRegistration;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
@@ -14,7 +15,13 @@ public class ApiCorsConfig implements WebMvcConfigurer {
 
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/api/**")
+        configure(registry.addMapping("/api/**"));
+        configure(registry.addMapping("/login"));
+        configure(registry.addMapping("/logout"));
+    }
+
+    private void configure(CorsRegistration registration) {
+        registration
                 .allowedOrigins(parseOrigins())
                 .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
                 .allowedHeaders("*")
