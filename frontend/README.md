@@ -179,3 +179,14 @@ Se reemplazaron acciones visuales por operaciones reales de edición y confirmac
 - Nuevos endpoints API-first `PUT` para siembras, procesos, clasificaciones y despachos.
 - Edición real desde React para lotes, camas, siembras, procesos, clasificación y despacho.
 
+## Fase 22 - Modales responsive y checklist funcional
+
+Se mejoró el sistema de overlays del frontend React:
+
+- Modales con header y footer sticky.
+- Cierre con `Escape`.
+- Bloqueo de scroll del fondo.
+- Confirmaciones responsive.
+- Drawers laterales en desktop y bottom sheet en móvil.
+- Checklist funcional para validar APF3 en `docs/functional-qa-checklist.md`.
+

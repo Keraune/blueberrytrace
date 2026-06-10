@@ -1,3 +1,4 @@
+import { useEffect, useId, useRef } from 'react';
 import type { ReactNode } from 'react';
 import { X } from 'lucide-react';
 
@@ -11,20 +12,46 @@ interface DetailDrawerProps {
 }
 
 export function DetailDrawer({ open, title, subtitle, children, actions, onClose }: DetailDrawerProps) {
+  const titleId = useId();
+  const closeButtonRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const focusTimer = window.setTimeout(() => closeButtonRef.current?.focus(), 80);
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    }
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => {
+      window.clearTimeout(focusTimer);
+      window.removeEventListener('keydown', onKeyDown);
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [open, onClose]);
+
   if (!open) {
     return null;
   }
 
   return (
     <div className="drawer-backdrop" role="presentation" onMouseDown={onClose}>
-      <aside className="detail-drawer" role="dialog" aria-modal="true" aria-label={title} onMouseDown={(event) => event.stopPropagation()}>
+      <aside className="detail-drawer" role="dialog" aria-modal="true" aria-labelledby={titleId} onMouseDown={(event) => event.stopPropagation()}>
         <header className="detail-drawer__header">
           <div>
             <span className="detail-drawer__eyebrow">Vista rápida</span>
-            <h2>{title}</h2>
+            <h2 id={titleId}>{title}</h2>
             {subtitle ? <p>{subtitle}</p> : null}
           </div>
-          <button type="button" className="icon-button" onClick={onClose} aria-label="Cerrar vista rápida">
+          <button ref={closeButtonRef} type="button" className="icon-button" onClick={onClose} aria-label="Cerrar vista rápida">
             <X size={17} />
           </button>
         </header>
