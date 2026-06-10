@@ -216,6 +216,36 @@ export interface TrazabilidadResponse {
   ultimoEvento: string | null;
 }
 
+export interface CatalogResponse {
+  lotes: ReferenceResponse[];
+  camas: ReferenceResponse[];
+  estadosLote: string[];
+  estadosCama: string[];
+  estadosOperativos: string[];
+  estadosClasificacion: string[];
+  estadosDespacho: string[];
+  modalidadesDespacho: string[];
+  validacionesCalidad: string[];
+}
+
+export interface LoteFormPayload {
+  codigo: string;
+  descripcion: string;
+  cultivo: string;
+  variedad: string;
+  fechaRegistro: string;
+  observacion?: string;
+  estado: string;
+}
+
+export interface CamaFormPayload {
+  codigo: string;
+  descripcion: string;
+  capacidadReferencial: number;
+  estado: string;
+  loteId: number;
+}
+
 export interface CsrfResponse {
   headerName: string;
   parameterName: string;

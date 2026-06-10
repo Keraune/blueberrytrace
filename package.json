@@ -8,9 +8,12 @@
     "frontend:build": "npm --prefix frontend run build",
     "frontend:preview": "npm --prefix frontend run preview",
     "frontend:lint": "npm --prefix frontend run lint",
-    "backend:run": "cd backend && ./mvnw spring-boot:run",
-    "backend:test": "cd backend && ./mvnw test",
-    "backend:package": "cd backend && ./mvnw clean package"
+    "backend:run": "./mvnw -pl backend spring-boot:run",
+    "backend:test": "./mvnw -pl backend test",
+    "backend:package": "./mvnw -pl backend clean package",
+    "backend:run:alt": "SERVER_PORT=8081 ./mvnw -pl backend spring-boot:run",
+    "dev": "npm run backend:run",
+    "dev:frontend": "npm run frontend:dev"
   },
   "workspaces": [
     "frontend"

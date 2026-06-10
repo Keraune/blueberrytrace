@@ -36,6 +36,31 @@ Ejecución desde la raíz:
 ./mvnw -pl backend spring-boot:run
 ```
 
+También puedes usar el script del workspace:
+
+```bash
+npm run backend:run
+```
+
+Si el puerto 8080 está ocupado, ejecuta el backend en 8081:
+
+```bash
+SERVER_PORT=8081 ./mvnw -pl backend spring-boot:run
+```
+
+o usando script:
+
+```bash
+npm run backend:run:alt
+```
+
+Para identificar el proceso que usa el puerto en Arch Linux:
+
+```bash
+ss -ltnp 'sport = :8080'
+fuser -k 8080/tcp
+```
+
 Ejecución desde backend:
 
 ```bash
@@ -65,7 +90,14 @@ GET /api/v1/session/me
 GET /api/v1/dashboard/summary
 GET /api/v1/catalogs/operations
 GET /api/v1/lotes
+POST /api/v1/lotes
+PUT /api/v1/lotes/{id}
+PATCH /api/v1/lotes/{id}/estado
+DELETE /api/v1/lotes/{id}
 GET /api/v1/camas
+POST /api/v1/camas
+PUT /api/v1/camas/{id}
+PATCH /api/v1/camas/{id}/estado
 GET /api/v1/siembras
 GET /api/v1/procesos
 GET /api/v1/procesos/uniformizaciones

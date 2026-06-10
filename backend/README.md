@@ -45,3 +45,18 @@ Clic derecho en backend/pom.xml → Add as Maven Project
 ```
 
 Luego usa **Reload All Maven Projects**.
+
+## Puerto ocupado
+
+Si aparece `java.net.BindException: La dirección ya se está usando`, otro proceso ya está utilizando el puerto 8080. Ejecuta el backend con otro puerto desde la raíz del workspace:
+
+```bash
+SERVER_PORT=8081 ./mvnw -pl backend spring-boot:run
+```
+
+O identifica y cierra el proceso en Arch Linux:
+
+```bash
+ss -ltnp 'sport = :8080'
+fuser -k 8080/tcp
+```

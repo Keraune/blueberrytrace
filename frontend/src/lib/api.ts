@@ -1,13 +1,16 @@
 import type {
   ApiResponse,
   AuthenticatedUserResponse,
+  CamaFormPayload,
   CamaResponse,
+  CatalogResponse,
   ClasificacionResponse,
   CsrfResponse,
   DashboardApiResponse,
   DespachoResponse,
   FrontendBootstrapResponse,
   ListResponse,
+  LoteFormPayload,
   LoteResponse,
   ProcesoOperativoResponse,
   SiembraResponse,
@@ -42,13 +45,13 @@ function buildUrl(path: string, params?: Record<string, string | number | undefi
 
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(buildUrl(path), {
+    ...init,
     credentials: 'include',
     headers: {
       Accept: 'application/json',
       'X-Requested-With': 'BlueberryTraceReact',
       ...(init?.headers || {})
-    },
-    ...init
+    }
   });
 
   const contentType = response.headers.get('content-type') || '';
@@ -71,13 +74,35 @@ async function getData<T>(path: string): Promise<T> {
   return payload.data;
 }
 
+async function mutateData<T>(path: string, method: string, body?: unknown): Promise<T> {
+  const csrfPayload = await request<ApiResponse<CsrfResponse>>('/auth/csrf');
+  const csrf = csrfPayload.data;
+  const payload = await request<ApiResponse<T>>(path, {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+      [csrf.headerName]: csrf.token
+    },
+    body: body === undefined ? undefined : JSON.stringify(body)
+  });
+  return payload.data;
+}
+
 export const blueberryApi = {
   csrf: () => getData<CsrfResponse>('/auth/csrf'),
   bootstrap: () => getData<FrontendBootstrapResponse>('/frontend/bootstrap'),
   session: () => getData<AuthenticatedUserResponse>('/session/me'),
   dashboard: () => getData<DashboardApiResponse>('/dashboard/summary'),
+  catalogs: () => getData<CatalogResponse>('/catalogs/operations'),
   lotes: () => getData<ListResponse<LoteResponse>>('/lotes'),
+  createLote: (payload: LoteFormPayload) => mutateData<ListResponse<LoteResponse>>('/lotes', 'POST', payload),
+  updateLote: (id: number, payload: LoteFormPayload) => mutateData<ListResponse<LoteResponse>>(`/lotes/${id}`, 'PUT', payload),
+  toggleLoteStatus: (id: number) => mutateData<ListResponse<LoteResponse>>(`/lotes/${id}/estado`, 'PATCH'),
+  deleteLote: (id: number) => mutateData<ListResponse<LoteResponse>>(`/lotes/${id}`, 'DELETE'),
   camas: () => getData<ListResponse<CamaResponse>>('/camas'),
+  createCama: (payload: CamaFormPayload) => mutateData<ListResponse<CamaResponse>>('/camas', 'POST', payload),
+  updateCama: (id: number, payload: CamaFormPayload) => mutateData<ListResponse<CamaResponse>>(`/camas/${id}`, 'PUT', payload),
+  toggleCamaStatus: (id: number) => mutateData<ListResponse<CamaResponse>>(`/camas/${id}/estado`, 'PATCH'),
   siembras: () => getData<ListResponse<SiembraResponse>>('/siembras'),
   procesos: () => getData<ProcesoOperativoResponse>('/procesos'),
   clasificaciones: () => getData<ListResponse<ClasificacionResponse>>('/clasificaciones'),

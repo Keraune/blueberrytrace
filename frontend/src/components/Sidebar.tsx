@@ -1,4 +1,5 @@
 import { BarChart3, Boxes, ClipboardList, Factory, Home, Layers3, PackageCheck, Sprout, Truck, UsersRound } from 'lucide-react';
+import { routeByKey } from '../lib/routes';
 import type { ModuleResponse } from '../types/api';
 
 const icons = {
@@ -33,16 +34,20 @@ export function Sidebar({ modules, activeKey, onSelect }: SidebarProps) {
       <nav className="sidebar__nav" aria-label="Módulos principales">
         {modules.map((module) => {
           const Icon = icons[module.key as keyof typeof icons] || PackageCheck;
+          const route = routeByKey(module.key);
           return (
-            <button
+            <a
               key={module.key}
               className={module.key === activeKey ? 'sidebar__link sidebar__link--active' : 'sidebar__link'}
-              type="button"
-              onClick={() => onSelect(module.key)}
+              href={route.path}
+              onClick={(event) => {
+                event.preventDefault();
+                onSelect(module.key);
+              }}
             >
               <Icon size={18} />
               <span>{module.label}</span>
-            </button>
+            </a>
           );
         })}
       </nav>

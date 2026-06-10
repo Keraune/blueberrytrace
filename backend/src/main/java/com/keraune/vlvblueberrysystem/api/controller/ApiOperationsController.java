@@ -14,6 +14,8 @@ import com.keraune.vlvblueberrysystem.api.dto.ApiPayloads.TrazabilidadResponse;
 import com.keraune.vlvblueberrysystem.api.dto.ApiPayloads.UniformizacionResponse;
 import com.keraune.vlvblueberrysystem.api.dto.ApiPayloads.UserReferenceResponse;
 import com.keraune.vlvblueberrysystem.api.mapper.ApiRecordMapper;
+import com.keraune.vlvblueberrysystem.dto.CamaForm;
+import com.keraune.vlvblueberrysystem.dto.LoteForm;
 import com.keraune.vlvblueberrysystem.entity.User;
 import com.keraune.vlvblueberrysystem.repository.UserRepository;
 import com.keraune.vlvblueberrysystem.service.CamaService;
@@ -25,9 +27,17 @@ import com.keraune.vlvblueberrysystem.service.SiembraService;
 import com.keraune.vlvblueberrysystem.service.TrazabilidadQueryService;
 import java.time.LocalDate;
 import java.util.List;
+import jakarta.validation.Valid;
+import java.security.Principal;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -89,12 +99,54 @@ public class ApiOperationsController {
         return ApiResponse.ok(ListResponse.from(items));
     }
 
+    @PostMapping("/lotes")
+    public ApiResponse<ListResponse<LoteResponse>> crearLote(@Valid @RequestBody LoteForm form, Principal principal) {
+        loteService.crearLote(form, principal.getName());
+        return ApiResponse.ok("Invernadero registrado correctamente.", lotes().data());
+    }
+
+    @PutMapping("/lotes/{id}")
+    public ApiResponse<ListResponse<LoteResponse>> actualizarLote(@PathVariable Long id, @Valid @RequestBody LoteForm form) {
+        loteService.actualizarLote(id, form);
+        return ApiResponse.ok("Invernadero actualizado correctamente.", lotes().data());
+    }
+
+    @PatchMapping("/lotes/{id}/estado")
+    public ApiResponse<ListResponse<LoteResponse>> cambiarEstadoLote(@PathVariable Long id) {
+        loteService.cambiarEstado(id);
+        return ApiResponse.ok("Estado del invernadero actualizado.", lotes().data());
+    }
+
+    @DeleteMapping("/lotes/{id}")
+    public ApiResponse<ListResponse<LoteResponse>> eliminarLote(@PathVariable Long id) {
+        loteService.eliminarLogicamente(id);
+        return ApiResponse.ok("Invernadero enviado a eliminados.", lotes().data());
+    }
+
     @GetMapping("/camas")
     public ApiResponse<ListResponse<CamaResponse>> camas() {
         List<CamaResponse> items = camaService.listarTodas().stream()
                 .map(mapper::toCamaResponse)
                 .toList();
         return ApiResponse.ok(ListResponse.from(items));
+    }
+
+    @PostMapping("/camas")
+    public ApiResponse<ListResponse<CamaResponse>> crearCama(@Valid @RequestBody CamaForm form, Principal principal) {
+        camaService.crearCama(form, principal.getName());
+        return ApiResponse.ok("Cama registrada correctamente.", camas().data());
+    }
+
+    @PutMapping("/camas/{id}")
+    public ApiResponse<ListResponse<CamaResponse>> actualizarCama(@PathVariable Long id, @Valid @RequestBody CamaForm form) {
+        camaService.actualizarCama(id, form);
+        return ApiResponse.ok("Cama actualizada correctamente.", camas().data());
+    }
+
+    @PatchMapping("/camas/{id}/estado")
+    public ApiResponse<ListResponse<CamaResponse>> cambiarEstadoCama(@PathVariable Long id) {
+        camaService.cambiarEstado(id);
+        return ApiResponse.ok("Estado de la cama actualizado.", camas().data());
     }
 
     @GetMapping("/siembras")
