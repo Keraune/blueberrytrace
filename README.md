@@ -277,3 +277,10 @@ GET  /api/v1/auth/csrf
 ```
 
 Los HTML de Thymeleaf en `backend/src/main/resources/templates` se mantienen por ahora como respaldo estable del panel MVC/HTMX y del login tradicional. No conviene eliminarlos hasta que React cubra todos los flujos productivos y el backend pueda pasar a modo API-only.
+
+
+## Historial de fases
+
+### Fase 15 - Login React estilo producción
+
+Se rediseñó la pantalla de inicio de sesión del frontend React con panel visual oscuro, formulario limpio, credenciales demo y estilo alineado a las pantallas de referencia del sistema.

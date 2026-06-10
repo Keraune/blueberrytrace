@@ -1,11 +1,23 @@
 import { FormEvent, useState } from 'react';
-import { Loader2, LockKeyhole, Sprout } from 'lucide-react';
+import { ArrowRight, CheckCircle2, Leaf, Loader2, ShieldCheck, Tag, Truck } from 'lucide-react';
 import { blueberryApi } from '../lib/api';
 import type { AuthenticatedUserResponse } from '../types/api';
 
 interface LoginPageProps {
   onAuthenticated: (user: AuthenticatedUserResponse) => Promise<void> | void;
 }
+
+const demoCredentials = {
+  username: 'admin',
+  password: 'admin123'
+};
+
+const featureItems = [
+  { label: 'Gestión completa de lotes, camas y bandejas', icon: Leaf },
+  { label: 'Clasificación avanzada por calidad y tamaño', icon: Tag },
+  { label: 'Trazabilidad hasta el despacho y exportación', icon: Truck },
+  { label: 'Roles y control de acceso por perfil', icon: ShieldCheck }
+];
 
 export function LoginPage({ onAuthenticated }: LoginPageProps) {
   const [username, setUsername] = useState('');
@@ -27,54 +39,93 @@ export function LoginPage({ onAuthenticated }: LoginPageProps) {
     }
   }
 
+  function fillDemoCredentials() {
+    setUsername(demoCredentials.username);
+    setPassword(demoCredentials.password);
+    setError(null);
+  }
+
   return (
-    <main className="login-shell">
+    <main className="login-shell login-shell--showcase">
       <section className="login-panel login-panel--visual">
+        <div className="login-background-orb login-background-orb--top" />
+        <div className="login-background-orb login-background-orb--bottom" />
+
         <div className="login-brand">
           <div className="brand__mark">BT</div>
           <div>
             <strong>BlueberryTrace</strong>
-            <span>Vivero Los Viñedos</span>
+            <span>Agro Intelligence</span>
           </div>
         </div>
-        <div className="login-copy">
-          <span className="login-kicker"><Sprout size={16} /> Control productivo</span>
-          <h1>Trazabilidad operativa para producción de arándanos</h1>
-          <p>Consulta lotes, camas, siembras, procesos, clasificaciones y despachos desde el frontend independiente conectado a la API del backend.</p>
+
+        <div className="login-copy login-copy--hero">
+          <h1>
+            Trazabilidad de <span>Excelencia</span> para la Exportación
+          </h1>
+          <p>
+            Control integral de arándanos desde el invernadero hasta el despacho internacional,
+            con trazabilidad total por lote y variedad.
+          </p>
         </div>
-        <div className="login-metrics">
-          <div><strong>API</strong><span>Spring Boot</span></div>
-          <div><strong>React</strong><span>Frontend separado</span></div>
-          <div><strong>CSRF</strong><span>Sesión segura</span></div>
+
+        <div className="login-feature-list">
+          {featureItems.map(({ label, icon: Icon }) => (
+            <div className="login-feature-item" key={label}>
+              <span><Icon size={16} /></span>
+              <p>{label}</p>
+            </div>
+          ))}
         </div>
       </section>
 
       <section className="login-panel login-panel--form">
-        <div className="login-form-heading">
-          <span><LockKeyhole size={18} /></span>
-          <div>
-            <h2>Acceso al sistema</h2>
-            <p>Ingresa con tu usuario operativo.</p>
+        <div className="login-form-card">
+          <div className="login-form-heading login-form-heading--simple">
+            <h2>Iniciar Sesión</h2>
+            <p>Ingresa tus credenciales para continuar.</p>
           </div>
-        </div>
 
-        <form className="login-form" onSubmit={handleSubmit}>
-          <label>
-            Usuario
-            <input value={username} onChange={(event) => setUsername(event.target.value)} autoComplete="username" required />
-          </label>
-          <label>
-            Contraseña
-            <input value={password} onChange={(event) => setPassword(event.target.value)} type="password" autoComplete="current-password" required />
-          </label>
+          <form className="login-form" onSubmit={handleSubmit}>
+            <label>
+              Usuario
+              <input
+                value={username}
+                onChange={(event) => setUsername(event.target.value)}
+                autoComplete="username"
+                placeholder="admin"
+                required
+              />
+            </label>
+            <label>
+              Contraseña
+              <input
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                type="password"
+                autoComplete="current-password"
+                placeholder="••••••••"
+                required
+              />
+            </label>
 
-          {error && <p className="form-error">{error}</p>}
+            {error && <p className="form-error">{error}</p>}
 
-          <button className="action-button action-button--wide" type="submit" disabled={loading}>
-            {loading ? <Loader2 className="spin" size={16} /> : <LockKeyhole size={16} />}
-            Iniciar sesión
+            <button className="action-button action-button--wide login-submit-button" type="submit" disabled={loading}>
+              {loading ? <Loader2 className="spin" size={16} /> : null}
+              <span>Ingresar al Sistema</span>
+              {!loading ? <ArrowRight size={16} /> : null}
+            </button>
+          </form>
+
+          <button type="button" className="login-demo-card" onClick={fillDemoCredentials}>
+            <span><CheckCircle2 size={15} /> Credenciales de demo</span>
+            <strong>Usuario: {demoCredentials.username}</strong>
+            <strong>Contraseña: {demoCredentials.password}</strong>
           </button>
-        </form>
+
+          <footer className="login-version">© 2026 BlueberryTrace · v0.1.0</footer>
+        </div>
       </section>
     </main>
   );

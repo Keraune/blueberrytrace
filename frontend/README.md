@@ -126,3 +126,10 @@ POST /api/v1/auth/logout
 ```
 
 Por ahora Thymeleaf se mantiene como respaldo hasta completar la migración total de módulos.
+
+
+## Historial de fases
+
+### Fase 15 - Login React estilo producción
+
+Se rediseñó la pantalla de inicio de sesión del frontend React con panel visual oscuro, formulario limpio, credenciales demo y estilo alineado a las pantallas de referencia del sistema.
