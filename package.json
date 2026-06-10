@@ -9,14 +9,18 @@
     "frontend:preview": "npm --prefix frontend run preview",
     "frontend:lint": "npm --prefix frontend run lint",
     "backend:run": "bash scripts/run-backend.sh",
-    "backend:test": "./mvnw -pl backend test",
-    "backend:package": "./mvnw -pl backend clean package",
+    "backend:test": "bash scripts/maven.sh -pl backend test",
+    "backend:package": "bash scripts/maven.sh -pl backend clean package",
     "backend:run:alt": "SERVER_PORT=8081 bash scripts/run-backend.sh",
     "backend:run:legacy": "SPRING_PROFILES_ACTIVE=legacy-mvc bash scripts/run-backend.sh",
     "dev": "npm run backend:run",
     "dev:frontend": "npm run frontend:dev",
     "backend:port": "bash scripts/check-backend-port.sh",
-    "backend:kill": "bash scripts/kill-backend-port.sh"
+    "backend:kill": "bash scripts/kill-backend-port.sh",
+    "setup:permissions": "bash scripts/setup-permissions.sh",
+    "doctor": "bash scripts/doctor.sh",
+    "dev:full": "npm run setup:permissions && npm run backend:run",
+    "maven": "bash scripts/maven.sh"
   },
   "workspaces": [
     "frontend"

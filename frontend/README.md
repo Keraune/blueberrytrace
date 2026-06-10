@@ -133,3 +133,14 @@ Por ahora Thymeleaf se mantiene como respaldo hasta completar la migración tota
 ### Fase 15 - Login React estilo producción
 
 Se rediseñó la pantalla de inicio de sesión del frontend React con panel visual oscuro, formulario limpio, credenciales demo y estilo alineado a las pantallas de referencia del sistema.
+
+## Diagnóstico del workspace
+
+Desde la raíz del repositorio puedes ejecutar:
+
+```bash
+npm run setup:permissions
+npm run doctor
+```
+
+Esto restaura permisos del Maven Wrapper y muestra el estado de Java, Node, npm, puerto 8080 y configuración local.

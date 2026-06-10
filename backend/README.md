@@ -5,19 +5,19 @@ Aplicación Spring Boot del sistema BlueberryTrace. Por defecto funciona como ba
 ## Ejecutar desde backend
 
 ```bash
-../mvnw -pl backend spring-boot:run
+.bash ./mvnw -pl backend spring-boot:run
 ```
 
 ## Ejecutar desde la raíz del repositorio
 
 ```bash
-../mvnw -pl backend spring-boot:run
+.bash ./mvnw -pl backend spring-boot:run
 ```
 
 O desde la raíz:
 
 ```bash
-./mvnw -pl backend spring-boot:run
+bash ./mvnw -pl backend spring-boot:run
 ```
 
 ## Build y pruebas
@@ -30,8 +30,8 @@ O desde la raíz:
 Desde la raíz:
 
 ```bash
-./mvnw -pl backend clean package
-./mvnw -pl backend test
+bash ./mvnw -pl backend clean package
+bash ./mvnw -pl backend test
 ```
 
 ## IntelliJ IDEA
@@ -51,7 +51,7 @@ Luego usa **Reload All Maven Projects**.
 Si aparece `java.net.BindException: La dirección ya se está usando`, otro proceso ya está utilizando el puerto 8080. Ejecuta el backend con otro puerto desde la raíz del workspace:
 
 ```bash
-SERVER_PORT=8081 ./mvnw -pl backend spring-boot:run
+SERVER_PORT=8081 bash ./mvnw -pl backend spring-boot:run
 ```
 
 O identifica y cierra el proceso en Arch Linux:
@@ -94,7 +94,7 @@ POST /api/v1/auth/logout
 Para abrir temporalmente el panel Thymeleaf/HTMX antiguo:
 
 ```bash
-SPRING_PROFILES_ACTIVE=legacy-mvc ../mvnw -pl backend spring-boot:run
+SPRING_PROFILES_ACTIVE=legacy-mvc .bash ./mvnw -pl backend spring-boot:run
 ```
 
 Desde la raíz también puedes usar:
@@ -104,3 +104,23 @@ npm run backend:run:legacy
 ```
 
 Sin ese perfil, los controladores MVC no se cargan y el backend queda orientado a API.
+
+## Diagnóstico del workspace
+
+Desde la raíz del repositorio puedes ejecutar:
+
+```bash
+npm run setup:permissions
+npm run doctor
+```
+
+Esto restaura permisos del Maven Wrapper y muestra el estado de Java, Node, npm, puerto 8080 y configuración local.
+
+
+## Maven seguro
+
+El workspace incluye `scripts/maven.sh`, que prefiere Maven instalado en el sistema y usa `./mvnw` como respaldo. Esto evita problemas de permisos o descarga del wrapper en entornos donde Maven ya está instalado.
+
+```bash
+npm run maven -- -pl backend clean package
+```

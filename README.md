@@ -17,6 +17,30 @@ blueberrytrace/
 └── README.md
 ```
 
+
+## Arranque rápido recomendado
+
+Después de extraer el ZIP en Linux o Arch Linux, ejecuta primero:
+
+```bash
+npm run setup:permissions
+npm run doctor
+```
+
+Luego levanta el backend:
+
+```bash
+npm run backend:run
+```
+
+En otra terminal, levanta el frontend:
+
+```bash
+npm run frontend:dev
+```
+
+Si aparece un problema con permisos de `mvnw`, el proyecto ya incluye una corrección defensiva: los scripts usan `bash ./mvnw` y no dependen únicamente del permiso de ejecución del archivo.
+
 ## Backend
 
 Stack principal:
@@ -33,7 +57,7 @@ Stack principal:
 Ejecución desde la raíz:
 
 ```bash
-./mvnw -pl backend spring-boot:run
+bash ./mvnw -pl backend spring-boot:run
 ```
 
 También puedes usar el script del workspace:
@@ -212,8 +236,8 @@ DB_URL='jdbc:mysql://localhost:3306/vlv_blueberry_system?useSSL=false&serverTime
 Backend desde la raíz:
 
 ```bash
-./mvnw -pl backend clean package
-./mvnw -pl backend test
+bash ./mvnw -pl backend clean package
+bash ./mvnw -pl backend test
 ```
 
 Backend desde la carpeta del módulo:
@@ -242,6 +266,9 @@ npm run backend:run:alt
 npm run backend:port
 npm run backend:kill
 npm run backend:test
+npm run backend:package
+npm run setup:permissions
+npm run doctor
 ```
 
 ## Estrategia de separación
@@ -284,3 +311,23 @@ Los HTML de Thymeleaf en `backend/src/main/resources/templates` se mantienen por
 ### Fase 15 - Login React estilo producción
 
 Se rediseñó la pantalla de inicio de sesión del frontend React con panel visual oscuro, formulario limpio, credenciales demo y estilo alineado a las pantallas de referencia del sistema.
+
+### Fase 16 - Arranque local estable
+
+Se agregaron scripts de diagnóstico y restauración de permisos para evitar errores al extraer el ZIP en Linux:
+
+```bash
+npm run setup:permissions
+npm run doctor
+```
+
+Además, los comandos backend usan `bash ./mvnw`, por lo que el backend puede arrancar aunque el ZIP haya perdido el bit ejecutable de `mvnw`.
+
+
+## Maven seguro
+
+El workspace incluye `scripts/maven.sh`, que prefiere Maven instalado en el sistema y usa `./mvnw` como respaldo. Esto evita problemas de permisos o descarga del wrapper en entornos donde Maven ya está instalado.
+
+```bash
+npm run maven -- -pl backend clean package
+```
