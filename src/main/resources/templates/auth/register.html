@@ -2,40 +2,36 @@
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 <head th:replace="~{fragments/layout :: head('Registro de usuarios | BlueberryTrace')}"></head>
 <body class="auth-clean-body vlv-auth-page">
-<div class="vlv-auth-layout">
-    <section class="vlv-auth-side">
-        <div class="vlv-auth-side-inner">
-            <img th:src="@{/img/vlv/image_11.png}" src="../../static/img/vlv/image_11.png" alt="Vivero Los Viñedos" class="vlv-auth-logo">
-            <span class="vlv-section-tag">Gestión de accesos</span>
-            <h1>Registro de usuarios para el sistema interno</h1>
-            <p>
-                Esta vista permite dar de alta perfiles de acceso para la operación y supervisión del sistema.
-            </p>
-            <ul class="vlv-auth-points">
-                <li>Asignación de roles internos</li>
-                <li>Control de accesos por perfil</li>
-                <li>Alta de usuarios activos e inactivos</li>
-                <li>Base preparada para seguridad del sistema</li>
-            </ul>
-            <div class="auth-status-grid" aria-label="Resumen de seguridad">
-                <div><strong>Roles</strong><span>Acceso segmentado por perfil</span></div>
-                <div><strong>Security</strong><span>Autenticación con Spring Security</span></div>
-                <div><strong>Auditable</strong><span>Base para seguimiento interno</span></div>
+<div class="vlv-auth-layout production-auth-layout">
+    <section class="vlv-auth-side production-auth-side">
+        <div class="vlv-auth-side-inner production-auth-side-inner">
+            <div class="auth-brand-row">
+                <span class="brand-orb" aria-hidden="true"></span>
+                <div><strong>BlueberryTrace</strong><span>AGRO INTELLIGENCE</span></div>
             </div>
+            <div class="auth-hero-copy">
+                <h1>Gestión de <span>Accesos</span> Operativos</h1>
+                <p>Administra perfiles internos para supervisión, registro operativo, clasificación y control de despacho.</p>
+            </div>
+            <ul class="vlv-auth-points production-auth-points">
+                <li><span class="auth-point-icon">◇</span> Asignación de roles internos</li>
+                <li><span class="auth-point-icon">▢</span> Control de acceso por perfil</li>
+                <li><span class="auth-point-icon">⌁</span> Usuarios activos e inactivos</li>
+                <li><span class="auth-point-icon">▱</span> Operación protegida por credenciales</li>
+            </ul>
         </div>
     </section>
 
-    <section class="vlv-auth-form-wrap">
-        <div class="auth-clean-card vlv-auth-card">
-            <a class="auth-clean-back" th:href="@{/auth/login}">← Volver a login</a>
-            <img th:src="@{/img/vlv/image_11.png}" src="../../static/img/vlv/image_11.png" alt="Vivero Los Viñedos" class="vlv-auth-card-logo">
+    <section class="vlv-auth-form-wrap production-auth-form-wrap">
+        <div class="auth-clean-card vlv-auth-card production-register-card">
+            <a class="auth-clean-back" th:href="@{/dashboard}">← Volver al dashboard</a>
             <h2>Crear usuario</h2>
             <p class="auth-clean-muted">Registro interno de nuevos perfiles del sistema.</p>
 
             <form class="auth-clean-form auth-clean-form-grid">
                 <div>
                     <label>Nombre completo</label>
-                    <input type="text" placeholder="Ej. Ramón Jiménez">
+                    <input type="text" placeholder="Ej. Carlos Mendoza">
                 </div>
                 <div>
                     <label>Usuario</label>
@@ -43,7 +39,7 @@
                 </div>
                 <div>
                     <label>Correo</label>
-                    <input type="email" placeholder="correo@vlv.pe">
+                    <input type="email" placeholder="correo@empresa.com">
                 </div>
                 <div>
                     <label>Rol</label>
@@ -72,14 +68,9 @@
                 </div>
                 <button class="primary-btn full-width full-span" type="button">Guardar usuario</button>
             </form>
-
-            <div class="auth-clean-footer">
-                <span>¿Ya existe una cuenta?</span>
-                <a th:href="@{/auth/login}">Ir a login</a>
-            </div>
         </div>
     </section>
 </div>
-    <div th:replace="~{fragments/layout :: scripts}"></div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
 </body>
 </html>

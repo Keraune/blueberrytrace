@@ -115,24 +115,24 @@ La entidad `Despacho` sincroniza los campos actuales `modalidad_despacho` y `can
 Si deseas limpiar completamente la base de datos durante desarrollo, puedes recrear el esquema `vlv_blueberry_system` y ejecutar nuevamente la aplicación.
 
 
-## Fase visual APF3
+## Interfaz productiva
 
-Se agregó una capa visual moderna para la presentación del tercer avance:
+Se agregó una capa visual moderna para operación interna:
 
-- Interfaz tipo dashboard moderno con fondo oscuro, glassmorphism y acentos verde/berry.
-- Sidebar renovado con estado técnico del avance APF3.
-- Topbar con etiquetas de arquitectura MVC, JPA y MySQL.
-- Login y registro con tarjetas técnicas para explicar el avance de desarrollo.
-- Dashboard con bloque de evidencias técnicas: MVC, persistencia JPA, seguridad y avance funcional.
-- Microinteracciones con animaciones, búsqueda rápida de módulos y efecto ripple en botones.
+- Login dividido con panel institucional y formulario limpio.
+- Sidebar fija con navegación por grupos funcionales.
+- Topbar compacta con búsqueda, notificaciones y acceso de perfil.
+- Dashboard claro con métricas, gráficos visuales y accesos rápidos.
+- Tablas, formularios, botones y badges con estilos consistentes.
+- Microinteracciones suaves, búsqueda rápida de módulos y efecto ripple en botones.
 
-## Fase 1 frontend · Tailwind + HTMX
+## Base frontend · Tailwind + HTMX
 
 Se preparó la base frontend para una modernización progresiva sin migrar a SPA y sin romper Spring MVC:
 
 - Centralización del `<head>` en `templates/fragments/layout.html`.
 - Centralización de scripts en el fragmento `fragments/layout :: scripts`.
-- Integración inicial de Tailwind Play CDN para prototipado visual académico.
+- Integración inicial de Tailwind Play CDN para prototipado visual.
 - Configuración de tokens visuales en `static/js/tailwind.config.js`.
 - Integración inicial de HTMX 2.x por CDN para futuras recargas parciales.
 - Metadatos CSRF disponibles para peticiones dinámicas protegidas por Spring Security.

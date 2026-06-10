@@ -15,12 +15,13 @@ const initializeBlueberryTraceUi = (scope = document) => {
         '.analytics-card',
         '.dashboard-hero-copy',
         '.dashboard-hero-panel',
-        '.dashboard-dev-strip > div',
+        '.production-kpi-card',
+        '.production-chart-card',
+        '.page-heading',
         '.landing-hero-copy',
         '.landing-hero-side',
         '.landing-section-dark',
         '.auth-clean-card',
-        '.auth-status-grid > div',
         '.executive-hero',
         '.section-ribbon'
     ];

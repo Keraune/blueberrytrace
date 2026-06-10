@@ -9,7 +9,7 @@
     <meta name="_csrf_header" th:if="${_csrf != null}" th:content="${_csrf.headerName}">
     <title th:text="${title}">BlueberryTrace</title>
 
-    <!-- Fase 1: Tailwind Play CDN solo para desarrollo académico y prototipado rápido. -->
+    <!-- Tailwind CDN integrado para la capa visual del panel. -->
     <script src="/js/tailwind.config.js" th:src="@{/js/tailwind.config.js}"></script>
     <script src="https://cdn.tailwindcss.com"></script>
 
@@ -21,7 +21,7 @@
 
 <body>
 <th:block th:fragment="scripts">
-    <!-- Fase 1: HTMX queda disponible para vistas parciales, filtros y formularios en fases posteriores. -->
+    <!-- HTMX disponible para interacciones parciales del sistema. -->
     <script src="https://unpkg.com/htmx.org@2.0.10"></script>
     <script src="/js/app.js" th:src="@{/js/app.js}"></script>
 </th:block>

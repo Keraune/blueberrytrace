@@ -83,7 +83,7 @@ templates/usuarios/lista.html
 - Se creó `static/js/tailwind.config.js` con colores relacionados al sistema: verde agroindustrial, berry, blueberry, superficies, sombras, radios y fuente Inter.
 - Se mantiene `style.css` como fuente visual principal para no romper la interfaz actual.
 
-> Nota: Tailwind Play CDN es útil para desarrollo, prototipos y APF3. Para producción o entrega final, se recomienda migrar a un build local con Tailwind CLI, PostCSS o integración Maven/npm controlada.
+> Nota: Tailwind Play CDN es útil para desarrollo, prototipos. Para producción o entrega final, se recomienda migrar a un build local con Tailwind CLI, PostCSS o integración Maven/npm controlada.
 
 ## Preparación realizada para HTMX
 
