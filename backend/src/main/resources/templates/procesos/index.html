@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Procesos operativos | BlueberryTrace')}"></head>
+<body class="app-body">
+<div class="app-shell">
+    <div th:replace="~{fragments/app-shell :: sidebar('procesos')}"></div>
+    <main class="main-content">
+        <div th:replace="~{fragments/app-shell :: topbar('Uniformización y formalización', 'Actividades internas por invernadero, cama, bandejas, plantas y criterio aplicado')}"></div>
+
+        <div id="module-content" class="module-content" th:fragment="moduleContent" hx-target="this" hx-swap="outerHTML">
+            <div class="module-loading-indicator" aria-hidden="true"><span></span></div>
+
+            <div class="lote-alert success" th:if="${successMessage}" th:text="${successMessage}"></div>
+
+            <section class="module-action-bar">
+                <div>
+                    <small>Proceso productivo</small>
+                    <h2>Uniformización y formalización</h2>
+                    <p>Registra ordenamiento operativo, bandejas y plantas por cama.</p>
+                </div>
+                <div class="module-action-buttons">
+                    <button class="primary-btn compact-btn" type="button" data-modal-open="modal-uniformizacion">+ Uniformización</button>
+                    <button class="ghost-btn compact-btn" type="button" data-modal-open="modal-formalizacion">+ Formalización</button>
+                </div>
+            </section>
+
+            <section class="operation-kpi-grid">
+                <article class="operation-kpi kpi-green"><span class="kpi-icon">≋</span><div><small>Uniformizaciones</small><strong th:text="${#lists.size(uniformizaciones)}">0</strong><p>Registros de ordenamiento operativo</p></div></article>
+                <article class="operation-kpi kpi-blue"><span class="kpi-icon">▣</span><div><small>Formalizaciones</small><strong th:text="${#lists.size(formalizaciones)}">0</strong><p>Registros de bandejas y plantas</p></div></article>
+                <article class="operation-kpi kpi-lime"><span class="kpi-icon">∑</span><div><small>Plantas formalizadas</small><strong th:text="${#aggregates.sum(formalizaciones.![cantidadPlantas]) ?: 0}">0</strong><p>Total acumulado del proceso</p></div></article>
+                <article class="operation-kpi kpi-purple"><span class="kpi-icon">▦</span><div><small>Bandejas</small><strong th:text="${#aggregates.sum(formalizaciones.![cantidadBandejas]) ?: 0}">0</strong><p>Capacidad documentada</p></div></article>
+            </section>
+
+            <section class="dashboard-grid bottom-grid process-history-grid">
+                <article class="panel-card operation-table-card">
+                    <div class="panel-head module-panel-head"><div><h3>Historial de uniformización</h3><span th:text="${#lists.size(uniformizaciones)} + ' registro(s)'">0 registro(s)</span></div></div>
+                    <div class="module-toolbar"><label class="module-search-field"><span>⌕</span><input type="search" placeholder="Buscar uniformización..." data-table-search="#uniformizacion-table"></label></div>
+                    <div class="empty-state-card" th:if="${#lists.isEmpty(uniformizaciones)}"><h4>Sin uniformizaciones</h4><p>Aún no hay actividades registradas.</p></div>
+                    <div class="table-responsive" th:if="${!#lists.isEmpty(uniformizaciones)}">
+                        <table class="custom-table production-table" id="uniformizacion-table">
+                            <thead><tr><th>Fecha</th><th>Lote</th><th>Cama</th><th>Criterio</th><th>Inicial</th><th>Uniformizada</th><th>Estado</th><th></th></tr></thead>
+                            <tbody>
+                            <tr th:each="item : ${uniformizaciones}" th:attr="data-status=${item.estado}">
+                                <td><span class="muted-table-text" th:text="${item.fechaUniformizacion}">2026-05-01</span></td>
+                                <td><strong class="table-code" th:text="${item.lote.codigo}">A1</strong></td>
+                                <td th:text="${item.cama.codigo}">CAM-001</td>
+                                <td th:text="${item.criterio}">Tamaño</td>
+                                <td th:text="${item.cantidadInicial}">0</td>
+                                <td><strong th:text="${item.cantidadUniformizada}">0</strong></td>
+                                <td><span class="badge" th:classappend="${item.estado == 'REGISTRADA'} ? ' success' : ' neutral'" th:text="${item.estado}">REGISTRADA</span></td>
+                                <td><form class="inline-action-form" th:action="@{/procesos/uniformizacion/{id}/estado(id=${item.id})}" method="post" th:attr="hx-post=@{/procesos/uniformizacion/{id}/estado(id=${item.id})}" hx-target="#module-content" hx-swap="outerHTML" hx-disabled-elt="button[type='submit']" hx-confirm="¿Deseas cambiar el estado de esta uniformización?"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><button class="icon-action" type="submit">↻</button></form></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+
+                <article class="panel-card operation-table-card">
+                    <div class="panel-head module-panel-head"><div><h3>Historial de formalización</h3><span th:text="${#lists.size(formalizaciones)} + ' registro(s)'">0 registro(s)</span></div></div>
+                    <div class="module-toolbar"><label class="module-search-field"><span>⌕</span><input type="search" placeholder="Buscar formalización..." data-table-search="#formalizacion-table"></label></div>
+                    <div class="empty-state-card" th:if="${#lists.isEmpty(formalizaciones)}"><h4>Sin formalizaciones</h4><p>Aún no hay actividades registradas.</p></div>
+                    <div class="table-responsive" th:if="${!#lists.isEmpty(formalizaciones)}">
+                        <table class="custom-table production-table" id="formalizacion-table">
+                            <thead><tr><th>Fecha</th><th>Lote</th><th>Cama</th><th>Detalle</th><th>Bandejas</th><th>Plantas</th><th>Estado</th><th></th></tr></thead>
+                            <tbody>
+                            <tr th:each="item : ${formalizaciones}" th:attr="data-status=${item.estado}">
+                                <td><span class="muted-table-text" th:text="${item.fechaFormalizacion}">2026-05-01</span></td>
+                                <td><strong class="table-code" th:text="${item.lote.codigo}">A1</strong></td>
+                                <td th:text="${item.cama.codigo}">CAM-001</td>
+                                <td th:text="${item.detalle}">Detalle</td>
+                                <td th:text="${item.cantidadBandejas}">0</td>
+                                <td><strong th:text="${item.cantidadPlantas}">0</strong></td>
+                                <td><span class="badge" th:classappend="${item.estado == 'REGISTRADA'} ? ' success' : ' neutral'" th:text="${item.estado}">REGISTRADA</span></td>
+                                <td><form class="inline-action-form" th:action="@{/procesos/formalizacion/{id}/estado(id=${item.id})}" method="post" th:attr="hx-post=@{/procesos/formalizacion/{id}/estado(id=${item.id})}" hx-target="#module-content" hx-swap="outerHTML" hx-disabled-elt="button[type='submit']" hx-confirm="¿Deseas cambiar el estado de esta formalización?"><input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}"><button class="icon-action" type="submit">↻</button></form></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </article>
+            </section>
+
+            <div class="bt-modal" id="modal-uniformizacion" data-modal hidden>
+                <div class="bt-modal-backdrop" data-modal-close></div>
+                <article class="bt-modal-card bt-modal-card-wide">
+                    <header class="bt-modal-header">
+                        <div><small>Registro operativo</small><h3>Uniformización</h3><p>Define cantidad inicial, cantidad uniformizada y criterio aplicado.</p></div>
+                        <button class="bt-modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+                    </header>
+                    <form class="form-grid two-columns modal-form" method="post" th:action="@{/procesos/uniformizacion}" th:object="${uniformizacionForm}" th:attr="hx-post=@{/procesos/uniformizacion}" hx-target="#module-content" hx-swap="outerHTML" hx-disabled-elt="button[type='submit']">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <div class="lote-alert full-span" th:if="${#fields.hasGlobalErrors()}"><span th:each="err : ${#fields.globalErrors()}" th:text="${err}">Error</span></div>
+                        <div class="form-group"><label>Invernadero</label><select th:field="*{loteId}"><option value="">Seleccione</option><option th:each="lote : ${lotes}" th:value="${lote.id}" th:text="${lote.codigo + ' - ' + lote.variedad}"></option></select><small class="field-error" th:if="${#fields.hasErrors('loteId')}" th:errors="*{loteId}"></small></div>
+                        <div class="form-group"><label>Cama</label><select th:field="*{camaId}"><option value="">Seleccione</option><option th:each="cama : ${camas}" th:value="${cama.id}" th:text="${cama.codigo + ' (' + cama.lote.codigo + ')'}"></option></select><small class="field-error" th:if="${#fields.hasErrors('camaId')}" th:errors="*{camaId}"></small></div>
+                        <div class="form-group"><label>Fecha</label><input type="date" th:field="*{fechaUniformizacion}"><small class="field-error" th:if="${#fields.hasErrors('fechaUniformizacion')}" th:errors="*{fechaUniformizacion}"></small></div>
+                        <div class="form-group"><label>Criterio</label><input type="text" th:field="*{criterio}" placeholder="Tamaño, vigor o condición"><small class="field-error" th:if="${#fields.hasErrors('criterio')}" th:errors="*{criterio}"></small></div>
+                        <div class="form-group"><label>Cantidad inicial</label><input type="number" min="0" th:field="*{cantidadInicial}" placeholder="Ej. 1200"><small class="field-error" th:if="${#fields.hasErrors('cantidadInicial')}" th:errors="*{cantidadInicial}"></small></div>
+                        <div class="form-group"><label>Cantidad uniformizada</label><input type="number" min="0" th:field="*{cantidadUniformizada}" placeholder="Ej. 1150"><small class="field-error" th:if="${#fields.hasErrors('cantidadUniformizada')}" th:errors="*{cantidadUniformizada}"></small></div>
+                        <div class="form-group"><label>Estado</label><select th:field="*{estado}"><option th:each="estado : ${estadosDisponibles}" th:value="${estado}" th:text="${estado}"></option></select></div>
+                        <div class="form-group full-span"><label>Observación</label><textarea th:field="*{observacion}" placeholder="Detalle interno de uniformización"></textarea></div>
+                        <footer class="bt-modal-actions full-span"><button class="ghost-btn" type="button" data-modal-close>Cancelar</button><button class="primary-btn" type="submit">Guardar uniformización</button></footer>
+                    </form>
+                </article>
+            </div>
+
+            <div class="bt-modal" id="modal-formalizacion" data-modal hidden>
+                <div class="bt-modal-backdrop" data-modal-close></div>
+                <article class="bt-modal-card bt-modal-card-wide">
+                    <header class="bt-modal-header">
+                        <div><small>Bandejas y plantas</small><h3>Formalización</h3><p>Registra el detalle operativo, bandejas y cantidad de plantas formalizadas.</p></div>
+                        <button class="bt-modal-close" type="button" data-modal-close aria-label="Cerrar">×</button>
+                    </header>
+                    <form class="form-grid two-columns modal-form" method="post" th:action="@{/procesos/formalizacion}" th:object="${formalizacionForm}" th:attr="hx-post=@{/procesos/formalizacion}" hx-target="#module-content" hx-swap="outerHTML" hx-disabled-elt="button[type='submit']">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+                        <div class="lote-alert full-span" th:if="${#fields.hasGlobalErrors()}"><span th:each="err : ${#fields.globalErrors()}" th:text="${err}">Error</span></div>
+                        <div class="form-group"><label>Invernadero</label><select th:field="*{loteId}"><option value="">Seleccione</option><option th:each="lote : ${lotes}" th:value="${lote.id}" th:text="${lote.codigo + ' - ' + lote.variedad}"></option></select><small class="field-error" th:if="${#fields.hasErrors('loteId')}" th:errors="*{loteId}"></small></div>
+                        <div class="form-group"><label>Cama</label><select th:field="*{camaId}"><option value="">Seleccione</option><option th:each="cama : ${camas}" th:value="${cama.id}" th:text="${cama.codigo + ' (' + cama.lote.codigo + ')'}"></option></select><small class="field-error" th:if="${#fields.hasErrors('camaId')}" th:errors="*{camaId}"></small></div>
+                        <div class="form-group"><label>Fecha</label><input type="date" th:field="*{fechaFormalizacion}"><small class="field-error" th:if="${#fields.hasErrors('fechaFormalizacion')}" th:errors="*{fechaFormalizacion}"></small></div>
+                        <div class="form-group"><label>Detalle</label><input type="text" th:field="*{detalle}" placeholder="Ordenamiento y formalización"><small class="field-error" th:if="${#fields.hasErrors('detalle')}" th:errors="*{detalle}"></small></div>
+                        <div class="form-group"><label>Bandejas</label><input type="number" min="0" th:field="*{cantidadBandejas}"><small class="field-error" th:if="${#fields.hasErrors('cantidadBandejas')}" th:errors="*{cantidadBandejas}"></small></div>
+                        <div class="form-group"><label>Plantas</label><input type="number" min="0" th:field="*{cantidadPlantas}"><small class="field-error" th:if="${#fields.hasErrors('cantidadPlantas')}" th:errors="*{cantidadPlantas}"></small></div>
+                        <div class="form-group"><label>Estado</label><select th:field="*{estado}"><option th:each="estado : ${estadosDisponibles}" th:value="${estado}" th:text="${estado}"></option></select></div>
+                        <div class="form-group full-span"><label>Observación</label><textarea th:field="*{observacion}" placeholder="Detalle de bandejas, plantas o condiciones"></textarea></div>
+                        <footer class="bt-modal-actions full-span"><button class="ghost-btn" type="button" data-modal-close>Cancelar</button><button class="primary-btn" type="submit">Guardar formalización</button></footer>
+                    </form>
+                </article>
+            </div>
+        </div>
+    </main>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

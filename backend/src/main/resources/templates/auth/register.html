@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Registro de usuarios | BlueberryTrace')}"></head>
+<body class="auth-clean-body vlv-auth-page">
+<div class="vlv-auth-layout production-auth-layout">
+    <section class="vlv-auth-side production-auth-side">
+        <div class="vlv-auth-side-inner production-auth-side-inner">
+            <div class="auth-brand-row">
+                <span class="brand-orb" aria-hidden="true"></span>
+                <div><strong>BlueberryTrace</strong><span>AGRO INTELLIGENCE</span></div>
+            </div>
+            <div class="auth-hero-copy">
+                <h1>Gestión de <span>Accesos</span> Operativos</h1>
+                <p>Administra perfiles internos para supervisión, registro operativo, clasificación y control de despacho.</p>
+            </div>
+            <ul class="vlv-auth-points production-auth-points">
+                <li><span class="auth-point-icon">◇</span> Asignación de roles internos</li>
+                <li><span class="auth-point-icon">▢</span> Control de acceso por perfil</li>
+                <li><span class="auth-point-icon">⌁</span> Usuarios activos e inactivos</li>
+                <li><span class="auth-point-icon">▱</span> Operación protegida por credenciales</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="vlv-auth-form-wrap production-auth-form-wrap">
+        <div class="auth-clean-card vlv-auth-card production-register-card">
+            <a class="auth-clean-back" th:href="@{/dashboard}">← Volver al dashboard</a>
+            <h2>Crear usuario</h2>
+            <p class="auth-clean-muted">Registro interno de nuevos perfiles del sistema.</p>
+
+            <form class="auth-clean-form auth-clean-form-grid">
+                <div>
+                    <label>Nombre completo</label>
+                    <input type="text" placeholder="Ej. Carlos Mendoza">
+                </div>
+                <div>
+                    <label>Usuario</label>
+                    <input type="text" placeholder="Ej. supervisor01">
+                </div>
+                <div>
+                    <label>Correo</label>
+                    <input type="email" placeholder="correo@empresa.com">
+                </div>
+                <div>
+                    <label>Rol</label>
+                    <select>
+                        <option>Administrador</option>
+                        <option>Supervisor</option>
+                        <option>Contabilizador</option>
+                        <option>Operario</option>
+                        <option>Control de calidad</option>
+                    </select>
+                </div>
+                <div>
+                    <label>Contraseña</label>
+                    <input type="password" placeholder="Mínimo 8 caracteres">
+                </div>
+                <div>
+                    <label>Confirmar contraseña</label>
+                    <input type="password" placeholder="Repite la contraseña">
+                </div>
+                <div class="full-span">
+                    <label>Estado</label>
+                    <select>
+                        <option>Activo</option>
+                        <option>Inactivo</option>
+                    </select>
+                </div>
+                <button class="primary-btn full-width full-span" type="button">Guardar usuario</button>
+            </form>
+        </div>
+    </section>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

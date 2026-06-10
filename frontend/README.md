@@ -2,7 +2,7 @@
 
 Cliente React/Vite inicial para la separación progresiva del panel BlueberryTrace.
 
-Este frontend consume la API JSON de Spring Boot bajo `/api/v1/**` y mantiene al panel Thymeleaf como versión estable mientras la migración se realiza por módulos.
+Este frontend consume la API JSON del backend Spring Boot bajo `/api/v1/**`. El panel Thymeleaf + HTMX sigue funcionando como versión estable mientras la migración se realiza por módulos.
 
 ## Requisitos
 
@@ -25,7 +25,17 @@ VITE_BLUEBERRYTRACE_BACKEND_ORIGIN=http://localhost:8080
 
 ## Ejecución
 
+Desde la raíz del repositorio:
+
 ```bash
+cd backend
+./mvnw spring-boot:run
+```
+
+En otra terminal:
+
+```bash
+cd frontend
 npm install
 npm run dev
 ```
@@ -51,7 +61,7 @@ npm run preview
 
 ## Estrategia
 
-- Mantener Thymeleaf + HTMX como panel productivo actual.
 - Consumir primero endpoints GET desde React.
 - Migrar módulos por bloques: dashboard, lotes, camas, procesos, clasificación, despacho y reportes.
 - Reutilizar los DTOs de `/api/v1/**` sin exponer entidades JPA.
+- Mantener el backend como fuente central de seguridad, negocio y persistencia.

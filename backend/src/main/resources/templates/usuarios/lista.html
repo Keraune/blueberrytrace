@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Usuarios | BlueberryTrace')}"></head>
+<body class="app-body">
+<div class="app-shell">
+    <div th:replace="~{fragments/app-shell :: sidebar('usuarios')}"></div>
+    <main class="main-content">
+        <div th:replace="~{fragments/app-shell :: topbar('Gestión de Usuarios', 'Administración de perfiles, roles y estado de acceso')}"></div>
+
+        <div id="module-content" class="module-content" th:fragment="moduleContent" hx-target="this" hx-swap="outerHTML">
+            <div class="module-loading-indicator" aria-hidden="true"><span></span></div>
+
+        <section class="operation-kpi-grid">
+            <article class="operation-kpi kpi-green"><span class="kpi-icon">U</span><div><small>Usuarios</small><strong th:text="${#lists.size(usuarios)}">0</strong><p>Perfiles registrados</p></div></article>
+            <article class="operation-kpi kpi-purple"><span class="kpi-icon">★</span><div><small>Administradores</small><strong th:text="${#lists.size(usuarios.?[rol != null and rol.nombre == 'ADMINISTRADOR'])}">0</strong><p>Acceso global del sistema</p></div></article>
+            <article class="operation-kpi kpi-blue"><span class="kpi-icon">✓</span><div><small>Activos</small><strong th:text="${#lists.size(usuarios.?[estado == true])}">0</strong><p>Con acceso habilitado</p></div></article>
+            <article class="operation-kpi kpi-orange"><span class="kpi-icon">!</span><div><small>Inactivos</small><strong th:text="${#lists.size(usuarios.?[estado == false])}">0</strong><p>Sin acceso operativo</p></div></article>
+        </section>
+
+        <section class="panel-card operation-table-card">
+            <div class="panel-head module-panel-head"><div><h3>Usuarios registrados</h3><span th:text="${#lists.size(usuarios)} + ' usuario(s)'">0 usuario(s)</span></div><a class="primary-btn compact-btn" th:href="@{/auth/register}">+ Nuevo usuario</a></div>
+            <div class="module-toolbar"><label class="module-search-field"><span>⌕</span><input type="search" placeholder="Buscar usuario, correo o rol..." data-table-search="#usuarios-table"></label></div>
+            <div class="table-responsive">
+                <table class="custom-table production-table" id="usuarios-table">
+                    <thead><tr><th>Usuario</th><th>Nombre completo</th><th>Email</th><th>Rol</th><th>Estado</th></tr></thead>
+                    <tbody>
+                    <tr th:if="${#lists.isEmpty(usuarios)}"><td colspan="5"><div class="empty-inline-state">No hay usuarios registrados.</div></td></tr>
+                    <tr th:each="usuario : ${usuarios}" th:attr="data-status=${usuario.estado ? 'ACTIVO' : 'INACTIVO'}">
+                        <td><div class="table-user-cell"><span th:text="${usuario.username != null and #strings.length(usuario.username) > 0 ? #strings.substring(usuario.username,0,1) : 'U'}">A</span><strong th:text="${usuario.username}">admin</strong></div></td>
+                        <td th:text="${usuario.nombreCompleto}">Administrador</td>
+                        <td th:text="${usuario.email ?: 'No registrado'}">admin@vlv.local</td>
+                        <td><span class="badge neutral" th:text="${usuario.rol != null ? usuario.rol.nombre : '-'}">ADMINISTRADOR</span></td>
+                        <td><span class="badge" th:classappend="${usuario.estado} ? ' success' : ' neutral'" th:text="${usuario.estado ? 'ACTIVO' : 'INACTIVO'}">ACTIVO</span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        </div>
+    </main>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

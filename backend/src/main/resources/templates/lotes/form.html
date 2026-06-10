@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Formulario de invernadero | BlueberryTrace')}"></head>
+<body class="app-body">
+<div class="app-shell">
+    <div th:replace="~{fragments/app-shell :: sidebar('lotes')}"></div>
+
+    <main class="main-content">
+        <div th:replace="~{fragments/app-shell :: topbar(${tituloFormulario}, ${subtituloFormulario})}"></div>
+
+        <section class="dashboard-grid bottom-grid form-page-grid">
+            <article class="panel-card form-main-card">
+                <div class="panel-head module-panel-head">
+                    <div>
+                        <h3 th:text="${tituloFormulario}">Nuevo invernadero</h3>
+                        <span th:text="${modo == 'editar'} ? 'Edición de registro' : 'Alta operativa'">Formulario</span>
+                    </div>
+                </div>
+
+                <form class="form-grid two-columns" th:action="${modo == 'editar'} ? @{/lotes/{id}/editar(id=${loteId})} : @{/lotes/nuevo}" th:object="${loteForm}" method="post">
+                    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+                    <div class="form-group"><label for="codigo">Código del invernadero</label><input id="codigo" type="text" th:field="*{codigo}" placeholder="A1"><small class="field-error" th:if="${#fields.hasErrors('codigo')}" th:errors="*{codigo}"></small></div>
+                    <div class="form-group"><label for="fechaRegistro">Fecha de registro</label><input id="fechaRegistro" type="date" th:field="*{fechaRegistro}"><small class="field-error" th:if="${#fields.hasErrors('fechaRegistro')}" th:errors="*{fechaRegistro}"></small></div>
+                    <div class="form-group full-span"><label for="descripcion">Descripción</label><input id="descripcion" type="text" th:field="*{descripcion}" placeholder="Invernadero del sector A"><small class="field-error" th:if="${#fields.hasErrors('descripcion')}" th:errors="*{descripcion}"></small></div>
+                    <div class="form-group"><label for="cultivo">Cultivo</label><input id="cultivo" type="text" th:field="*{cultivo}" list="cultivos-sugeridos" placeholder="Arándano"><datalist id="cultivos-sugeridos"><option th:each="cultivo : ${cultivosSugeridos}" th:value="${cultivo}"></option></datalist><small class="field-error" th:if="${#fields.hasErrors('cultivo')}" th:errors="*{cultivo}"></small></div>
+                    <div class="form-group"><label for="variedad">Variedad</label><input id="variedad" type="text" th:field="*{variedad}" placeholder="Biloxi, Ventura, Emerald..."><small class="field-error" th:if="${#fields.hasErrors('variedad')}" th:errors="*{variedad}"></small></div>
+                    <div class="form-group"><label for="estado">Estado</label><select id="estado" th:field="*{estado}"><option th:each="estado : ${estadosDisponibles}" th:value="${estado}" th:text="${estado}"></option></select><small class="field-error" th:if="${#fields.hasErrors('estado')}" th:errors="*{estado}"></small></div>
+                    <div class="form-group full-span"><label for="observacion">Observación</label><textarea id="observacion" th:field="*{observacion}" placeholder="Ubicación, responsable interno o detalle operativo"></textarea><small class="field-error" th:if="${#fields.hasErrors('observacion')}" th:errors="*{observacion}"></small></div>
+
+                    <div class="lote-edit-actions full-span"><button class="primary-btn full-width" type="submit" th:text="${modo == 'editar'} ? 'Actualizar invernadero' : 'Guardar invernadero'">Guardar</button><a class="ghost-btn full-width" th:href="@{/lotes}">Volver al listado</a></div>
+                </form>
+            </article>
+
+            <aside class="panel-card trace-side-card">
+                <div class="panel-head"><div><h3>Datos operativos</h3><span>Registro maestro</span></div></div>
+                <div class="trace-progress-list compact">
+                    <div class="active"><span>01</span><strong>Identificación</strong><p>Código único del invernadero.</p></div>
+                    <div class="active"><span>02</span><strong>Cultivo y variedad</strong><p>Base para reportes y trazabilidad.</p></div>
+                    <div class="active"><span>03</span><strong>Estado</strong><p>Disponibilidad para procesos internos.</p></div>
+                </div>
+            </aside>
+        </section>
+    </main>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

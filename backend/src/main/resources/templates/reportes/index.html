@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head th:replace="~{fragments/layout :: head('Reportes y trazabilidad | BlueberryTrace')}"></head>
+<body class="app-body">
+<div class="app-shell">
+    <div th:replace="~{fragments/app-shell :: sidebar('reportes')}"></div>
+    <main class="main-content">
+        <div th:replace="~{fragments/app-shell :: topbar('Reportes y trazabilidad', 'Consulta consolidada por lote, variedad, fecha y eventos productivos')}"></div>
+
+        <div id="module-content" class="module-content" th:fragment="moduleContent" hx-target="this" hx-swap="outerHTML">
+            <div class="module-loading-indicator" aria-hidden="true"><span></span></div>
+
+        <section class="operation-kpi-grid">
+            <article class="operation-kpi kpi-green"><span class="kpi-icon">▦</span><div><small>Lotes encontrados</small><strong th:text="${#lists.size(resultados)}">0</strong><p>Resultado según filtros aplicados</p></div></article>
+            <article class="operation-kpi kpi-lime"><span class="kpi-icon">∑</span><div><small>Plantas sembradas</small><strong th:text="${#aggregates.sum(resultados.![plantasSembradas]) ?: 0}">0</strong><p>Total dentro de la consulta</p></div></article>
+            <article class="operation-kpi kpi-blue"><span class="kpi-icon">⇢</span><div><small>Plantas despachadas</small><strong th:text="${#aggregates.sum(resultados.![plantasDespachadas]) ?: 0}">0</strong><p>Salida acumulada consultada</p></div></article>
+            <article class="operation-kpi kpi-purple"><span class="kpi-icon">✓</span><div><small>Clasificaciones</small><strong th:text="${#aggregates.sum(resultados.![clasificaciones]) ?: 0}">0</strong><p>Eventos de control de calidad</p></div></article>
+        </section>
+
+        <section class="panel-card report-filter-card">
+            <div class="panel-head module-panel-head"><div><h3>Consulta de historial</h3><span>Trazabilidad integral</span></div></div>
+            <form class="form-grid report-filter-grid" method="get" th:action="@{/reportes}" th:attr="hx-get=@{/reportes}" hx-target="#module-content" hx-swap="outerHTML" hx-push-url="true">
+                <div class="form-group"><label for="codigo">Código de lote</label><input id="codigo" name="codigo" type="text" th:value="${codigo}" placeholder="Ej. A1"></div>
+                <div class="form-group"><label for="variedad">Variedad</label><input id="variedad" name="variedad" type="text" th:value="${variedad}" placeholder="Ej. Biloxi"></div>
+                <div class="form-group"><label for="fecha">Fecha de registro</label><input id="fecha" name="fecha" type="date" th:value="${fecha}"></div>
+                <div class="report-filter-actions"><button class="primary-btn full-width" type="submit">Buscar trazabilidad</button><a class="ghost-btn full-width" th:href="@{/reportes}" th:attr="hx-get=@{/reportes}" hx-target="#module-content" hx-swap="outerHTML" hx-push-url="true">Limpiar filtros</a></div>
+            </form>
+        </section>
+
+        <section class="dashboard-grid bottom-grid report-visual-grid" th:if="${!#lists.isEmpty(resultados)}">
+            <article class="panel-card report-chart-card">
+                <div class="panel-head"><div><h3>Producción consultada</h3><span>Relación sembrada vs. despachada</span></div></div>
+                <div class="report-bar-comparison">
+                    <div><span>Sembradas</span><strong th:text="${#aggregates.sum(resultados.![plantasSembradas]) ?: 0}">0</strong><i class="green" style="--w: 88%"></i></div>
+                    <div><span>Despachadas</span><strong th:text="${#aggregates.sum(resultados.![plantasDespachadas]) ?: 0}">0</strong><i class="blue" style="--w: 62%"></i></div>
+                    <div><span>Clasificaciones</span><strong th:text="${#aggregates.sum(resultados.![clasificaciones]) ?: 0}">0</strong><i class="purple" style="--w: 48%"></i></div>
+                </div>
+            </article>
+            <article class="panel-card report-card-grid">
+                <div class="panel-head"><div><h3>Estado de consulta</h3><span>Vista operativa</span></div></div>
+                <div class="trace-progress-list compact">
+                    <div class="active"><span>01</span><strong>Siembra</strong><p>Consulta plantas iniciales por lote.</p></div>
+                    <div class="active"><span>02</span><strong>Clasificación</strong><p>Relaciona eventos de calidad.</p></div>
+                    <div class="active"><span>03</span><strong>Despacho</strong><p>Contrasta salidas acumuladas.</p></div>
+                </div>
+            </article>
+        </section>
+
+        <section class="panel-card operation-table-card">
+            <div class="panel-head module-panel-head"><div><h3>Resultados consolidados</h3><span th:text="${#lists.size(resultados)} + ' lote(s)'">0 lote(s)</span></div></div>
+            <div class="module-toolbar"><label class="module-search-field"><span>⌕</span><input type="search" placeholder="Buscar dentro de resultados..." data-table-search="#reportes-table"></label></div>
+            <div class="empty-state-card" th:if="${#lists.isEmpty(resultados)}"><h4>Sin resultados para los filtros aplicados</h4><p>Prueba consultando por código de lote, variedad o fecha de registro.</p></div>
+            <div class="table-responsive" th:if="${!#lists.isEmpty(resultados)}">
+                <table class="custom-table production-table" id="reportes-table">
+                    <thead><tr><th>Lote</th><th>Variedad</th><th>Camas</th><th>Siembras</th><th>Sembradas</th><th>Uniform.</th><th>Formal.</th><th>Clasif.</th><th>Despachos</th><th>Despachadas</th><th>Último evento</th></tr></thead>
+                    <tbody>
+                    <tr th:each="row : ${resultados}">
+                        <td><strong class="table-code" th:text="${row.lote.codigo}">A1</strong><br><small th:text="${row.lote.descripcion}">Invernadero</small></td>
+                        <td th:text="${row.lote.variedad ?: 'No registrada'}">Biloxi</td>
+                        <td th:text="${row.camas}">0</td>
+                        <td th:text="${row.siembras}">0</td>
+                        <td><strong th:text="${row.plantasSembradas}">0</strong></td>
+                        <td th:text="${row.uniformizaciones}">0</td>
+                        <td th:text="${row.formalizaciones}">0</td>
+                        <td th:text="${row.clasificaciones}">0</td>
+                        <td th:text="${row.despachos}">0</td>
+                        <td><strong th:text="${row.plantasDespachadas}">0</strong></td>
+                        <td><span class="badge neutral" th:text="${row.ultimoEvento}">Evento</span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+        </div>
+    </main>
+</div>
+<div th:replace="~{fragments/layout :: scripts}"></div>
+</body>
+</html>

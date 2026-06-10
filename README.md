@@ -1,190 +1,57 @@
 # BlueberryTrace
 
-Sistema web interno para el control, clasificación y trazabilidad de plantas de arándano en el área de frutales de Vivero Los Viñedos.
+Sistema web interno para el control, clasificación y trazabilidad de plantas de arándano para exportación en el área de frutales de Vivero Los Viñedos.
 
-## Módulos backend implementados
+El proyecto quedó organizado como una base separada para backend y frontend, manteniendo estable el panel actual en Spring MVC + Thymeleaf + HTMX y dejando listo el cliente React/Vite para una migración progresiva.
 
-El proyecto mantiene arquitectura MVC con Spring Boot, Thymeleaf, Spring Security, JPA y MySQL.
-
-### Base operativa
-
-- Usuarios y roles.
-- Lotes / invernaderos.
-- Camas por invernadero.
-
-### Procesos de trazabilidad
-
-- Siembra y ubicación en cama.
-- Uniformización.
-- Formalización.
-- Clasificación de plantas.
-- Despacho.
-- Reportes consolidados de trazabilidad.
-- Dashboard con KPIs calculados desde la base de datos.
-
-## Flujo de trazabilidad
+## Estructura del repositorio
 
 ```text
-Lote / Invernadero → Cama → Siembra → Uniformización → Formalización → Clasificación → Despacho → Reportes
+blueberrytrace/
+├── backend/              # Spring Boot, Thymeleaf, HTMX, API REST y seguridad
+├── frontend/             # React + TypeScript + Vite
+├── docs/                 # Documentación técnica por etapa
+├── .gitignore
+└── README.md
 ```
 
-Cada registro operativo queda asociado a:
+## Backend
 
-- Invernadero.
-- Cama, cuando corresponde.
-- Usuario autenticado.
-- Fecha del proceso.
-- Estado operativo.
-- Observaciones.
+Stack principal:
 
-## Credenciales iniciales
+- Java 21
+- Spring Boot
+- Spring Security
+- Thymeleaf
+- HTMX
+- JPA / Hibernate
+- MySQL
+- Maven Wrapper
 
-El inicializador crea un usuario administrador si no existe:
+Ejecución:
+
+```bash
+cd backend
+./mvnw spring-boot:run
+```
+
+Abrir:
+
+```text
+http://localhost:8080
+```
+
+Credenciales iniciales:
 
 ```text
 Usuario: admin
 Contraseña: admin123
 ```
 
-## Base de datos
-
-Crear la base de datos antes de ejecutar:
-
-```sql
-CREATE DATABASE vlv_blueberry_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-```
-
-Revisar credenciales en:
+API disponible para clientes externos:
 
 ```text
-src/main/resources/application.properties
-```
-
-## Ejecución
-
-Con Maven Wrapper:
-
-```bash
-./mvnw spring-boot:run
-```
-
-O con Maven instalado:
-
-```bash
-mvn spring-boot:run
-```
-
-Luego abrir:
-
-```text
-http://localhost:8080
-```
-
-## Estructura principal
-
-```text
-src/main/java/com/keraune/vlvblueberrysystem
-├── config
-├── controller
-├── dto
-├── entity
-├── repository
-├── security
-└── service
-```
-
-## Nota técnica
-
-El proyecto incluye `.mvn/wrapper/maven-wrapper.properties` para que el script `mvnw` pueda descargar Maven automáticamente en un entorno con conexión a internet.
-
-## Corrección aplicada
-
-Se corrigió el mapeo de la entidad `Despacho` para usar la columna persistente `modalidad_despacho`. Esto evita el error de MySQL:
-
-```text
-Field 'modalidad_despacho' doesn't have a default value
-```
-
-El formulario y el código Java pueden seguir usando la propiedad `modalidad`; JPA la persiste correctamente en la columna `modalidad_despacho`. Además, se agregó compatibilidad con la columna `modalidad` en caso de que Hibernate la haya creado durante una ejecución previa fallida con `ddl-auto=update`.
-
-## Nota de compatibilidad de base de datos
-
-El módulo de despacho mantiene compatibilidad con esquemas locales creados durante versiones anteriores del proyecto.
-La entidad `Despacho` sincroniza los campos actuales `modalidad_despacho` y `cantidad_despachada` con las columnas heredadas `modalidad` y `cantidad`, evitando errores `Field ... doesn't have a default value` cuando MySQL conserva columnas antiguas como `NOT NULL`.
-
-Si deseas limpiar completamente la base de datos durante desarrollo, puedes recrear el esquema `vlv_blueberry_system` y ejecutar nuevamente la aplicación.
-
-
-## Interfaz productiva
-
-Se agregó una capa visual moderna para operación interna:
-
-- Login dividido con panel institucional y formulario limpio.
-- Sidebar fija con navegación por grupos funcionales.
-- Topbar compacta con búsqueda, notificaciones y acceso de perfil.
-- Dashboard claro con métricas, gráficos visuales y accesos rápidos.
-- Tablas, formularios, botones y badges con estilos consistentes.
-- Microinteracciones suaves, búsqueda rápida de módulos y efecto ripple en botones.
-
-## Base frontend · Tailwind + HTMX
-
-Se preparó la base frontend para una modernización progresiva sin migrar a SPA y sin romper Spring MVC:
-
-- Centralización del `<head>` en `templates/fragments/layout.html`.
-- Centralización de scripts en el fragmento `fragments/layout :: scripts`.
-- Integración inicial de Tailwind Play CDN para prototipado visual.
-- Configuración de tokens visuales en `static/js/tailwind.config.js`.
-- Integración inicial de HTMX 2.x por CDN para futuras recargas parciales.
-- Metadatos CSRF disponibles para peticiones dinámicas protegidas por Spring Security.
-- `app.js` preparado para reinicializar microinteracciones después de swaps parciales de HTMX.
-- Estilos base para indicadores y estados HTMX en `style.css`.
-
-Documentación de auditoría: `docs/frontend-fase-1.md`.
-
-### Comandos principales
-
-```bash
-./mvnw spring-boot:run
-./mvnw clean package
-./mvnw test
-```
-
-
-## Interactividad progresiva con HTMX
-
-Se incorporó actualización parcial en módulos operativos sin reemplazar Spring MVC ni Thymeleaf:
-
-- Formularios con `hx-post` y fallback tradicional por `action`/`method`.
-- Acciones de estado con recarga parcial del contenido del módulo.
-- Consulta de reportes con `hx-get` y conservación de URL.
-- Fragmentos Thymeleaf reutilizables mediante `moduleContent`.
-- Helper backend `HtmxRequestSupport` para responder vista completa o fragmento según el encabezado `HX-Request`.
-- Indicadores visuales de carga, transición de contenido y toast de error.
-
-Documentación técnica: `docs/frontend-fase-4.md`.
-
-## Modales operativos y confirmaciones
-
-Se incorporó una capa de interacción productiva para operaciones frecuentes:
-
-- Botones superiores de acción por módulo.
-- Formularios de creación en modales para siembra, camas, uniformización, formalización, clasificación y despacho.
-- Edición de camas desde modal cuando se abre un registro existente.
-- Confirmaciones visuales para acciones críticas integradas con `hx-confirm`.
-- Reapertura automática de modales cuando Thymeleaf devuelve errores de validación.
-- Corrección del formulario de uniformización para usar `cantidadInicial` y `cantidadUniformizada`.
-- Corrección del formulario de formalización para incluir el campo obligatorio `detalle`.
-
-Documentación de esta etapa: `docs/frontend-fase-5.md`.
-
-
-## Separación progresiva para React/Vue
-
-Se agregó una capa API inicial bajo `/api/v1/**` para preparar una futura integración con React o Vue sin retirar Thymeleaf todavía.
-
-Endpoints principales disponibles:
-
-```text
+GET /api/v1/auth/csrf
 GET /api/v1/frontend/bootstrap
 GET /api/v1/session/me
 GET /api/v1/dashboard/summary
@@ -201,29 +68,17 @@ GET /api/v1/reportes/trazabilidad
 GET /api/v1/usuarios
 ```
 
-La API no expone entidades JPA directamente. Usa DTOs/records en `src/main/java/com/keraune/vlvblueberrysystem/api/dto` y mappers en `src/main/java/com/keraune/vlvblueberrysystem/api/mapper`.
+## Frontend
 
-También se agregó `static/js/api-client.js`, un cliente ligero para consumir el API desde JavaScript o como referencia para una futura app React/Vue.
+Stack principal:
 
-CORS para desarrollo local:
+- React
+- TypeScript
+- Vite
+- CSS modular por componentes
+- Consumo de API `/api/v1/**`
 
-```properties
-blueberrytrace.api.cors.allowed-origins=http://localhost:5173,http://localhost:3000
-```
-
-Documentación de esta etapa: `docs/frontend-fase-6.md`.
-
-## Cliente React/Vite inicial
-
-Se agregó una primera aplicación separada en:
-
-```text
-frontend/
-```
-
-Esta aplicación permite iniciar la separación progresiva hacia React sin retirar el panel actual en Thymeleaf + HTMX.
-
-Comandos principales:
+Ejecución:
 
 ```bash
 cd frontend
@@ -238,31 +93,68 @@ Abrir:
 http://localhost:5173
 ```
 
-El backend debe estar ejecutándose en:
+El backend debe estar corriendo en:
 
 ```text
 http://localhost:8080
 ```
 
-Para consumir endpoints protegidos desde React, inicia sesión primero en el panel actual:
+Para consumir endpoints protegidos desde React, inicia sesión primero en el backend:
 
 ```text
 http://localhost:8080/auth/login
 ```
 
-Endpoints consumidos inicialmente:
+## Base de datos
 
-```text
-GET /api/v1/auth/csrf
-GET /api/v1/frontend/bootstrap
-GET /api/v1/session/me
-GET /api/v1/dashboard/summary
-GET /api/v1/lotes
-GET /api/v1/camas
+Crear la base de datos antes de ejecutar el backend:
+
+```sql
+CREATE DATABASE vlv_blueberry_system CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 ```
 
-La documentación técnica de esta etapa está en:
+Revisar credenciales en:
 
 ```text
-docs/frontend-fase-7.md
+backend/src/main/resources/application.properties
+```
+
+## Comandos de build y prueba
+
+Backend:
+
+```bash
+cd backend
+./mvnw clean package
+./mvnw test
+```
+
+Frontend:
+
+```bash
+cd frontend
+npm run build
+npm run preview
+```
+
+## Estrategia de separación
+
+- `backend/` mantiene el sistema productivo actual con Spring MVC, Thymeleaf y HTMX.
+- `backend/src/main/java/.../api` expone DTOs seguros para React/Vue sin devolver entidades JPA directamente.
+- `frontend/` consume la API con React/Vite.
+- La migración puede avanzar módulo por módulo sin retirar todavía las vistas Thymeleaf.
+
+## Flujo operativo principal
+
+```text
+Lote / Invernadero → Cama → Siembra → Uniformización → Formalización → Clasificación → Despacho → Reportes
+```
+
+## Git recomendado
+
+```bash
+git status
+git add .
+git commit -m "refactor(project): separar backend y frontend en workspaces"
+git push origin main
 ```
