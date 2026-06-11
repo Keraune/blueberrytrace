@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/dashboard")
 public class ApiDashboardController {
-
     private final DashboardMetricsService dashboardMetricsService;
 
     public ApiDashboardController(DashboardMetricsService dashboardMetricsService) {
@@ -19,10 +18,6 @@ public class ApiDashboardController {
 
     @GetMapping("/summary")
     public ApiResponse<DashboardApiResponse> summary() {
-        DashboardApiResponse response = new DashboardApiResponse(
-                dashboardMetricsService.obtenerResumen(),
-                ApiModuleMetadata.modules()
-        );
-        return ApiResponse.ok(response);
+        return ApiResponse.ok("Resumen operativo cargado", new DashboardApiResponse(dashboardMetricsService.summary(), ApiModuleMetadata.modules()));
     }
 }

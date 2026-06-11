@@ -3,15 +3,15 @@ package com.keraune.vlvblueberrysystem.security;
 import com.keraune.vlvblueberrysystem.entity.User;
 import com.keraune.vlvblueberrysystem.repository.UserRepository;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.*;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 public class CustomUserDetailsService implements UserDetailsService {
-
     private final UserRepository userRepository;
 
     public CustomUserDetailsService(UserRepository userRepository) {
@@ -19,18 +19,19 @@ public class CustomUserDetailsService implements UserDetailsService {
     }
 
     @Override
-    @Transactional(readOnly = true)
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + username));
+    public UserDetails loadUserByUsername(String usernameOrEmail) throws UsernameNotFoundException {
+        String identifier = LoginIdentifier.normalize(usernameOrEmail);
+        User user = (LoginIdentifier.isEmail(identifier)
+                ? userRepository.findByEmailIgnoreCase(identifier)
+                : userRepository.findByUsernameIgnoreCase(identifier))
+                .orElseThrow(() -> new UsernameNotFoundException("Usuario o correo no encontrado"));
 
-        String roleName = "ROLE_" + user.getRol().getNombre();
-
+        String roleName = user.getRole() != null ? user.getRole().getNombre() : "OPERARIO";
         return org.springframework.security.core.userdetails.User
                 .withUsername(user.getUsername())
                 .password(user.getPassword())
-                .authorities(List.of(new SimpleGrantedAuthority(roleName)))
-                .disabled(!user.getEstado())
+                .disabled(!Boolean.TRUE.equals(user.getEstado()))
+                .authorities(List.of(new SimpleGrantedAuthority("ROLE_" + roleName)))
                 .build();
     }
 }

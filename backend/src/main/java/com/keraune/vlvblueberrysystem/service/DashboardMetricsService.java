@@ -1,19 +1,13 @@
 package com.keraune.vlvblueberrysystem.service;
 
 import com.keraune.vlvblueberrysystem.dto.DashboardSummary;
-import com.keraune.vlvblueberrysystem.repository.CamaRepository;
-import com.keraune.vlvblueberrysystem.repository.ClasificacionRepository;
-import com.keraune.vlvblueberrysystem.repository.DespachoRepository;
-import com.keraune.vlvblueberrysystem.repository.FormalizacionRepository;
-import com.keraune.vlvblueberrysystem.repository.LoteRepository;
-import com.keraune.vlvblueberrysystem.repository.SiembraRepository;
-import com.keraune.vlvblueberrysystem.repository.UniformizacionRepository;
+import com.keraune.vlvblueberrysystem.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 public class DashboardMetricsService {
-
     private final LoteRepository loteRepository;
     private final CamaRepository camaRepository;
     private final SiembraRepository siembraRepository;
@@ -22,13 +16,9 @@ public class DashboardMetricsService {
     private final ClasificacionRepository clasificacionRepository;
     private final DespachoRepository despachoRepository;
 
-    public DashboardMetricsService(LoteRepository loteRepository,
-                                   CamaRepository camaRepository,
-                                   SiembraRepository siembraRepository,
-                                   UniformizacionRepository uniformizacionRepository,
-                                   FormalizacionRepository formalizacionRepository,
-                                   ClasificacionRepository clasificacionRepository,
-                                   DespachoRepository despachoRepository) {
+    public DashboardMetricsService(LoteRepository loteRepository, CamaRepository camaRepository, SiembraRepository siembraRepository,
+                                   UniformizacionRepository uniformizacionRepository, FormalizacionRepository formalizacionRepository,
+                                   ClasificacionRepository clasificacionRepository, DespachoRepository despachoRepository) {
         this.loteRepository = loteRepository;
         this.camaRepository = camaRepository;
         this.siembraRepository = siembraRepository;
@@ -38,56 +28,32 @@ public class DashboardMetricsService {
         this.despachoRepository = despachoRepository;
     }
 
-    @Transactional(readOnly = true)
-    public DashboardSummary obtenerResumen() {
-        long lotesRegistrados = loteRepository.count();
+    public DashboardSummary summary() {
+        long lotes = loteRepository.count();
         long lotesActivos = loteRepository.countByEstadoIgnoreCase("ACTIVO");
-        long camasRegistradas = camaRepository.count();
+        long camas = camaRepository.count();
         long camasActivas = camaRepository.countByEstadoIgnoreCase("ACTIVA");
-        long capacidadReferencialTotal = camaRepository.sumCapacidadReferencial();
-
-        long siembrasRegistradas = siembraRepository.count();
-        long plantasSembradas = siembraRepository.sumCantidadRegistrada();
-        long uniformizacionesRegistradas = uniformizacionRepository.count();
-        long formalizacionesRegistradas = formalizacionRepository.count();
-        long clasificacionesRegistradas = clasificacionRepository.count();
-        long clasificacionesPendientes = clasificacionRepository.countByEstadoIgnoreCase("PENDIENTE");
-        long clasificacionesValidadas = clasificacionRepository.countByEstadoIgnoreCase("VALIDADA");
-        long despachosRegistrados = despachoRepository.count();
-        long plantasDespachadas = despachoRepository.sumCantidadDespachada();
+        long siembras = siembraRepository.count();
+        long plantasSembradas = siembraRepository.findAll().stream().mapToLong(s -> value(s.getCantidadRegistrada())).sum();
+        long uniformizaciones = uniformizacionRepository.count();
+        long formalizaciones = formalizacionRepository.count();
+        long clasificaciones = clasificacionRepository.count();
+        long pendientes = clasificacionRepository.countByEstadoIgnoreCase("PENDIENTE");
+        long validadas = clasificacionRepository.countByEstadoIgnoreCase("VALIDADA");
+        long despachos = despachoRepository.count();
+        long plantasDespachadas = despachoRepository.findAll().stream().mapToLong(d -> value(d.getCantidadDespachada())).sum();
+        long capacidad = camaRepository.findAll().stream().mapToLong(c -> value(c.getCapacidadReferencial())).sum();
 
         return new DashboardSummary(
-                lotesRegistrados,
-                lotesActivos,
-                Math.max(0, lotesRegistrados - lotesActivos),
-                camasRegistradas,
-                camasActivas,
-                Math.max(0, camasRegistradas - camasActivas),
-                capacidadReferencialTotal,
-                siembrasRegistradas,
-                plantasSembradas,
-                uniformizacionesRegistradas,
-                formalizacionesRegistradas,
-                clasificacionesRegistradas,
-                clasificacionesPendientes,
-                clasificacionesValidadas,
-                despachosRegistrados,
-                plantasDespachadas,
-                calcularPorcentaje(lotesActivos, lotesRegistrados),
-                calcularPorcentaje(camasActivas, camasRegistradas),
-                calcularPorcentaje(clasificacionesValidadas, clasificacionesRegistradas),
-                calcularPorcentaje(plantasDespachadas, plantasSembradas),
-                calcularPorcentaje(uniformizacionesRegistradas, siembrasRegistradas),
-                calcularPorcentaje(formalizacionesRegistradas, siembrasRegistradas),
-                calcularPorcentaje(clasificacionesRegistradas, siembrasRegistradas),
-                calcularPorcentaje(despachosRegistrados, siembrasRegistradas)
+                lotes, lotesActivos, Math.max(lotes - lotesActivos, 0),
+                camas, camasActivas, Math.max(camas - camasActivas, 0), capacidad,
+                siembras, plantasSembradas, uniformizaciones, formalizaciones,
+                clasificaciones, pendientes, validadas, despachos, plantasDespachadas,
+                pct(lotesActivos, lotes), pct(camasActivas, camas), pct(validadas, clasificaciones), pct(plantasDespachadas, plantasSembradas),
+                pct(uniformizaciones, siembras), pct(formalizaciones, siembras), pct(clasificaciones, siembras), pct(despachos, siembras)
         );
     }
 
-    private int calcularPorcentaje(long parte, long total) {
-        if (total <= 0) {
-            return 0;
-        }
-        return (int) Math.round((parte * 100.0) / total);
-    }
+    private long value(Integer value) { return value == null ? 0 : value; }
+    private double pct(long part, long total) { return total <= 0 ? 0 : Math.round((part * 10000.0 / total)) / 100.0; }
 }

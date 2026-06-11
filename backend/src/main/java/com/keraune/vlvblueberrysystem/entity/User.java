@@ -1,19 +1,25 @@
 package com.keraune.vlvblueberrysystem.entity;
 
-import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "usuarios")
-public class User {
-
+public class User extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(optional = false, fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "rol_id", nullable = false)
-    private Role rol;
+    private Role role;
 
     @Column(name = "nombre_completo", nullable = false, length = 150)
     private String nombreCompleto;
@@ -27,59 +33,36 @@ public class User {
     @Column(length = 120)
     private String email;
 
-    @Column(length = 90)
+    @Column(name = "cargo", length = 90)
     private String cargo;
 
-    @Column(length = 30)
+    @Column(name = "telefono", length = 30)
     private String telefono;
 
-    @Column(name = "avatar_color", length = 24)
+    @Column(name = "avatar_color", length = 30)
     private String avatarColor;
 
-    @Column(nullable = false)
+    @Column(name = "estado", nullable = false)
     private Boolean estado = true;
 
-    @Column(name = "fecha_creacion", nullable = false, updatable = false)
-    private LocalDateTime fechaCreacion;
-
-    @Column(name = "fecha_actualizacion")
-    private LocalDateTime fechaActualizacion;
-
-    @PrePersist
-    public void prePersist() {
-        this.fechaCreacion = LocalDateTime.now();
-    }
-
-    @PreUpdate
-    public void preUpdate() {
-        this.fechaActualizacion = LocalDateTime.now();
-    }
-
-    public User() {}
-
     public Long getId() { return id; }
-    public Role getRol() { return rol; }
-    public String getNombreCompleto() { return nombreCompleto; }
-    public String getUsername() { return username; }
-    public String getPassword() { return password; }
-    public String getEmail() { return email; }
-    public String getCargo() { return cargo; }
-    public String getTelefono() { return telefono; }
-    public String getAvatarColor() { return avatarColor; }
-    public Boolean getEstado() { return estado; }
-    public LocalDateTime getFechaCreacion() { return fechaCreacion; }
-    public LocalDateTime getFechaActualizacion() { return fechaActualizacion; }
-
     public void setId(Long id) { this.id = id; }
-    public void setRol(Role rol) { this.rol = rol; }
+    public Role getRole() { return role; }
+    public void setRole(Role role) { this.role = role; }
+    public String getNombreCompleto() { return nombreCompleto; }
     public void setNombreCompleto(String nombreCompleto) { this.nombreCompleto = nombreCompleto; }
+    public String getUsername() { return username; }
     public void setUsername(String username) { this.username = username; }
+    public String getPassword() { return password; }
     public void setPassword(String password) { this.password = password; }
+    public String getEmail() { return email; }
     public void setEmail(String email) { this.email = email; }
+    public String getCargo() { return cargo; }
     public void setCargo(String cargo) { this.cargo = cargo; }
+    public String getTelefono() { return telefono; }
     public void setTelefono(String telefono) { this.telefono = telefono; }
+    public String getAvatarColor() { return avatarColor; }
     public void setAvatarColor(String avatarColor) { this.avatarColor = avatarColor; }
+    public Boolean getEstado() { return estado; }
     public void setEstado(Boolean estado) { this.estado = estado; }
-    public void setFechaCreacion(LocalDateTime fechaCreacion) { this.fechaCreacion = fechaCreacion; }
-    public void setFechaActualizacion(LocalDateTime fechaActualizacion) { this.fechaActualizacion = fechaActualizacion; }
 }

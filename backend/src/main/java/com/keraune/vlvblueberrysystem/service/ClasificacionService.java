@@ -1,124 +1,64 @@
 package com.keraune.vlvblueberrysystem.service;
 
+import com.keraune.vlvblueberrysystem.api.dto.ApiPayloads.ClasificacionResponse;
+import com.keraune.vlvblueberrysystem.api.mapper.ApiRecordMapper;
 import com.keraune.vlvblueberrysystem.dto.ClasificacionForm;
-import com.keraune.vlvblueberrysystem.entity.Cama;
 import com.keraune.vlvblueberrysystem.entity.Clasificacion;
-import com.keraune.vlvblueberrysystem.entity.Lote;
-import com.keraune.vlvblueberrysystem.entity.User;
-import com.keraune.vlvblueberrysystem.repository.CamaRepository;
 import com.keraune.vlvblueberrysystem.repository.ClasificacionRepository;
-import com.keraune.vlvblueberrysystem.repository.LoteRepository;
-import com.keraune.vlvblueberrysystem.repository.UserRepository;
-import java.time.LocalDate;
-import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
+@Transactional
 public class ClasificacionService {
-
     private final ClasificacionRepository clasificacionRepository;
-    private final LoteRepository loteRepository;
-    private final CamaRepository camaRepository;
-    private final UserRepository userRepository;
+    private final AccountService accountService;
+    private final OperationReferenceService references;
+    private final ApiRecordMapper mapper;
 
-    public ClasificacionService(ClasificacionRepository clasificacionRepository, LoteRepository loteRepository,
-                                CamaRepository camaRepository, UserRepository userRepository) {
+    public ClasificacionService(ClasificacionRepository clasificacionRepository, AccountService accountService, OperationReferenceService references, ApiRecordMapper mapper) {
         this.clasificacionRepository = clasificacionRepository;
-        this.loteRepository = loteRepository;
-        this.camaRepository = camaRepository;
-        this.userRepository = userRepository;
+        this.accountService = accountService;
+        this.references = references;
+        this.mapper = mapper;
     }
 
     @Transactional(readOnly = true)
-    public List<Clasificacion> listarTodas() {
-        return clasificacionRepository.findAllByOrderByFechaClasificacionDescIdDesc();
+    public List<ClasificacionResponse> list() {
+        return clasificacionRepository.findAllByOrderByFechaClasificacionDescIdDesc().stream().map(mapper::clasificacion).toList();
     }
 
-    @Transactional
-    public void crearClasificacion(ClasificacionForm form, String username) {
-        Lote lote = obtenerLote(form.getLoteId());
-        Cama cama = obtenerCamaValida(form.getCamaId(), lote.getId());
-        User usuario = obtenerUsuario(username);
-
-        Clasificacion clasificacion = new Clasificacion();
-        clasificacion.setLote(lote);
-        clasificacion.setCama(cama);
-        clasificacion.setFechaClasificacion(form.getFechaClasificacion());
-        clasificacion.setEstadoPlanta(normalizar(form.getEstadoPlanta()));
-        clasificacion.setTamano(normalizar(form.getTamano()));
-        clasificacion.setCondicion(normalizar(form.getCondicion()));
-        clasificacion.setCantidad(form.getCantidad());
-        clasificacion.setObservacion(normalizarOpcional(form.getObservacion()));
-        clasificacion.setEstado(normalizarEstado(form.getEstado(), "PENDIENTE"));
-        clasificacion.setUsuarioRegistro(usuario);
-        clasificacionRepository.save(clasificacion);
+    public List<ClasificacionResponse> create(ClasificacionForm form) {
+        Clasificacion entity = new Clasificacion();
+        entity.setUsuarioRegistro(accountService.currentUser());
+        apply(entity, form);
+        clasificacionRepository.save(entity);
+        return list();
     }
 
-    @Transactional
-    public void actualizarClasificacion(Long id, ClasificacionForm form) {
-        Clasificacion clasificacion = clasificacionRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró la clasificación solicitada."));
-        Lote lote = obtenerLote(form.getLoteId());
-        Cama cama = obtenerCamaValida(form.getCamaId(), lote.getId());
-
-        clasificacion.setLote(lote);
-        clasificacion.setCama(cama);
-        clasificacion.setFechaClasificacion(form.getFechaClasificacion());
-        clasificacion.setEstadoPlanta(normalizar(form.getEstadoPlanta()));
-        clasificacion.setTamano(normalizar(form.getTamano()));
-        clasificacion.setCondicion(normalizar(form.getCondicion()));
-        clasificacion.setCantidad(form.getCantidad());
-        clasificacion.setObservacion(normalizarOpcional(form.getObservacion()));
-        clasificacion.setEstado(normalizarEstado(form.getEstado(), "PENDIENTE"));
-        clasificacionRepository.save(clasificacion);
+    public List<ClasificacionResponse> update(Long id, ClasificacionForm form) {
+        Clasificacion entity = clasificacionRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Clasificación no encontrada"));
+        apply(entity, form);
+        return list();
     }
 
-    @Transactional
-    public void cambiarEstado(Long id, String nuevoEstado) {
-        Clasificacion clasificacion = clasificacionRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró la clasificación solicitada."));
-        clasificacion.setEstado(normalizarEstado(nuevoEstado, "PENDIENTE"));
-        clasificacionRepository.save(clasificacion);
+    public List<ClasificacionResponse> changeStatus(Long id, String estado) {
+        Clasificacion entity = clasificacionRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Clasificación no encontrada"));
+        entity.setEstado(references.clean(estado, "PENDIENTE"));
+        return list();
     }
 
-    public ClasificacionForm crearFormularioInicial() {
-        ClasificacionForm form = new ClasificacionForm();
-        form.setFechaClasificacion(LocalDate.now());
-        form.setEstado("PENDIENTE");
-        return form;
-    }
-
-    private Lote obtenerLote(Long loteId) {
-        return loteRepository.findById(loteId)
-                .orElseThrow(() -> new IllegalArgumentException("El invernadero seleccionado no existe."));
-    }
-
-    private Cama obtenerCamaValida(Long camaId, Long loteId) {
-        Cama cama = camaRepository.findById(camaId)
-                .orElseThrow(() -> new IllegalArgumentException("La cama seleccionada no existe."));
-        if (cama.getLote() == null || !cama.getLote().getId().equals(loteId)) {
-            throw new IllegalArgumentException("La cama seleccionada no pertenece al invernadero elegido.");
-        }
-        return cama;
-    }
-
-    private User obtenerUsuario(String username) {
-        return userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró el usuario autenticado."));
-    }
-
-    private String normalizar(String valor) {
-        return valor == null ? null : valor.trim();
-    }
-
-    private String normalizarOpcional(String valor) {
-        String texto = normalizar(valor);
-        return (texto == null || texto.isBlank()) ? null : texto;
-    }
-
-    private String normalizarEstado(String estado, String estadoPorDefecto) {
-        String valor = normalizar(estado);
-        return (valor == null || valor.isBlank()) ? estadoPorDefecto : valor.toUpperCase();
+    private void apply(Clasificacion entity, ClasificacionForm form) {
+        entity.setLote(references.lote(form.loteId()));
+        entity.setCama(references.camaDelLote(form.camaId(), form.loteId()));
+        entity.setFechaClasificacion(form.fechaClasificacion());
+        entity.setEstadoPlanta(form.estadoPlanta().trim());
+        entity.setTamano(form.tamano().trim());
+        entity.setCondicion(form.condicion().trim());
+        entity.setCantidad(form.cantidad());
+        entity.setObservacion(references.trim(form.observacion()));
+        entity.setEstado(references.clean(form.estado(), "PENDIENTE"));
     }
 }

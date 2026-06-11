@@ -1,124 +1,65 @@
 package com.keraune.vlvblueberrysystem.service;
 
+import com.keraune.vlvblueberrysystem.api.dto.ApiPayloads.LoteResponse;
+import com.keraune.vlvblueberrysystem.api.mapper.ApiRecordMapper;
 import com.keraune.vlvblueberrysystem.dto.LoteForm;
 import com.keraune.vlvblueberrysystem.entity.Lote;
-import com.keraune.vlvblueberrysystem.entity.User;
 import com.keraune.vlvblueberrysystem.repository.LoteRepository;
-import com.keraune.vlvblueberrysystem.repository.UserRepository;
-import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
+@Transactional
 public class LoteService {
-
     private final LoteRepository loteRepository;
-    private final UserRepository userRepository;
+    private final AccountService accountService;
+    private final ApiRecordMapper mapper;
 
-    public LoteService(LoteRepository loteRepository, UserRepository userRepository) {
+    public LoteService(LoteRepository loteRepository, AccountService accountService, ApiRecordMapper mapper) {
         this.loteRepository = loteRepository;
-        this.userRepository = userRepository;
+        this.accountService = accountService;
+        this.mapper = mapper;
     }
 
     @Transactional(readOnly = true)
-    public List<Lote> listarTodos() {
-        return loteRepository.findAllByOrderByFechaRegistroDescIdDesc();
+    public List<LoteResponse> list() {
+        return loteRepository.findAllByOrderByFechaRegistroDescIdDesc().stream().map(mapper::lote).toList();
     }
 
-    @Transactional(readOnly = true)
-    public Lote obtenerPorId(Long id) {
-        return loteRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró el invernadero solicitado."));
-    }
-
-    @Transactional
-    public void crearLote(LoteForm form, String username) {
-        String codigoNormalizado = normalizar(form.getCodigo()).toUpperCase();
-        validarCodigoDuplicado(codigoNormalizado, null);
-
-        User usuario = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró el usuario autenticado."));
-
+    public List<LoteResponse> create(LoteForm form) {
         Lote lote = new Lote();
-        aplicarFormulario(lote, form, codigoNormalizado);
-        lote.setUsuarioRegistro(usuario);
+        lote.setUsuarioRegistro(accountService.currentUser());
+        apply(lote, form);
         loteRepository.save(lote);
+        return list();
     }
 
-    @Transactional
-    public void actualizarLote(Long id, LoteForm form) {
-        Lote lote = obtenerPorId(id);
-        String codigoNormalizado = normalizar(form.getCodigo()).toUpperCase();
-        validarCodigoDuplicado(codigoNormalizado, id);
-        aplicarFormulario(lote, form, codigoNormalizado);
-        loteRepository.save(lote);
+    public List<LoteResponse> update(Long id, LoteForm form) {
+        Lote lote = loteRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Lote no encontrado"));
+        apply(lote, form);
+        return list();
     }
 
-    @Transactional
-    public void cambiarEstado(Long id) {
-        Lote lote = obtenerPorId(id);
-        if ("ACTIVO".equalsIgnoreCase(lote.getEstado())) {
-            lote.setEstado("INACTIVO");
-        } else {
-            lote.setEstado("ACTIVO");
-        }
-        loteRepository.save(lote);
+    public List<LoteResponse> toggleStatus(Long id) {
+        Lote lote = loteRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Lote no encontrado"));
+        lote.setEstado("ACTIVO".equalsIgnoreCase(lote.getEstado()) ? "INACTIVO" : "ACTIVO");
+        return list();
     }
 
-    @Transactional
-    public void eliminarLogicamente(Long id) {
-        Lote lote = obtenerPorId(id);
-        lote.setEstado("ELIMINADO");
-        loteRepository.save(lote);
+    public List<LoteResponse> delete(Long id) {
+        loteRepository.deleteById(id);
+        return list();
     }
 
-    @Transactional(readOnly = true)
-    public LoteForm construirFormularioDesdeEntidad(Long id) {
-        Lote lote = obtenerPorId(id);
-        LoteForm form = new LoteForm();
-        form.setCodigo(lote.getCodigo());
-        form.setDescripcion(lote.getDescripcion());
-        form.setCultivo(lote.getCultivo());
-        form.setVariedad(lote.getVariedad());
-        form.setFechaRegistro(lote.getFechaRegistro());
-        form.setObservacion(lote.getObservacion());
-        form.setEstado(lote.getEstado());
-        return form;
-    }
-
-    private void aplicarFormulario(Lote lote, LoteForm form, String codigoNormalizado) {
-        lote.setCodigo(codigoNormalizado);
-        lote.setDescripcion(normalizar(form.getDescripcion()));
-        lote.setCultivo(normalizar(form.getCultivo()));
-        lote.setVariedad(normalizar(form.getVariedad()));
-        lote.setFechaRegistro(form.getFechaRegistro());
-        lote.setObservacion(normalizarOpcional(form.getObservacion()));
-        lote.setEstado(normalizarEstado(form.getEstado()));
-    }
-
-    private void validarCodigoDuplicado(String codigo, Long loteIdActual) {
-        loteRepository.findByCodigo(codigo).ifPresent(lote -> {
-            boolean esMismoRegistro = loteIdActual != null && lote.getId().equals(loteIdActual);
-            if (!esMismoRegistro) {
-                throw new IllegalArgumentException("Ya existe un invernadero con ese código.");
-            }
-        });
-    }
-
-    private String normalizar(String valor) {
-        return valor == null ? null : valor.trim();
-    }
-
-    private String normalizarOpcional(String valor) {
-        String texto = normalizar(valor);
-        return (texto == null || texto.isBlank()) ? null : texto;
-    }
-
-    private String normalizarEstado(String estado) {
-        String valor = normalizar(estado);
-        if (valor == null || valor.isBlank()) {
-            return "ACTIVO";
-        }
-        return valor.toUpperCase();
+    private void apply(Lote lote, LoteForm form) {
+        lote.setCodigo(form.codigo().trim().toUpperCase());
+        lote.setDescripcion(form.descripcion().trim());
+        lote.setCultivo(form.cultivo() == null ? null : form.cultivo().trim());
+        lote.setVariedad(form.variedad() == null ? null : form.variedad().trim());
+        lote.setFechaRegistro(form.fechaRegistro());
+        lote.setObservacion(form.observacion() == null ? null : form.observacion().trim());
+        lote.setEstado(form.estado().trim().toUpperCase());
     }
 }

@@ -1,9 +1,10 @@
 package com.keraune.vlvblueberrysystem.dto;
 
-import com.keraune.vlvblueberrysystem.entity.Lote;
-
 public record TrazabilidadRow(
-        Lote lote,
+        Long id,
+        Long loteId,
+        String codigoLote,
+        String descripcionLote,
         long camas,
         long siembras,
         long plantasSembradas,
@@ -13,5 +14,4 @@ public record TrazabilidadRow(
         long despachos,
         long plantasDespachadas,
         String ultimoEvento
-) {
-}
+) {}

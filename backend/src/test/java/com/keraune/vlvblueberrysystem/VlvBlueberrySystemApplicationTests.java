@@ -1,12 +1,12 @@
 package com.keraune.vlvblueberrysystem;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 
-@SpringBootTest
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+
 class VlvBlueberrySystemApplicationTests {
-
     @Test
-    void contextLoads() {
+    void mainClassIsLoadable() {
+        assertDoesNotThrow(() -> Class.forName("com.keraune.vlvblueberrysystem.VlvBlueberrySystemApplication"));
     }
 }

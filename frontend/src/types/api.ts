@@ -343,6 +343,6 @@ export interface CsrfResponse {
 }
 
 export interface LoginPayload {
-  username: string;
+  identifier: string;
   password: string;
 }

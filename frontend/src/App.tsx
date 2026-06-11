@@ -262,7 +262,7 @@ export default function App() {
         await load(controller.signal);
       } catch (exception) {
         if (!controller.signal.aborted) {
-          if (exception instanceof ApiError && exception.status === 401) {
+          if (exception instanceof ApiError && (exception.status === 401 || exception.status === 403)) {
             setAuthRequired(true);
             setError(null);
           } else {
@@ -310,7 +310,7 @@ export default function App() {
       await load();
       pushToast('success', 'Datos sincronizados', 'La información operativa fue actualizada correctamente.');
     } catch (exception) {
-      if (exception instanceof ApiError && exception.status === 401) {
+      if (exception instanceof ApiError && (exception.status === 401 || exception.status === 403)) {
         setAuthRequired(true);
         setUser(null);
         setError(null);

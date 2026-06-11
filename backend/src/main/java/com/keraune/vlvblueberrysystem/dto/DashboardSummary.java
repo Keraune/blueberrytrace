@@ -17,13 +17,12 @@ public record DashboardSummary(
         long clasificacionesValidadas,
         long despachosRegistrados,
         long plantasDespachadas,
-        int porcentajeLotesActivos,
-        int porcentajeCamasActivas,
-        int porcentajeClasificacionesValidadas,
-        int porcentajePlantasDespachadas,
-        int porcentajeUniformizacionesSobreSiembras,
-        int porcentajeFormalizacionesSobreSiembras,
-        int porcentajeClasificacionesSobreSiembras,
-        int porcentajeDespachosSobreSiembras
-) {
-}
+        double porcentajeLotesActivos,
+        double porcentajeCamasActivas,
+        double porcentajeClasificacionesValidadas,
+        double porcentajePlantasDespachadas,
+        double porcentajeUniformizacionesSobreSiembras,
+        double porcentajeFormalizacionesSobreSiembras,
+        double porcentajeClasificacionesSobreSiembras,
+        double porcentajeDespachosSobreSiembras
+) {}

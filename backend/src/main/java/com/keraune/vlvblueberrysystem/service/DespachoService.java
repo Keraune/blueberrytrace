@@ -1,104 +1,66 @@
 package com.keraune.vlvblueberrysystem.service;
 
+import com.keraune.vlvblueberrysystem.api.dto.ApiPayloads.DespachoResponse;
+import com.keraune.vlvblueberrysystem.api.mapper.ApiRecordMapper;
 import com.keraune.vlvblueberrysystem.dto.DespachoForm;
 import com.keraune.vlvblueberrysystem.entity.Despacho;
-import com.keraune.vlvblueberrysystem.entity.Lote;
-import com.keraune.vlvblueberrysystem.entity.User;
 import com.keraune.vlvblueberrysystem.repository.DespachoRepository;
-import com.keraune.vlvblueberrysystem.repository.LoteRepository;
-import com.keraune.vlvblueberrysystem.repository.UserRepository;
-import java.time.LocalDate;
-import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
+@Transactional
 public class DespachoService {
-
     private final DespachoRepository despachoRepository;
-    private final LoteRepository loteRepository;
-    private final UserRepository userRepository;
+    private final AccountService accountService;
+    private final OperationReferenceService references;
+    private final ApiRecordMapper mapper;
 
-    public DespachoService(DespachoRepository despachoRepository, LoteRepository loteRepository,
-                           UserRepository userRepository) {
+    public DespachoService(DespachoRepository despachoRepository, AccountService accountService, OperationReferenceService references, ApiRecordMapper mapper) {
         this.despachoRepository = despachoRepository;
-        this.loteRepository = loteRepository;
-        this.userRepository = userRepository;
+        this.accountService = accountService;
+        this.references = references;
+        this.mapper = mapper;
     }
 
     @Transactional(readOnly = true)
-    public List<Despacho> listarTodos() {
-        return despachoRepository.findAllByOrderByFechaDespachoDescIdDesc();
+    public List<DespachoResponse> list() {
+        return despachoRepository.findAllByOrderByFechaDespachoDescIdDesc().stream().map(mapper::despacho).toList();
     }
 
-    @Transactional
-    public void crearDespacho(DespachoForm form, String username) {
-        Lote lote = loteRepository.findById(form.getLoteId())
-                .orElseThrow(() -> new IllegalArgumentException("El invernadero seleccionado no existe."));
-        User usuario = userRepository.findByUsername(username)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró el usuario autenticado."));
-
-        Despacho despacho = new Despacho();
-        despacho.setLote(lote);
-        despacho.setFechaDespacho(form.getFechaDespacho());
-        despacho.setModalidad(normalizar(form.getModalidad()));
-        despacho.setCantidadDespachada(form.getCantidadDespachada());
-        despacho.setDestino(normalizarOpcional(form.getDestino()));
-        despacho.setGuiaRemision(normalizarOpcional(form.getGuiaRemision()));
-        despacho.setValidacionCalidad(normalizar(form.getValidacionCalidad()));
-        despacho.setObservacion(normalizarOpcional(form.getObservacion()));
-        despacho.setEstado(normalizarEstado(form.getEstado(), "REGISTRADO"));
-        despacho.setUsuarioRegistro(usuario);
-        despachoRepository.save(despacho);
+    public List<DespachoResponse> create(DespachoForm form) {
+        Despacho entity = new Despacho();
+        entity.setUsuarioRegistro(accountService.currentUser());
+        apply(entity, form);
+        despachoRepository.save(entity);
+        return list();
     }
 
-    @Transactional
-    public void actualizarDespacho(Long id, DespachoForm form) {
-        Despacho despacho = despachoRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró el despacho solicitado."));
-        Lote lote = loteRepository.findById(form.getLoteId())
-                .orElseThrow(() -> new IllegalArgumentException("El invernadero seleccionado no existe."));
-
-        despacho.setLote(lote);
-        despacho.setFechaDespacho(form.getFechaDespacho());
-        despacho.setModalidad(normalizar(form.getModalidad()));
-        despacho.setCantidadDespachada(form.getCantidadDespachada());
-        despacho.setDestino(normalizarOpcional(form.getDestino()));
-        despacho.setGuiaRemision(normalizarOpcional(form.getGuiaRemision()));
-        despacho.setValidacionCalidad(normalizar(form.getValidacionCalidad()));
-        despacho.setObservacion(normalizarOpcional(form.getObservacion()));
-        despacho.setEstado(normalizarEstado(form.getEstado(), "REGISTRADO"));
-        despachoRepository.save(despacho);
+    public List<DespachoResponse> update(Long id, DespachoForm form) {
+        Despacho entity = despachoRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Despacho no encontrado"));
+        apply(entity, form);
+        return list();
     }
 
-    @Transactional
-    public void cambiarEstado(Long id, String nuevoEstado) {
-        Despacho despacho = despachoRepository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("No se encontró el despacho solicitado."));
-        despacho.setEstado(normalizarEstado(nuevoEstado, "REGISTRADO"));
-        despachoRepository.save(despacho);
+    public List<DespachoResponse> changeStatus(Long id, String estado) {
+        Despacho entity = despachoRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Despacho no encontrado"));
+        entity.setEstado(references.clean(estado, "REGISTRADO"));
+        return list();
     }
 
-    public DespachoForm crearFormularioInicial() {
-        DespachoForm form = new DespachoForm();
-        form.setFechaDespacho(LocalDate.now());
-        form.setEstado("REGISTRADO");
-        form.setModalidad("JABAS");
-        form.setValidacionCalidad("APROBADO");
-        return form;
-    }
-
-    private String normalizar(String valor) {
-        return valor == null ? null : valor.trim();
-    }
-
-    private String normalizarOpcional(String valor) {
-        String texto = normalizar(valor);
-        return (texto == null || texto.isBlank()) ? null : texto;
-    }
-
-    private String normalizarEstado(String estado, String estadoPorDefecto) {
-        String valor = normalizar(estado);
-        return (valor == null || valor.isBlank()) ? estadoPorDefecto : valor.toUpperCase();
+    private void apply(Despacho entity, DespachoForm form) {
+        entity.setLote(references.lote(form.loteId()));
+        entity.setFechaDespacho(form.fechaDespacho());
+        entity.setModalidadDespacho(references.clean(form.modalidad(), "JABAS"));
+        entity.setModalidad(entity.getModalidadDespacho());
+        entity.setCantidadDespachada(form.cantidadDespachada());
+        entity.setCantidad(form.cantidadDespachada());
+        entity.setDestino(references.trim(form.destino()));
+        entity.setGuiaRemision(references.trim(form.guiaRemision()));
+        entity.setValidacionCalidad(form.validacionCalidad().trim());
+        entity.setObservacion(references.trim(form.observacion()));
+        entity.setEstado(references.clean(form.estado(), "REGISTRADO"));
     }
 }

@@ -1,67 +1,52 @@
 package com.keraune.vlvblueberrysystem.config;
 
-import com.keraune.vlvblueberrysystem.security.CustomUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
+@EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfig {
-
-    private final CustomUserDetailsService customUserDetailsService;
-
-    public SecurityConfig(CustomUserDetailsService customUserDetailsService) {
-        this.customUserDetailsService = customUserDetailsService;
-    }
-
+    /**
+     * Configuración API-first: React consume /api/v1/**, Spring mantiene sesión segura,
+     * CSRF activo y login JSON controlado por ApiAuthController.
+     */
     @Bean
-    public SecurityFilterChain apiSecurityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authenticationProvider(authenticationProvider())
                 .cors(Customizer.withDefaults())
+                .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/",
-                                "/api/v1/health",
-                                "/api/v1/auth/csrf",
-                                "/api/v1/auth/login",
-                                "/api/v1/frontend/bootstrap",
-                                "/favicon.ico",
-                                "/error")
-                        .permitAll()
-                        .anyRequest().authenticated())
+                        .requestMatchers("/api/v1/health", "/api/v1/auth/csrf", "/api/v1/auth/login", "/api/v1/frontend/bootstrap").permitAll()
+                        .requestMatchers("/api/v1/**").authenticated()
+                        .anyRequest().permitAll())
                 .formLogin(form -> form.disable())
-                .logout(logout -> logout.disable())
+                .httpBasic(basic -> basic.disable())
                 .exceptionHandling(exceptions -> exceptions
                         .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
-                .csrf(Customizer.withDefaults());
-
+                .logout(logout -> logout.logoutUrl("/api/v1/auth/logout"));
         return http.build();
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
+    PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public DaoAuthenticationProvider authenticationProvider() {
-        DaoAuthenticationProvider provider = new DaoAuthenticationProvider(customUserDetailsService);
-        provider.setPasswordEncoder(passwordEncoder());
-        return provider;
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+    AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
         return configuration.getAuthenticationManager();
     }
 }

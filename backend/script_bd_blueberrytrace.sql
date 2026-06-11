@@ -1,20 +1,22 @@
 -- =========================================================
 -- BlueberryTrace - Script base de datos MySQL
 -- Sistema de trazabilidad de arándanos - Vivero Los Viñedos
--- Versión recomendada para el backend MVC actual
+-- Versión recomendada para el backend API REST actual
+-- Ejecutar como script completo, no como una sola sentencia aislada.
 -- =========================================================
 
 -- Opcional para reiniciar desde cero:
 -- DROP DATABASE IF EXISTS vlv_blueberry_system;
 
-CREATE DATABASE IF NOT EXISTS vlv_blueberry_system
-CHARACTER SET utf8mb4
-COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS `vlv_blueberry_system`
+DEFAULT CHARACTER SET = utf8mb4
+DEFAULT COLLATE = utf8mb4_unicode_ci;
 
-USE vlv_blueberry_system;
+USE `vlv_blueberry_system`;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
+DROP TABLE IF EXISTS auditoria_operaciones;
 DROP TABLE IF EXISTS despachos;
 DROP TABLE IF EXISTS clasificaciones;
 DROP TABLE IF EXISTS formalizaciones;
@@ -23,6 +25,7 @@ DROP TABLE IF EXISTS siembras;
 DROP TABLE IF EXISTS camas;
 DROP TABLE IF EXISTS lotes;
 DROP TABLE IF EXISTS usuarios;
+DROP TABLE IF EXISTS variedades;
 DROP TABLE IF EXISTS roles;
 
 SET FOREIGN_KEY_CHECKS = 1;
@@ -35,7 +38,8 @@ CREATE TABLE roles (
     nombre VARCHAR(50) NOT NULL UNIQUE,
     descripcion VARCHAR(255),
     estado BOOLEAN NOT NULL DEFAULT TRUE,
-    fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+    fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion DATETIME NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =========================================================
@@ -48,11 +52,28 @@ CREATE TABLE usuarios (
     username VARCHAR(50) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL,
     email VARCHAR(120),
+    cargo VARCHAR(90),
+    telefono VARCHAR(30),
+    avatar_color VARCHAR(30) DEFAULT 'emerald',
     estado BOOLEAN NOT NULL DEFAULT TRUE,
     fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     fecha_actualizacion DATETIME NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_usuarios_roles
         FOREIGN KEY (rol_id) REFERENCES roles(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+
+-- =========================================================
+-- 2.1 VARIEDADES REFERENCIALES
+-- =========================================================
+CREATE TABLE variedades (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    codigo VARCHAR(30) NOT NULL UNIQUE,
+    nombre VARCHAR(120) NOT NULL,
+    descripcion VARCHAR(255),
+    estado BOOLEAN NOT NULL DEFAULT TRUE,
+    fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    fecha_actualizacion DATETIME NULL DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- =========================================================
@@ -244,6 +265,26 @@ CREATE INDEX idx_despachos_lote ON despachos(lote_id);
 CREATE INDEX idx_despachos_fecha ON despachos(fecha_despacho);
 CREATE INDEX idx_despachos_estado ON despachos(estado);
 
+
+-- =========================================================
+-- 10. AUDITORÍA OPERATIVA REFERENCIAL
+-- =========================================================
+CREATE TABLE auditoria_operaciones (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    usuario_id BIGINT NULL,
+    modulo VARCHAR(80) NOT NULL,
+    accion VARCHAR(80) NOT NULL,
+    entidad VARCHAR(80),
+    entidad_id BIGINT,
+    descripcion VARCHAR(255),
+    fecha_creacion DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_auditoria_usuario
+        FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE INDEX idx_auditoria_modulo ON auditoria_operaciones(modulo);
+CREATE INDEX idx_auditoria_fecha ON auditoria_operaciones(fecha_creacion);
+
 -- =========================================================
 -- DATOS INICIALES
 -- =========================================================
@@ -253,6 +294,11 @@ INSERT IGNORE INTO roles (nombre, descripcion, estado) VALUES
 ('CONTABILIZADOR', 'Registra conteos y cantidades', TRUE),
 ('OPERARIO', 'Registra actividades operativas', TRUE),
 ('CONTROL_CALIDAD', 'Valida calidad y despacho', TRUE);
+
+INSERT IGNORE INTO variedades (codigo, nombre, descripcion, estado) VALUES
+('BILOXI', 'Biloxi', 'Variedad referencial de arándano', TRUE),
+('VENTURA', 'Ventura', 'Variedad referencial de arándano', TRUE),
+('EMERALD', 'Emerald', 'Variedad referencial de arándano', TRUE);
 
 -- Nota:
 -- El usuario admin se crea automáticamente desde DataInitializer con:

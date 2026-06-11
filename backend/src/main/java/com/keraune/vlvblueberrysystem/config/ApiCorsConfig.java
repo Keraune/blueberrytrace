@@ -1,38 +1,29 @@
 package com.keraune.vlvblueberrysystem.config;
 
-import java.util.Arrays;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.CorsRegistration;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Configuration
-public class ApiCorsConfig implements WebMvcConfigurer {
-
-    @Value("${blueberrytrace.api.cors.allowed-origins:http://localhost:5173,http://localhost:3000}")
+public class ApiCorsConfig {
+    @Value("${blueberrytrace.api.cors.allowed-origins:http://localhost:5173}")
     private String allowedOrigins;
 
-    @Override
-    public void addCorsMappings(CorsRegistry registry) {
-        configure(registry.addMapping("/api/**"));
-        configure(registry.addMapping("/login"));
-        configure(registry.addMapping("/logout"));
-    }
-
-    private void configure(CorsRegistration registration) {
-        registration
-                .allowedOrigins(parseOrigins())
-                .allowedMethods("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
-                .allowedHeaders("*")
-                .allowCredentials(true)
-                .maxAge(3600);
-    }
-
-    private String[] parseOrigins() {
-        return Arrays.stream(allowedOrigins.split(","))
-                .map(String::trim)
-                .filter(origin -> !origin.isBlank())
-                .toArray(String[]::new);
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        configuration.setAllowedOrigins(Arrays.stream(allowedOrigins.split(",")).map(String::trim).filter(s -> !s.isBlank()).toList());
+        configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(List.of("Content-Type", "X-Requested-With", "X-CSRF-TOKEN", "X-XSRF-TOKEN"));
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/api/v1/**", configuration);
+        return source;
     }
 }

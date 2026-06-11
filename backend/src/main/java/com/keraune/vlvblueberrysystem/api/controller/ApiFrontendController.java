@@ -1,27 +1,27 @@
 package com.keraune.vlvblueberrysystem.api.controller;
 
-import com.keraune.vlvblueberrysystem.api.dto.ApiPayloads.ApiResponse;
-import com.keraune.vlvblueberrysystem.api.dto.ApiPayloads.FrontendBootstrapResponse;
-import java.util.List;
+import com.keraune.vlvblueberrysystem.api.dto.ApiPayloads.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/frontend")
 public class ApiFrontendController {
-
     @GetMapping("/bootstrap")
     public ApiResponse<FrontendBootstrapResponse> bootstrap() {
+        PaletteResponse palette = new PaletteResponse("#082817", "#227848", "#1c97d8", "#7c3aed", "#84cc16", "#f59e0b", "#ffffff", "#eef3ef");
         FrontendBootstrapResponse response = new FrontendBootstrapResponse(
                 "BlueberryTrace",
                 "v1",
-                "Interfaz operativa principal para el control de trazabilidad",
-                List.of("React", "Vue"),
+                "React + Spring Boot API REST",
+                List.of("React", "Vite", "TypeScript"),
                 ApiModuleMetadata.endpoints(),
                 ApiModuleMetadata.modules(),
-                ApiModuleMetadata.palette()
+                palette
         );
-        return ApiResponse.ok("Configuración frontend cargada correctamente.", response);
+        return ApiResponse.ok("Configuración frontend cargada", response);
     }
 }

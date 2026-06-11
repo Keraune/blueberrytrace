@@ -320,7 +320,7 @@ export function TrazabilidadPage({ lotes, camas, siembras, procesos, clasificaci
           </article>
 
           <article className="panel-card trace-flow-card">
-            <div className="panel-card__header"><div><h2>Flujo del lote seleccionado</h2><p>Vista resumida del avance por etapa.</p></div></div>
+            <div className="panel-card__header"><div><h2>Flujo del lote seleccionado</h2><p>Vista resumida del progreso por etapa.</p></div></div>
             <div className="trace-stage-row">
               <div className={selectedRow.siembras > 0 ? 'trace-stage trace-stage--done' : 'trace-stage'}><Sprout size={18} /><strong>Siembra</strong><span>{selectedRow.siembras}</span></div>
               <div className={selectedRow.uniformizaciones > 0 ? 'trace-stage trace-stage--done' : 'trace-stage'}><Leaf size={18} /><strong>Uniformización</strong><span>{selectedRow.uniformizaciones}</span></div>

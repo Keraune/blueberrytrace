@@ -1,21 +1,58 @@
 # BlueberryTrace
 
-Sistema web interno para el control, clasificación y trazabilidad de plantas de arándano para exportación en el área de frutales de **Vivero Los Viñedos**.
+BlueberryTrace es un sistema web interno para el control, clasificación y trazabilidad de plantas de arándano para exportación en el área de frutales de **Vivero Los Viñedos**.
 
-BlueberryTrace permite centralizar la información operativa del proceso productivo, reduciendo la dependencia de registros manuales, hojas de cálculo dispersas y consultas lentas de información histórica. El sistema permite gestionar lotes, camas, siembras, procesos productivos, clasificación, despacho, reportes y trazabilidad por lote.
+La solución permite registrar y consultar información operativa desde el lote inicial hasta el despacho final, manteniendo relación entre usuarios, roles, lotes, camas, siembras, uniformizaciones, formalizaciones, clasificaciones, despachos, reportes y trazabilidad.
 
 ---
 
-## Descripción general
+## Stack tecnológico
 
-BlueberryTrace está orientado a mejorar el control operativo del proceso de plantas de arándano, desde el registro inicial del lote hasta el despacho final. La solución permite registrar información real, consultar el historial de cada lote y generar reportes útiles para la supervisión del área de frutales.
+### Backend
 
-El sistema utiliza una arquitectura web desacoplada:
+- Java 21
+- Spring Boot
+- Spring Security
+- Spring Data JPA
+- Hibernate
+- MySQL Connector/J
+- Jackson
+- Logback
+- Maven
 
-* **Frontend:** React, Vite, TypeScript, HTML y CSS.
-* **Backend:** Java 21, Spring Boot, Spring Security y API REST.
-* **Persistencia:** Spring Data JPA, Hibernate y MySQL.
-* **Gestión del proyecto:** Maven, Git y GitHub.
+### Frontend
+
+- React
+- Vite
+- TypeScript
+- HTML
+- CSS
+- Lucide React
+
+### Base de datos y control de versiones
+
+- MySQL
+- Git
+- GitHub
+
+---
+
+## Arquitectura
+
+El proyecto usa una arquitectura web desacoplada:
+
+- **Frontend React:** capa visual y experiencia de usuario.
+- **Backend Spring Boot API REST:** controladores, servicios, seguridad y reglas de negocio.
+- **Spring Data JPA / Hibernate:** capa DAO/JPA para persistencia.
+- **MySQL:** almacenamiento transaccional de la operación.
+
+La API principal se expone bajo:
+
+```text
+/api/v1/**
+```
+
+El backend no utiliza vistas Thymeleaf ni HTML del lado servidor. La interfaz final es el cliente React.
 
 ---
 
@@ -23,159 +60,115 @@ El sistema utiliza una arquitectura web desacoplada:
 
 ```text
 blueberrytrace/
-├── pom.xml               # agregador Maven
-├── package.json          # scripts de workspace
-├── backend/              # API REST con Spring Boot, seguridad, servicios, JPA y MySQL
-├── frontend/             # interfaz web con React, TypeScript y Vite
-├── docs/                 # documentación técnica y funcional
-├── scripts/              # utilidades de ejecución y mantenimiento
+├── backend/                    # API REST Java 21 + Spring Boot
+│   ├── src/main/java/           # controladores, servicios, entidades, repositorios, seguridad
+│   ├── src/main/resources/      # application.properties
+│   ├── src/test/java/           # pruebas unitarias mínimas
+│   ├── pom.xml
+│   └── script_bd_blueberrytrace.sql
+├── frontend/                   # cliente React + Vite + TypeScript
+│   ├── src/components/
+│   ├── src/pages/
+│   ├── src/lib/
+│   ├── src/types/
+│   ├── package.json
+│   └── .env.example
+├── docs/                       # matriz APF3 y guía de exposición práctica
+├── scripts/                    # utilidades de ejecución y diagnóstico
+├── pom.xml                     # agregador Maven
+├── package.json                # scripts de workspace
 └── README.md
 ```
 
 ---
 
-## Arquitectura del sistema
-
-BlueberryTrace trabaja bajo una arquitectura **API REST desacoplada**, donde el frontend y el backend se ejecutan como capas independientes.
-
-### Frontend
-
-La interfaz principal está desarrollada con React, Vite y TypeScript. Esta capa se encarga de mostrar las pantallas del sistema, formularios, tablas, dashboard, reportes, trazabilidad, modales, notificaciones y navegación interna.
-
-### Backend
-
-El backend está desarrollado con Java 21 y Spring Boot. Expone servicios REST bajo la ruta `/api/v1/**`, gestiona reglas de negocio, validaciones, autenticación, autorización y comunicación con la base de datos.
-
-### Base de datos
-
-La información se almacena en MySQL mediante Spring Data JPA e Hibernate. Las entidades principales del sistema están relacionadas para conservar trazabilidad entre usuarios, lotes, camas, siembras, procesos, clasificaciones y despachos.
-
----
-
-## Módulos principales
-
-BlueberryTrace incluye los siguientes módulos:
-
-* Inicio de sesión seguro.
-* Panel operativo con indicadores principales.
-* Gestión de usuarios y roles.
-* Gestión de lotes e invernaderos.
-* Gestión de camas.
-* Registro de siembra.
-* Uniformización y formalización.
-* Control de clasificación.
-* Seguimiento de despacho.
-* Reportes operativos.
-* Trazabilidad por lote.
-* Perfil de usuario.
-* Notificaciones operativas.
-* Exportación CSV e impresión desde navegador.
-
----
-
-## Tecnologías utilizadas
-
-### Backend
-
-* Java 21
-* Spring Boot
-* Spring Security
-* Spring Data JPA
-* Hibernate
-* MySQL Connector/J
-* Jackson
-* Logback
-* Maven
-
-### Frontend
-
-* React
-* TypeScript
-* Vite
-* Lucide React
-* HTML
-* CSS
-
-### Herramientas de desarrollo
-
-* Git
-* GitHub
-* Maven Wrapper
-* npm
-
----
-
 ## Requisitos
 
-Antes de ejecutar el proyecto, se requiere tener instalado:
-
-* Java 21
-* Node.js
-* npm
-* MySQL
-* Git
+- Java 21
+- Node.js y npm
+- MySQL 8 o compatible
+- Git
+- Maven o Maven Wrapper funcional
 
 ---
 
-## Configuración de base de datos
+## Configuración de MySQL
 
-Crear la base de datos en MySQL:
+Crear la base de datos:
 
 ```sql
-CREATE DATABASE vlv_blueberry_system
-CHARACTER SET utf8mb4
-COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS `vlv_blueberry_system`
+DEFAULT CHARACTER SET = utf8mb4
+DEFAULT COLLATE = utf8mb4_unicode_ci;
 ```
 
-Configurar credenciales mediante variables de entorno o desde el archivo de configuración del backend.
-
-Ejemplo con variables de entorno:
-
-```bash
-DB_USERNAME=root DB_PASSWORD=12345678 npm run backend:run
-```
-
-Configuración esperada:
+También puedes ejecutar el script base completo:
 
 ```text
-Base de datos: vlv_blueberry_system
-Usuario: root
-Contraseña: según configuración local
-Puerto MySQL: 3306
+backend/script_bd_blueberrytrace.sql
+```
+
+En DBeaver, HeidiSQL o clientes similares, ejecútalo como **script completo**. Si el cliente intenta correr todo como una sola sentencia y marca error cerca de `USE`, usa la opción de ejecutar script, no la opción de ejecutar solo la sentencia actual.
+
+Si tu servidor local es MariaDB, el proyecto ya usa `MariaDBDialect` por defecto para evitar advertencias de Hibernate 7. En MySQL Server puro puedes sobrescribirlo con `JPA_DATABASE_PLATFORM=org.hibernate.dialect.MySQLDialect`.
+
+Configuración por defecto del backend:
+
+```properties
+spring.datasource.url=jdbc:mysql://localhost:3306/vlv_blueberry_system?useSSL=false&serverTimezone=America/Lima&allowPublicKeyRetrieval=true
+spring.datasource.username=root
+spring.datasource.password=12345678
+```
+
+Puedes sobreescribir credenciales usando variables de entorno:
+
+```bash
+DB_USERNAME=root DB_PASSWORD=tu_password npm run backend:run
 ```
 
 ---
 
-## Variables de entorno del frontend
+## Variables del frontend
 
-Crear el archivo `.env` dentro de `frontend/` tomando como referencia `.env.example`.
-
-```bash
-cd frontend
-cp .env.example .env
-```
-
-Valores recomendados:
+Crear o revisar `frontend/.env`:
 
 ```env
 VITE_BLUEBERRYTRACE_API_BASE=http://localhost:8080/api/v1
 VITE_BLUEBERRYTRACE_BACKEND_ORIGIN=http://localhost:8080
 ```
 
+`VITE_BLUEBERRYTRACE_API_BASE` debe apuntar al backend Spring Boot.
+
 ---
 
-## Ejecución del proyecto
+## Instalación
 
-Desde la raíz del proyecto, preparar permisos de ejecución:
+Desde la raíz del proyecto:
 
 ```bash
-npm run setup:permissions
+npm ci
 ```
+
+Instalar dependencias solo del frontend:
+
+```bash
+npm --prefix frontend ci
+```
+
+---
+
+## Ejecución
 
 Ejecutar backend:
 
 ```bash
 npm run backend:run
+```
+
+Ejecutar backend en puerto alternativo:
+
+```bash
+SERVER_PORT=8081 npm run backend:run
 ```
 
 Ejecutar frontend:
@@ -190,7 +183,7 @@ Abrir la aplicación:
 http://localhost:5173
 ```
 
-Verificar estado de la API:
+Verificar estado del backend:
 
 ```text
 http://localhost:8080/api/v1/health
@@ -198,44 +191,57 @@ http://localhost:8080/api/v1/health
 
 ---
 
-## Comandos disponibles
+## Compilación y pruebas
 
-### Backend
-
-```bash
-npm run backend:run
-npm run backend:run:alt
-npm run backend:test
-npm run backend:package
-npm run backend:port
-npm run backend:kill
-```
-
-### Frontend
+Compilar frontend:
 
 ```bash
-npm run frontend:dev
 npm run frontend:build
-npm run frontend:preview
 ```
 
-### Workspace
+Ejecutar pruebas backend:
 
 ```bash
-npm run setup:permissions
-npm run doctor
+npm run backend:test
+```
+
+Empaquetar backend:
+
+```bash
+npm run backend:package
 ```
 
 ---
 
 ## Credenciales iniciales
 
+El backend crea un usuario administrador inicial cuando no existe en MySQL:
+
 ```text
 Usuario: admin
+Correo: admin@vlv.com
 Contraseña: admin123
 ```
 
-Estas credenciales permiten ingresar al sistema con un usuario administrador inicial.
+El inicio de sesión acepta usuario o correo.
+
+---
+
+## Módulos funcionales
+
+- Inicio de sesión seguro con sesión y CSRF.
+- Dashboard operativo con indicadores generales.
+- Usuarios y roles.
+- Lotes e invernaderos.
+- Camas productivas.
+- Siembras.
+- Uniformizaciones y formalizaciones.
+- Clasificaciones.
+- Despachos.
+- Trazabilidad por lote.
+- Reportes operativos.
+- Perfil de usuario y cambio de contraseña.
+- Exportación CSV desde el frontend.
 
 ---
 
@@ -248,6 +254,8 @@ POST   /api/v1/auth/login
 POST   /api/v1/auth/logout
 GET    /api/v1/frontend/bootstrap
 GET    /api/v1/session/me
+PUT    /api/v1/session/me
+PATCH  /api/v1/session/me/password
 GET    /api/v1/dashboard/summary
 GET    /api/v1/catalogs/operations
 
@@ -270,7 +278,11 @@ DELETE /api/v1/siembras/{id}
 
 GET    /api/v1/procesos
 POST   /api/v1/procesos/uniformizaciones
+PUT    /api/v1/procesos/uniformizaciones/{id}
+PATCH  /api/v1/procesos/uniformizaciones/{id}/estado
 POST   /api/v1/procesos/formalizaciones
+PUT    /api/v1/procesos/formalizaciones/{id}
+PATCH  /api/v1/procesos/formalizaciones/{id}/estado
 
 GET    /api/v1/clasificaciones
 POST   /api/v1/clasificaciones
@@ -287,68 +299,18 @@ GET    /api/v1/usuarios
 POST   /api/v1/usuarios
 PUT    /api/v1/usuarios/{id}
 PATCH  /api/v1/usuarios/{id}/estado
+GET    /api/v1/roles
 ```
 
 ---
 
-## Funcionalidades implementadas
+## Base de datos
 
-### Autenticación y seguridad
-
-* Inicio de sesión desde React.
-* Autenticación mediante backend Spring Boot.
-* Protección de rutas.
-* Gestión de sesión.
-* Validación de usuario activo.
-* Control de roles.
-
-### Gestión operativa
-
-* Registro y edición de lotes.
-* Registro y edición de camas.
-* Registro, edición, anulación y eliminación de siembras.
-* Registro de uniformizaciones.
-* Registro de formalizaciones.
-* Registro y validación de clasificaciones.
-* Registro y seguimiento de despachos.
-
-### Trazabilidad
-
-* Consulta de historial por lote.
-* Relación entre lote, cama, siembra, procesos, clasificación y despacho.
-* Visualización de eventos operativos.
-* Seguimiento desde el inicio del proceso hasta el despacho.
-
-### Reportes
-
-* Reportes por lote.
-* Reportes de siembra.
-* Reportes de clasificación.
-* Reportes de despacho.
-* Exportación CSV compatible con Excel.
-* Impresión o guardado como PDF desde navegador.
-
-### Interfaz de usuario
-
-* Dashboard operativo.
-* Sidebar corporativo.
-* Búsqueda global.
-* Notificaciones operativas.
-* Modales y drawers responsive.
-* Estados visuales con iconos.
-* Perfil editable del usuario.
-* Diseño moderno orientado a uso interno.
-
----
-
-## Diseño de base de datos
-
-El modelo de datos está organizado para conservar trazabilidad del proceso productivo. Las tablas principales son:
+Tablas principales:
 
 ```text
 roles
 usuarios
-variedades
 lotes
 camas
 siembras
@@ -356,25 +318,25 @@ uniformizaciones
 formalizaciones
 clasificaciones
 despachos
-auditoria_operacion
 ```
 
-Cada operación se relaciona con entidades principales como lote, cama y usuario responsable. Esto permite consultar el historial completo del proceso y mantener integridad de la información mediante claves primarias, claves foráneas, restricciones e índices.
+El modelo conserva trazabilidad mediante claves foráneas entre lote, cama, usuario responsable y procesos operativos.
+
+Consultas útiles para ver evidencias:
+
+```sql
+USE vlv_blueberry_system;
+SHOW TABLES;
+SELECT id, username, email, estado FROM usuarios;
+SELECT id, codigo, estado FROM lotes;
+SELECT id, codigo, lote_id, estado FROM camas;
+SELECT id, lote_id, cama_id, cantidad_registrada FROM siembras;
+SELECT id, lote_id, cantidad_despachada, estado FROM despachos;
+```
 
 ---
 
 ## Control de versiones
-
-El proyecto utiliza Git y GitHub para registrar la evolución del código fuente, mantener historial de cambios y organizar el trabajo del equipo.
-
-El repositorio incluye:
-
-* Estructura separada de backend y frontend.
-* Commits descriptivos.
-* Ramas de trabajo.
-* README actualizado.
-* Documentación técnica.
-* Evidencias del desarrollo.
 
 Repositorio oficial:
 
@@ -382,118 +344,18 @@ Repositorio oficial:
 https://github.com/Keraune/blueberrytrace
 ```
 
----
-
-## Documentación
-
-La carpeta `docs/` contiene documentación técnica y funcional del sistema, incluyendo:
-
-* Arquitectura del sistema.
-* Diseño de base de datos.
-* Validaciones funcionales.
-* Evidencias del proyecto.
-* Guías de ejecución.
-* Diagramas y material de soporte.
-
----
-
-## Compilación
-
-Compilar frontend:
+Buenas prácticas recomendadas:
 
 ```bash
-npm run frontend:build
-```
-
-Compilar backend:
-
-```bash
-npm run backend:package
-```
-
-Ejecutar pruebas backend:
-
-```bash
-npm run backend:test
+git status
+git add .
+git commit -m "Consolida backend API REST y mejora presentación APF3"
+git push origin main
 ```
 
 ---
 
-## Solución de problemas
+## Autores
 
-### El puerto 8080 está ocupado
-
-Verificar el puerto:
-
-```bash
-npm run backend:port
-```
-
-Liberar el puerto:
-
-```bash
-npm run backend:kill
-```
-
-Ejecutar nuevamente:
-
-```bash
-npm run backend:run
-```
-
-También puede usarse el puerto alternativo:
-
-```bash
-npm run backend:run:alt
-```
-
-### El frontend no conecta con el backend
-
-Verificar que el backend esté ejecutándose:
-
-```text
-http://localhost:8080/api/v1/health
-```
-
-Revisar el archivo `.env` del frontend:
-
-```env
-VITE_BLUEBERRYTRACE_API_BASE=http://localhost:8080/api/v1
-VITE_BLUEBERRYTRACE_BACKEND_ORIGIN=http://localhost:8080
-```
-
-### No aparecen tablas en MySQL
-
-Verificar que la base de datos exista:
-
-```sql
-SHOW DATABASES;
-USE vlv_blueberry_system;
-SHOW TABLES;
-```
-
-Luego iniciar el backend para que Hibernate cree o actualice las tablas según la configuración del proyecto.
-
----
-
-## Autoría
-
-Proyecto desarrollado por:
-
-* Jiménez Vásquez, Ramón Franschescoli
-* Pisconte Ríos, Rodrigo William
-
-Curso:
-
-```text
-Integrador I: Sistemas Software
-Universidad Tecnológica del Perú
-Ica, Perú
-2026
-```
-
----
-
-## Estado del proyecto
-
-BlueberryTrace cuenta con una implementación funcional de sus módulos principales, integrando frontend React, backend Java Spring Boot, API REST, seguridad, persistencia en MySQL, reportes y trazabilidad por lote.
+- Jiménez Vásquez, Ramón Franschescoli
+- Pisconte Ríos, Rodrigo William

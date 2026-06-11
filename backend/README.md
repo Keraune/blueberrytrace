@@ -1,118 +1,67 @@
 # BlueberryTrace Backend
 
-Backend Spring Boot de BlueberryTrace. Desde la Fase 20 funciona como **API-first** y ya no contiene plantillas HTML Thymeleaf.
+Backend API REST de BlueberryTrace desarrollado con Java 21, Spring Boot, Spring Security, Spring Data JPA, Hibernate y MySQL.
 
 ## Responsabilidades
 
-- Exponer `/api/v1/**`.
-- Autenticación JSON para React.
-- Seguridad con Spring Security, sesión y CSRF.
-- Servicios de negocio.
-- Repositorios JPA.
-- Conexión MySQL.
+- Exponer endpoints bajo `/api/v1/**`.
+- Autenticar usuarios con username o correo.
+- Mantener sesión segura con Spring Security y CSRF.
+- Ejecutar reglas de negocio en servicios.
+- Persistir datos mediante repositorios JPA.
+- Conectar con la base de datos `vlv_blueberry_system`.
 
-## Ejecutar desde la raíz
+## Estructura principal
+
+```text
+src/main/java/com/keraune/vlvblueberrysystem/
+├── api/controller/   # controladores REST
+├── api/dto/          # contratos JSON de la API
+├── api/error/        # manejo centralizado de errores
+├── api/mapper/       # conversión de entidades a DTOs
+├── config/           # seguridad, CORS y datos iniciales
+├── dto/              # formularios de entrada
+├── entity/           # entidades JPA
+├── repository/       # DAO/JPA
+├── security/         # carga de usuarios y login flexible
+└── service/          # reglas de negocio
+```
+
+## Ejecutar
+
+Desde la raíz:
 
 ```bash
 npm run backend:run
 ```
 
-Puerto alternativo:
+Con puerto alternativo:
 
 ```bash
-npm run backend:run:alt
+SERVER_PORT=8081 npm run backend:run
 ```
 
-Build y pruebas:
+## Pruebas y build
 
 ```bash
-npm run backend:package
 npm run backend:test
+npm run backend:package
 ```
 
-## Ejecutar con Maven directamente
+## Credenciales iniciales
 
-Desde la raíz:
-
-```bash
-bash ./mvnw -pl backend spring-boot:run
-bash ./mvnw -pl backend clean package
+```text
+Usuario: admin
+Correo: admin@vlv.com
+Contraseña: admin123
 ```
 
-Desde `backend/`:
+## Endpoints base
 
-```bash
-../mvnw spring-boot:run
-```
-
-## API de autenticación
-
-```http
+```text
+GET  /api/v1/health
 GET  /api/v1/auth/csrf
 POST /api/v1/auth/login
 POST /api/v1/auth/logout
 GET  /api/v1/session/me
 ```
-
-## Health check
-
-```text
-http://localhost:8080/api/v1/health
-```
-
-## Recursos del backend
-
-Se mantiene:
-
-```text
-backend/src/main/resources/application.properties
-```
-
-Se retiró:
-
-```text
-backend/src/main/resources/templates/
-backend/src/main/resources/static/
-```
-
-## Diagnóstico
-
-```bash
-npm run setup:permissions
-npm run doctor
-```
-
-## Maven seguro
-
-El workspace incluye `scripts/maven.sh`, que prefiere Maven instalado en el sistema y usa `./mvnw` como respaldo.
-
-```bash
-npm run maven -- -pl backend clean package
-```
-
-## Fase 21 - Edición real avanzada desde React
-
-Se reemplazaron acciones visuales por operaciones reales de edición y confirmación:
-
-- Formularios reutilizables con datos iniciales para editar registros existentes.
-- Confirmaciones modernas con `ConfirmDialog` en lugar de `window.confirm`.
-- Toasts globales para operaciones exitosas, errores y cambios de estado.
-- Nuevos endpoints API-first `PUT` para siembras, procesos, clasificaciones y despachos.
-- Edición real desde React para lotes, camas, siembras, procesos, clasificación y despacho.
-
-## Fase 24 - Usuarios corporativos y modales por portal
-
-Se corrigió el sistema de overlays del frontend para que los modales, confirmaciones y drawers se rendericen fuera del layout principal mediante portal en `document.body`. Esto evita desplazamientos visuales causados por el sidebar, el topbar o las transiciones de ruta.
-
-También se avanzó el módulo de usuarios con operaciones reales conectadas al backend y MySQL:
-
-- crear usuario corporativo;
-- editar usuario;
-- activar/desactivar usuario;
-- validar correos `@vlv.com`;
-- consumir roles activos desde el backend.
-
-
-## Perfil corporativo y experiencia visual
-
-Se consolidó la experiencia visual del sistema como producto final: sidebar más compacto, topbar corporativo, modales centrados, avatar por color, perfil editable del trabajador y cambio de contraseña desde la sesión activa. Los usuarios ahora pueden guardar cargo, teléfono y color de avatar como datos persistidos en MySQL.

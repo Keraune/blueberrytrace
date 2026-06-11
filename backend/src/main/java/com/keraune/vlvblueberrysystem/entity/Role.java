@@ -1,12 +1,15 @@
 package com.keraune.vlvblueberrysystem.entity;
 
-import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "roles")
-public class Role {
-
+public class Role extends AuditableEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -17,28 +20,15 @@ public class Role {
     @Column(length = 255)
     private String descripcion;
 
-    @Column(nullable = false)
+    @Column(name = "estado", nullable = false)
     private Boolean estado = true;
 
-    @Column(name = "fecha_creacion", nullable = false, updatable = false)
-    private LocalDateTime fechaCreacion;
-
-    @PrePersist
-    public void prePersist() {
-        this.fechaCreacion = LocalDateTime.now();
-    }
-
-    public Role() {}
-
     public Long getId() { return id; }
-    public String getNombre() { return nombre; }
-    public String getDescripcion() { return descripcion; }
-    public Boolean getEstado() { return estado; }
-    public LocalDateTime getFechaCreacion() { return fechaCreacion; }
-
     public void setId(Long id) { this.id = id; }
+    public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
+    public String getDescripcion() { return descripcion; }
     public void setDescripcion(String descripcion) { this.descripcion = descripcion; }
+    public Boolean getEstado() { return estado; }
     public void setEstado(Boolean estado) { this.estado = estado; }
-    public void setFechaCreacion(LocalDateTime fechaCreacion) { this.fechaCreacion = fechaCreacion; }
 }
