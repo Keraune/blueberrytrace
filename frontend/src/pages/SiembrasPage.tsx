@@ -133,7 +133,9 @@ export function SiembrasPage({ siembras, lotes, camas, onSiembrasChange }: Siemb
           {wizardSteps.map(({ id, label, icon: StepIcon }) => (
             <div key={id} className={id === step ? 'stepper__item stepper__item--active' : 'stepper__item'}>
               <span className={id <= step ? 'stepper__index stepper__index--active' : 'stepper__index'}><StepIcon size={15} /></span>
-              <strong>{label}</strong>
+              <span className="stepper__label">
+                <strong>{label}</strong>
+              </span>
             </div>
           ))}
         </div>

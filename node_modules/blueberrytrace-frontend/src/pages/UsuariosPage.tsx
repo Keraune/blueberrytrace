@@ -152,12 +152,7 @@ export function UsuariosPage({ usuarios, roles, onUsuariosChange }: UsuariosPage
                     </div>
                   </td>
                   <td><StatusBadge value={usuario.rol} /></td>
-                  <td>
-                    <span className="status-with-dot">
-                      <i className={usuario.activo ? 'status-dot status-dot--green' : 'status-dot'} />
-                      {usuario.activo ? 'Activo' : 'Inactivo'}
-                    </span>
-                  </td>
+                  <td><StatusBadge value={usuario.activo ? 'Activo' : 'Inactivo'} /></td>
                   <td>{dateShort(usuario.fechaActualizacion || usuario.fechaCreacion)}</td>
                   <td>
                     <div className="icon-actions">
@@ -201,7 +196,7 @@ export function UsuariosPage({ usuarios, roles, onUsuariosChange }: UsuariosPage
               items={[
                 { label: 'Usuario', value: selectedUser.username, tone: 'green' },
                 { label: 'Rol', value: <StatusBadge value={selectedUser.rol} />, tone: 'purple' },
-                { label: 'Estado', value: selectedUser.activo ? 'Activo' : 'Inactivo', tone: selectedUser.activo ? 'blue' : 'neutral' },
+                { label: 'Estado', value: <StatusBadge value={selectedUser.activo ? 'Activo' : 'Inactivo'} />, tone: selectedUser.activo ? 'blue' : 'neutral' },
                 { label: 'Correo', value: selectedUser.email },
                 { label: 'Cargo', value: selectedUser.cargo || 'Sin cargo registrado' },
                 { label: 'Teléfono', value: selectedUser.telefono || 'Sin teléfono registrado' },
