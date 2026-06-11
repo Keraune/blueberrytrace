@@ -16,7 +16,7 @@ public class ApiFrontendController {
         FrontendBootstrapResponse response = new FrontendBootstrapResponse(
                 "BlueberryTrace",
                 "v1",
-                "API-first backend para React/Vite. La interfaz principal vive en el workspace frontend",
+                "Interfaz operativa principal para el control de trazabilidad",
                 List.of("React", "Vue"),
                 ApiModuleMetadata.endpoints(),
                 ApiModuleMetadata.modules(),

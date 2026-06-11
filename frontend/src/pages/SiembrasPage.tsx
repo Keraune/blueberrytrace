@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
-import { ChevronLeft, ChevronRight, Pencil, RotateCcw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Pencil, RotateCcw, Sprout } from 'lucide-react';
 import { ConfirmDialog } from '../components/ConfirmDialog';
+import { EmptyState } from '../components/EmptyState';
 import { Modal } from '../components/Modal';
 import { ModuleHeader } from '../components/ModuleHeader';
 import { SiembraForm } from '../components/SiembraForm';
@@ -47,16 +48,40 @@ export function SiembrasPage({ siembras, lotes, camas, onSiembrasChange }: Siemb
   const [confirming, setConfirming] = useState(false);
 
   const camasDisponibles = useMemo(() => camas.filter((cama) => cama.lote?.id === payload.loteId), [camas, payload.loteId]);
+  const selectedLote = lotes.find((lote) => lote.id === payload.loteId);
+  const selectedCama = camasDisponibles.find((cama) => cama.id === payload.camaId);
   const recientes = siembras.slice(0, 10);
 
+  const selectionError = !payload.loteId
+    ? 'Selecciona un lote para continuar.'
+    : !payload.camaId
+      ? 'Selecciona una cama asociada al lote.'
+      : null;
+  const dataError = !payload.fechaSiembra
+    ? 'La fecha de siembra es obligatoria.'
+    : payload.cantidadRegistrada <= 0
+      ? 'La cantidad registrada debe ser mayor a cero.'
+      : null;
+
+  function goNext() {
+    if (step === 1 && selectionError) return;
+    if (step === 2 && dataError) return;
+    setStep(Math.min(step + 1, 3));
+  }
+
   async function submit() {
+    if (selectionError || dataError) {
+      setError(selectionError || dataError);
+      return;
+    }
+
     try {
       setSaving(true);
       setError(null);
       const response = await blueberryApi.createSiembra(payload);
       onSiembrasChange(response.items);
       setStep(1);
-      setPayload({ ...payload, camaId: 0, fechaSiembra: today, cantidadRegistrada: 1, observacion: '', estado: 'REGISTRADA' });
+      setPayload({ loteId: payload.loteId, camaId: 0, fechaSiembra: today, cantidadRegistrada: 1, observacion: '', estado: 'REGISTRADA' });
       emitToast('success', 'Siembra registrada', 'El registro fue creado correctamente.');
     } catch (exception) {
       setError(exception instanceof Error ? exception.message : 'No se pudo registrar la siembra.');
@@ -89,50 +114,60 @@ export function SiembrasPage({ siembras, lotes, camas, onSiembrasChange }: Siemb
   }
 
   return (
-    <main className="content-grid">
+    <main className="content-grid planting-screen">
       <ModuleHeader
         eyebrow="Proceso productivo"
-        title="Registro de Siembra"
-        description="Registrar y editar plantas sembradas por cama y bandeja."
+        title="Registro de siembra"
+        description="Registra plantas sembradas por lote y cama con validación previa."
       />
 
-      <section className="panel-card step-card">
-        <div className="stepper">
+      <section className="panel-card step-card step-card--refined">
+        <div className="stepper stepper--corporate">
           {[1, 2, 3].map((current) => (
-            <div key={current} className="stepper__item">
-              <span className={current === step ? 'stepper__index stepper__index--active' : 'stepper__index'}>{current}</span>
-              <strong>{current === 1 ? 'Selección de Lote' : current === 2 ? 'Datos de Siembra' : 'Confirmación'}</strong>
+            <div key={current} className={current === step ? 'stepper__item stepper__item--active' : 'stepper__item'}>
+              <span className={current <= step ? 'stepper__index stepper__index--active' : 'stepper__index'}>{current}</span>
+              <strong>{current === 1 ? 'Lote y cama' : current === 2 ? 'Datos de siembra' : 'Confirmación'}</strong>
             </div>
           ))}
         </div>
 
-        {step === 1 && (
+        {lotes.length === 0 || camas.length === 0 ? (
+          <EmptyState
+            icon={<Sprout size={28} />}
+            title="Faltan datos base para registrar siembra"
+            description="Primero registra lotes e invernaderos y camas productivas para habilitar este flujo."
+          />
+        ) : null}
+
+        {step === 1 && lotes.length > 0 && camas.length > 0 && (
           <div className="step-card__body">
-            <h3>Paso 1: Selección de Lote y Cama</h3>
-            <p>Seleccione el lote e invernadero donde se realizará la siembra.</p>
+            <h3>Selecciona ubicación productiva</h3>
+            <p>Elige el lote y la cama donde se colocará la siembra. Solo se listan camas asociadas al lote seleccionado.</p>
             <div className="form-grid form-grid--two">
               <label>
                 Lote
                 <select value={payload.loteId} onChange={(event) => setPayload({ ...payload, loteId: Number(event.target.value), camaId: 0 })}>
                   <option value={0}>Seleccionar lote...</option>
-                  {lotes.map((lote) => <option key={lote.id} value={lote.id}>{lote.codigo}</option>)}
+                  {lotes.map((lote) => <option key={lote.id} value={lote.id}>{lote.codigo} {lote.descripcion ? `· ${lote.descripcion}` : ''}</option>)}
                 </select>
               </label>
               <label>
                 Cama
-                <select value={payload.camaId} onChange={(event) => setPayload({ ...payload, camaId: Number(event.target.value) })}>
-                  <option value={0}>Seleccionar cama...</option>
-                  {camasDisponibles.map((cama) => <option key={cama.id} value={cama.id}>{cama.codigo}</option>)}
+                <select value={payload.camaId} onChange={(event) => setPayload({ ...payload, camaId: Number(event.target.value) })} disabled={!payload.loteId}>
+                  <option value={0}>{payload.loteId ? 'Seleccionar cama...' : 'Selecciona un lote primero'}</option>
+                  {camasDisponibles.map((cama) => <option key={cama.id} value={cama.id}>{cama.codigo} {cama.descripcion ? `· ${cama.descripcion}` : ''}</option>)}
                 </select>
               </label>
             </div>
+            {payload.loteId && camasDisponibles.length === 0 ? <div className="form-alert">El lote seleccionado todavía no tiene camas registradas.</div> : null}
+            {selectionError ? <div className="form-hint form-hint--warning">{selectionError}</div> : null}
           </div>
         )}
 
         {step === 2 && (
           <div className="step-card__body">
-            <h3>Paso 2: Datos de Siembra</h3>
-            <p>Registre la fecha y la cantidad de plantas sembradas.</p>
+            <h3>Registra datos de siembra</h3>
+            <p>La fecha y la cantidad permiten conservar la trazabilidad desde el primer registro operativo.</p>
             <div className="form-grid form-grid--two">
               <label>
                 Fecha de siembra
@@ -144,22 +179,24 @@ export function SiembrasPage({ siembras, lotes, camas, onSiembrasChange }: Siemb
               </label>
               <label className="form-grid__full">
                 Observación
-                <textarea value={payload.observacion} onChange={(event) => setPayload({ ...payload, observacion: event.target.value })} placeholder="Notas del registro de siembra" />
+                <textarea value={payload.observacion} onChange={(event) => setPayload({ ...payload, observacion: event.target.value })} placeholder="Notas relevantes del registro de siembra" />
               </label>
             </div>
+            {dataError ? <div className="form-hint form-hint--warning">{dataError}</div> : null}
           </div>
         )}
 
         {step === 3 && (
           <div className="step-card__body">
-            <h3>Paso 3: Confirmación</h3>
-            <p>Verifique los datos antes de registrar la siembra.</p>
-            <div className="confirmation-grid">
-              <div><span>Lote</span><strong>{lotes.find((lote) => lote.id === payload.loteId)?.codigo || 'No seleccionado'}</strong></div>
-              <div><span>Cama</span><strong>{camasDisponibles.find((cama) => cama.id === payload.camaId)?.codigo || 'No seleccionada'}</strong></div>
+            <h3>Confirma el registro</h3>
+            <p>Verifica los datos antes de guardar la siembra en la trazabilidad del lote.</p>
+            <div className="confirmation-grid confirmation-grid--refined">
+              <div><span>Lote</span><strong>{selectedLote?.codigo || 'No seleccionado'}</strong><small>{selectedLote?.descripcion || 'Sin descripción'}</small></div>
+              <div><span>Cama</span><strong>{selectedCama?.codigo || 'No seleccionada'}</strong><small>{selectedCama?.descripcion || 'Sin descripción'}</small></div>
               <div><span>Fecha</span><strong>{dateShort(payload.fechaSiembra)}</strong></div>
               <div><span>Cantidad</span><strong>{numberCompact(payload.cantidadRegistrada)}</strong></div>
             </div>
+            {payload.observacion ? <div className="confirmation-note"><strong>Observación:</strong> {payload.observacion}</div> : null}
             {error ? <div className="form-alert">{error}</div> : null}
           </div>
         )}
@@ -167,9 +204,9 @@ export function SiembrasPage({ siembras, lotes, camas, onSiembrasChange }: Siemb
         <div className="step-card__footer">
           <button type="button" className="ghost-button" onClick={() => setStep(Math.max(step - 1, 1))} disabled={step === 1}><ChevronLeft size={16} /> Anterior</button>
           {step < 3 ? (
-            <button type="button" className="action-button" onClick={() => setStep(Math.min(step + 1, 3))} disabled={(step === 1 && (!payload.loteId || !payload.camaId))}><span>Siguiente</span> <ChevronRight size={16} /></button>
+            <button type="button" className="action-button" onClick={goNext} disabled={(step === 1 && Boolean(selectionError)) || (step === 2 && Boolean(dataError)) || lotes.length === 0 || camas.length === 0}><span>Siguiente</span> <ChevronRight size={16} /></button>
           ) : (
-            <button type="button" className="action-button" onClick={submit} disabled={saving || !payload.loteId || !payload.camaId}>{saving ? 'Guardando...' : 'Registrar siembra'}</button>
+            <button type="button" className="action-button" onClick={submit} disabled={saving || Boolean(selectionError) || Boolean(dataError)}>{saving ? 'Guardando...' : 'Registrar siembra'}</button>
           )}
         </div>
       </section>
@@ -182,37 +219,41 @@ export function SiembrasPage({ siembras, lotes, camas, onSiembrasChange }: Siemb
           </div>
           <span className="panel-card__count">{siembras.length} registros</span>
         </div>
-        <div className="data-table-wrap">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>Lote</th>
-                <th>Cama</th>
-                <th>Fecha</th>
-                <th>Cantidad</th>
-                <th>Estado</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {recientes.map((siembra) => (
-                <tr key={siembra.id}>
-                  <td>{siembra.lote?.codigo || 'Sin lote'}</td>
-                  <td>{siembra.cama?.codigo || 'Sin cama'}</td>
-                  <td>{dateShort(siembra.fechaSiembra)}</td>
-                  <td>{numberCompact(siembra.cantidadRegistrada || 0)}</td>
-                  <td><StatusBadge value={siembra.estado} /></td>
-                  <td>
-                    <div className="icon-actions">
-                      <button type="button" className="icon-action" title="Editar" onClick={() => setEditingSiembra(siembra)}><Pencil size={15} /></button>
-                      <button type="button" className="icon-action" title="Cambiar estado" onClick={() => setPendingStatus(siembra)}><RotateCcw size={15} /></button>
-                    </div>
-                  </td>
+        {recientes.length > 0 ? (
+          <div className="data-table-wrap">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>Lote</th>
+                  <th>Cama</th>
+                  <th>Fecha</th>
+                  <th>Cantidad</th>
+                  <th>Estado</th>
+                  <th />
                 </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+              </thead>
+              <tbody>
+                {recientes.map((siembra) => (
+                  <tr key={siembra.id}>
+                    <td>{siembra.lote?.codigo || 'Sin lote'}</td>
+                    <td>{siembra.cama?.codigo || 'Sin cama'}</td>
+                    <td>{dateShort(siembra.fechaSiembra)}</td>
+                    <td>{numberCompact(siembra.cantidadRegistrada || 0)}</td>
+                    <td><StatusBadge value={siembra.estado} /></td>
+                    <td>
+                      <div className="icon-actions">
+                        <button type="button" className="icon-action" title="Editar" onClick={() => setEditingSiembra(siembra)}><Pencil size={15} /></button>
+                        <button type="button" className="icon-action" title="Cambiar estado" onClick={() => setPendingStatus(siembra)}><RotateCcw size={15} /></button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <EmptyState compact icon={<Sprout size={24} />} title="Sin siembras registradas" description="Los registros recientes aparecerán luego de guardar la primera siembra." />
+        )}
       </section>
 
       <Modal open={Boolean(editingSiembra)} title="Editar siembra" description="Actualiza lote, cama, fecha, cantidad y estado." onClose={() => setEditingSiembra(null)}>

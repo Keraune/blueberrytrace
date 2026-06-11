@@ -104,7 +104,7 @@ export function UsuariosPage({ usuarios, roles, onUsuariosChange }: UsuariosPage
       />
 
       <section className="summary-strip summary-strip--three">
-        <article className="summary-pill summary-pill--green"><strong>{usuarios.length}</strong><span>Usuarios</span><small>cuentas desde MySQL</small></article>
+        <article className="summary-pill summary-pill--green"><strong>{usuarios.length}</strong><span>Usuarios</span><small>cuentas registradas</small></article>
         <article className="summary-pill summary-pill--blue"><strong>{activos}</strong><span>Activos</span><small>con acceso habilitado</small></article>
         <article className="summary-pill summary-pill--purple"><strong>{availableRoles.length}</strong><span>Roles</span><small>perfiles corporativos</small></article>
       </section>
@@ -177,7 +177,7 @@ export function UsuariosPage({ usuarios, roles, onUsuariosChange }: UsuariosPage
           </div>
         ) : null}
 
-        <div className="table-footer-note">Mostrando {filtered.length} de {usuarios.length} usuarios cargados desde la API</div>
+        <div className="table-footer-note">Mostrando {filtered.length} de {usuarios.length} usuarios registrados</div>
       </section>
 
       <DetailDrawer
@@ -208,7 +208,7 @@ export function UsuariosPage({ usuarios, roles, onUsuariosChange }: UsuariosPage
             />
             <section className="drawer-section drawer-section--soft">
               <h3>Cuenta empresarial</h3>
-              <p>Este usuario opera con el dominio corporativo @vlv.com y sus permisos dependen del rol asignado desde la base de datos.</p>
+              <p>Este usuario opera con el dominio corporativo @vlv.com y sus permisos dependen del rol asignado por administración.</p>
             </section>
           </>
         ) : null}
@@ -217,7 +217,7 @@ export function UsuariosPage({ usuarios, roles, onUsuariosChange }: UsuariosPage
       <Modal
         open={creating}
         title="Nuevo usuario corporativo"
-        description="Crea una cuenta operativa conectada al backend y a MySQL."
+        description="Crea una cuenta operativa para el equipo del vivero."
         size="md"
         onClose={() => setCreating(false)}
       >

@@ -1,14 +1,16 @@
 import { useMemo, useState } from 'react';
-import { Download, Eye, Pencil, Plus, RefreshCcw } from 'lucide-react';
+import { Download, Eye, Pencil, Plus, RefreshCcw, Tags } from 'lucide-react';
 import { ClasificacionForm } from '../components/ClasificacionForm';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { DetailDrawer } from '../components/DetailDrawer';
+import { EmptyState } from '../components/EmptyState';
 import { FilterToolbar } from '../components/FilterToolbar';
 import { InfoGrid } from '../components/InfoGrid';
 import { Modal } from '../components/Modal';
 import { ModuleHeader } from '../components/ModuleHeader';
 import { StatusBadge } from '../components/StatusBadge';
 import { blueberryApi } from '../lib/api';
+import { downloadCsv } from '../lib/export';
 import { dateShort, numberCompact } from '../lib/format';
 import { emitToast } from '../lib/uiEvents';
 import type { CamaResponse, ClasificacionFormPayload, ClasificacionResponse, ReferenceResponse } from '../types/api';
@@ -20,13 +22,15 @@ interface ClasificacionPageProps {
   onClasificacionesChange: (items: ClasificacionResponse[]) => void;
 }
 
-function bucketOf(item: ClasificacionResponse, index: number) {
+type QualityBucket = 'Primera calidad' | 'Segunda calidad' | 'Tercera calidad' | 'Descarte' | 'Sin criterio';
+
+function bucketOf(item: ClasificacionResponse): QualityBucket {
   const combined = `${item.condicion || ''} ${item.estadoPlanta || ''} ${item.tamano || ''}`.toLowerCase();
-  if (combined.includes('descarte') || combined.includes('observ')) return 'Descarte';
-  if (combined.includes('export') || combined.includes('apta') || combined.includes('grande')) return 'Primera Calidad';
-  if (combined.includes('mediana')) return 'Segunda Calidad';
-  if (combined.includes('peque')) return 'Tercera Calidad';
-  return ['Primera Calidad', 'Segunda Calidad', 'Tercera Calidad', 'Descarte'][index % 4];
+  if (/descarte|rechaz|observ|no apt|dañ|enfer/.test(combined)) return 'Descarte';
+  if (/primera|export|apta|excelente|grande|óptim|optim/.test(combined)) return 'Primera calidad';
+  if (/segunda|buena|mediana|medio/.test(combined)) return 'Segunda calidad';
+  if (/tercera|regular|pequeñ|pequen|bajo/.test(combined)) return 'Tercera calidad';
+  return 'Sin criterio';
 }
 
 function toPayload(item: ClasificacionResponse): ClasificacionFormPayload {
@@ -45,26 +49,40 @@ function toPayload(item: ClasificacionResponse): ClasificacionFormPayload {
 
 export function ClasificacionPage({ clasificaciones, lotes, camas, onClasificacionesChange }: ClasificacionPageProps) {
   const [query, setQuery] = useState('');
+  const [loteFilter, setLoteFilter] = useState('TODOS');
+  const [statusFilter, setStatusFilter] = useState('TODOS');
   const [creating, setCreating] = useState(false);
   const [selectedClasificacion, setSelectedClasificacion] = useState<ClasificacionResponse | null>(null);
   const [editingClasificacion, setEditingClasificacion] = useState<ClasificacionResponse | null>(null);
   const [pendingStatus, setPendingStatus] = useState<{ item: ClasificacionResponse; estado: string } | null>(null);
   const [confirming, setConfirming] = useState(false);
 
+  const availableStates = useMemo(() => Array.from(new Set(clasificaciones.map((item) => item.estado).filter(Boolean))) as string[], [clasificaciones]);
+
   const filtered = useMemo(() => {
     const term = query.trim().toLowerCase();
-    return clasificaciones.filter((item) => !term || [item.lote?.codigo, item.estadoPlanta, item.tamano, item.condicion, item.estado]
-      .some((value) => String(value || '').toLowerCase().includes(term)));
-  }, [clasificaciones, query]);
+    return clasificaciones.filter((item) => {
+      const matchesTerm = !term || [item.lote?.codigo, item.cama?.codigo, item.estadoPlanta, item.tamano, item.condicion, item.estado, item.usuarioRegistro?.nombreCompleto]
+        .some((value) => String(value || '').toLowerCase().includes(term));
+      const matchesLot = loteFilter === 'TODOS' || String(item.lote?.id || '') === loteFilter;
+      const matchesStatus = statusFilter === 'TODOS' || item.estado === statusFilter;
+      return matchesTerm && matchesLot && matchesStatus;
+    });
+  }, [clasificaciones, loteFilter, query, statusFilter]);
 
   const grouped = useMemo(() => {
-    const initial = { 'Primera Calidad': 0, 'Segunda Calidad': 0, 'Tercera Calidad': 0, 'Descarte': 0 };
-    return clasificaciones.reduce((acc, item, index) => {
-      acc[bucketOf(item, index) as keyof typeof acc] += item.cantidad || 0;
+    const initial: Record<QualityBucket, number> = {
+      'Primera calidad': 0,
+      'Segunda calidad': 0,
+      'Tercera calidad': 0,
+      Descarte: 0,
+      'Sin criterio': 0
+    };
+    return clasificaciones.reduce((acc, item) => {
+      acc[bucketOf(item)] += item.cantidad || 0;
       return acc;
     }, initial);
   }, [clasificaciones]);
-  const total = Object.values(grouped).reduce((sum, value) => sum + value, 0) || 1;
 
   async function create(payload: ClasificacionFormPayload) {
     const response = await blueberryApi.createClasificacion(payload);
@@ -97,80 +115,102 @@ export function ClasificacionPage({ clasificaciones, lotes, camas, onClasificaci
     }
   }
 
+  function exportCsv() {
+    downloadCsv('blueberrytrace-clasificaciones.csv', [
+      'Código', 'Lote', 'Cama', 'Fecha', 'Criterio', 'Estado planta', 'Tamaño', 'Condición', 'Cantidad', 'Responsable', 'Estado'
+    ], filtered.map((item) => [
+      `CL-${String(item.id).padStart(4, '0')}`,
+      item.lote?.codigo || '',
+      item.cama?.codigo || '',
+      item.fechaClasificacion || '',
+      bucketOf(item),
+      item.estadoPlanta || '',
+      item.tamano || '',
+      item.condicion || '',
+      item.cantidad || 0,
+      item.usuarioRegistro?.nombreCompleto || '',
+      item.estado || ''
+    ]));
+  }
+
   const cards = [
-    { label: 'Primera Calidad', value: grouped['Primera Calidad'], tone: 'green' },
-    { label: 'Segunda Calidad', value: grouped['Segunda Calidad'], tone: 'blue' },
-    { label: 'Tercera Calidad', value: grouped['Tercera Calidad'], tone: 'orange' },
-    { label: 'Descarte', value: grouped['Descarte'], tone: 'red' }
+    { label: 'Primera calidad', value: grouped['Primera calidad'], tone: 'green' },
+    { label: 'Segunda calidad', value: grouped['Segunda calidad'], tone: 'blue' },
+    { label: 'Tercera calidad', value: grouped['Tercera calidad'], tone: 'orange' },
+    { label: 'Descarte', value: grouped.Descarte, tone: 'red' }
   ];
+  const qualityTotal = cards.reduce((sum, item) => sum + item.value, 0);
+  const filteredTotal = filtered.reduce((sum, item) => sum + (item.cantidad || 0), 0);
 
   return (
-    <main className="content-grid">
+    <main className="content-grid classification-screen">
       <ModuleHeader
         eyebrow="Calidad"
-        title="Módulo de Clasificación"
-        description="Clasificación por tamaño, estado y condición de las plantas."
+        title="Control de clasificación"
+        description="Clasificación por tamaño, estado y condición de plantas registradas."
         actions={<button type="button" className="action-button" onClick={() => setCreating(true)}><Plus size={16} /> Nueva clasificación</button>}
       />
 
-      <section className="quality-card-grid">
-        {cards.map((card) => (
-          <article key={card.label} className={`quality-card quality-card--${card.tone}`}>
-            <div className="quality-card__header">
-              <span>{card.label}</span>
-              <strong>{Math.round((card.value / total) * 100)}%</strong>
-            </div>
-            <h3>{numberCompact(card.value)}</h3>
-            <div className="progress-track"><span style={{ width: `${Math.max((card.value / total) * 100, 4)}%` }} /></div>
-          </article>
-        ))}
+      <section className="quality-card-grid quality-card-grid--real">
+        {cards.map((card) => {
+          const percent = qualityTotal === 0 ? 0 : Math.round((card.value / qualityTotal) * 100);
+          return (
+            <article key={card.label} className={`quality-card quality-card--${card.tone}`}>
+              <div className="quality-card__header">
+                <span>{card.label}</span>
+                <strong>{percent}%</strong>
+              </div>
+              <h3>{numberCompact(card.value)}</h3>
+              <div className="progress-track"><span style={{ width: `${percent}%` }} /></div>
+            </article>
+          );
+        })}
       </section>
 
       <section className="panel-card">
         <div className="module-toolbar-card module-toolbar-card--filters">
-          <FilterToolbar value={query} onChange={setQuery} placeholder="Buscar clasificación..." />
-          <select><option>Todos los lotes</option></select>
-          <select><option>Todos los estados</option></select>
-          <button type="button" className="ghost-button"><Download size={15} /> Exportar</button>
+          <FilterToolbar value={query} onChange={setQuery} placeholder="Buscar lote, cama, condición o responsable..." />
+          <select value={loteFilter} onChange={(event) => setLoteFilter(event.target.value)}>
+            <option value="TODOS">Todos los lotes</option>
+            {lotes.map((lote) => <option key={lote.id} value={lote.id}>{lote.codigo}</option>)}
+          </select>
+          <select value={statusFilter} onChange={(event) => setStatusFilter(event.target.value)}>
+            <option value="TODOS">Todos los estados</option>
+            {availableStates.map((estado) => <option key={estado} value={estado}>{estado}</option>)}
+          </select>
+          <button type="button" className="ghost-button" onClick={exportCsv} disabled={filtered.length === 0}><Download size={15} /> Exportar CSV</button>
         </div>
-        <div className="data-table-wrap">
-          <table className="data-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Lote</th>
-                <th>Fecha</th>
-                <th>Primera</th>
-                <th>Segunda</th>
-                <th>Tercera</th>
-                <th>Descarte</th>
-                <th>Total</th>
-                <th>Operario</th>
-                <th>Estado</th>
-                <th />
-              </tr>
-            </thead>
-            <tbody>
-              {filtered.map((item, index) => {
-                const bucket = bucketOf(item, index);
-                const amount = item.cantidad || 0;
-                const values = {
-                  primera: bucket === 'Primera Calidad' ? amount : 0,
-                  segunda: bucket === 'Segunda Calidad' ? amount : 0,
-                  tercera: bucket === 'Tercera Calidad' ? amount : 0,
-                  descarte: bucket === 'Descarte' ? amount : 0
-                };
-                return (
+
+        {filtered.length > 0 ? (
+          <div className="data-table-wrap">
+            <table className="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Lote</th>
+                  <th>Cama</th>
+                  <th>Fecha</th>
+                  <th>Criterio</th>
+                  <th>Tamaño</th>
+                  <th>Condición</th>
+                  <th>Cantidad</th>
+                  <th>Responsable</th>
+                  <th>Estado</th>
+                  <th />
+                </tr>
+              </thead>
+              <tbody>
+                {filtered.map((item) => (
                   <tr key={item.id}>
                     <td><strong className="table-code">CL-{String(item.id).padStart(4, '0')}</strong></td>
                     <td>{item.lote?.codigo || 'Sin lote'}</td>
+                    <td>{item.cama?.codigo || 'Sin cama'}</td>
                     <td>{dateShort(item.fechaClasificacion)}</td>
-                    <td className="table-number table-number--green">{numberCompact(values.primera)}</td>
-                    <td className="table-number table-number--blue">{numberCompact(values.segunda)}</td>
-                    <td className="table-number table-number--orange">{numberCompact(values.tercera)}</td>
-                    <td className="table-number table-number--red">{numberCompact(values.descarte)}</td>
-                    <td><strong>{numberCompact(amount)}</strong></td>
-                    <td>{item.usuarioRegistro?.nombreCompleto || 'Sin operario'}</td>
+                    <td><StatusBadge value={bucketOf(item)} /></td>
+                    <td>{item.tamano || 'Sin tamaño'}</td>
+                    <td>{item.condicion || 'Sin condición'}</td>
+                    <td><strong>{numberCompact(item.cantidad || 0)}</strong></td>
+                    <td>{item.usuarioRegistro?.nombreCompleto || 'Sin responsable'}</td>
                     <td><StatusBadge value={item.estado} /></td>
                     <td>
                       <div className="icon-actions">
@@ -180,12 +220,19 @@ export function ClasificacionPage({ clasificaciones, lotes, camas, onClasificaci
                       </div>
                     </td>
                   </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-        <div className="table-footer-note">{filtered.length} registros · {numberCompact(total)} plantas clasificadas</div>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <EmptyState
+            icon={<Tags size={26} />}
+            title="Sin clasificaciones para mostrar"
+            description="Registra controles de calidad o ajusta los filtros para visualizar resultados."
+            compact
+          />
+        )}
+        <div className="table-footer-note">{filtered.length} registros · {numberCompact(filteredTotal)} plantas clasificadas</div>
       </section>
 
       <DetailDrawer
@@ -202,7 +249,7 @@ export function ClasificacionPage({ clasificaciones, lotes, camas, onClasificaci
                 { label: 'Lote', value: selectedClasificacion.lote?.codigo || 'Sin lote', tone: 'green' },
                 { label: 'Cama', value: selectedClasificacion.cama?.codigo || 'Sin cama' },
                 { label: 'Cantidad', value: numberCompact(selectedClasificacion.cantidad || 0), tone: 'blue' },
-                { label: 'Estado planta', value: selectedClasificacion.estadoPlanta || 'No definido' },
+                { label: 'Criterio', value: <StatusBadge value={bucketOf(selectedClasificacion)} /> },
                 { label: 'Tamaño', value: selectedClasificacion.tamano || 'No definido', tone: 'purple' },
                 { label: 'Estado', value: <StatusBadge value={selectedClasificacion.estado} />, tone: 'orange' }
               ]}

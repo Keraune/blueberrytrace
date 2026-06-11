@@ -94,7 +94,7 @@ export function CommandPalette({ open, modules, activeKey, searchItems = [], onC
             <span><Command size={18} /></span>
             <div>
               <strong>Centro de búsqueda</strong>
-              <small>Busca módulos y registros cargados desde la API</small>
+              <small>Busca módulos y registros operativos</small>
             </div>
           </div>
           <button type="button" className="icon-button" aria-label="Cerrar buscador" onClick={onClose}>
@@ -121,7 +121,7 @@ export function CommandPalette({ open, modules, activeKey, searchItems = [], onC
             <span className="command-item__icon"><RefreshCcw size={17} /></span>
             <div>
               <strong>Sincronizar datos</strong>
-              <small>Recarga la información desde Spring Boot y MySQL</small>
+              <small>Recarga la información operativa actual</small>
             </div>
             <ArrowRight size={16} />
           </button>

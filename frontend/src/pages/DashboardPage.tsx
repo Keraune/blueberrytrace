@@ -230,7 +230,7 @@ export function DashboardPage({ dashboard, lotes, camas, siembras, procesos, cla
     <main className="content-grid dashboard-screen dashboard-screen--refined">
       <section className="screen-header dashboard-header-refined">
         <div>
-          <h1>Dashboard</h1>
+          <h1>Panel operativo</h1>
           <p>Resumen general del sistema · Actualizado: {updatedAt}</p>
         </div>
       </section>
@@ -392,7 +392,7 @@ export function DashboardPage({ dashboard, lotes, camas, siembras, procesos, cla
             <div className="empty-state empty-state--compact">
               <PackageCheck size={24} />
               <strong>Sin actividad reciente</strong>
-              <small>Los movimientos aparecerán cuando existan registros en MySQL.</small>
+              <small>Los movimientos aparecerán cuando existan registros operativos.</small>
             </div>
           )}
         </article>
@@ -418,7 +418,7 @@ export function DashboardPage({ dashboard, lotes, camas, siembras, procesos, cla
 
       <section className="data-origin-note">
         <strong>Fuente de datos</strong>
-        <span>{trazabilidad.length} registros de trazabilidad disponibles desde la API.</span>
+        <span>{trazabilidad.length} registros de trazabilidad disponibles.</span>
       </section>
     </main>
   );

@@ -18,11 +18,11 @@ export function DespachoForm({ lotes, modalidades, validaciones, initialData, su
   const [payload, setPayload] = useState<DespachoFormPayload>(initialData || {
     loteId: lotes[0]?.id || 0,
     fechaDespacho: today(),
-    modalidad: modalidades[0] || 'JABAS',
+    modalidad: modalidades[0] || '',
     cantidadDespachada: 1,
     destino: '',
     guiaRemision: '',
-    validacionCalidad: validaciones[0] || 'APROBADO',
+    validacionCalidad: validaciones[0] || '',
     observacion: '',
     estado: 'REGISTRADO'
   });
@@ -59,7 +59,7 @@ export function DespachoForm({ lotes, modalidades, validaciones, initialData, su
       <label>
         Modalidad
         <select value={payload.modalidad} onChange={(event) => setPayload({ ...payload, modalidad: event.target.value })}>
-          {modalidades.map((modalidad) => <option key={modalidad} value={modalidad}>{modalidad}</option>)}
+          {modalidades.length === 0 ? <option value="" disabled>Sin modalidades configuradas</option> : modalidades.map((modalidad) => <option key={modalidad} value={modalidad}>{modalidad}</option>)}
         </select>
       </label>
       <label>
@@ -77,7 +77,7 @@ export function DespachoForm({ lotes, modalidades, validaciones, initialData, su
       <label>
         Validación calidad
         <select value={payload.validacionCalidad} onChange={(event) => setPayload({ ...payload, validacionCalidad: event.target.value })}>
-          {validaciones.map((validacion) => <option key={validacion} value={validacion}>{validacion}</option>)}
+          {validaciones.length === 0 ? <option value="" disabled>Sin validaciones configuradas</option> : validaciones.map((validacion) => <option key={validacion} value={validacion}>{validacion}</option>)}
         </select>
       </label>
       <label>
@@ -95,7 +95,7 @@ export function DespachoForm({ lotes, modalidades, validaciones, initialData, su
       </label>
       <footer className="form-actions">
         <button type="button" className="ghost-button" onClick={onCancel}>Cancelar</button>
-        <button type="submit" className="action-button" disabled={saving || payload.loteId === 0}>
+        <button type="submit" className="action-button" disabled={saving || payload.loteId === 0 || !payload.modalidad || !payload.validacionCalidad}>
           {saving ? <Loader2 className="spin" size={16} /> : <Save size={16} />} {submitLabel}
         </button>
       </footer>

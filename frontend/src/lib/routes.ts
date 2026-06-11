@@ -5,15 +5,15 @@ export interface AppRoute {
 }
 
 export const appRoutes: AppRoute[] = [
-  { key: 'dashboard', path: '/dashboard', label: 'Dashboard' },
+  { key: 'dashboard', path: '/dashboard', label: 'Panel operativo' },
   { key: 'lotes', path: '/lotes', label: 'Lotes e invernaderos' },
   { key: 'camas', path: '/camas', label: 'Camas' },
-  { key: 'siembra', path: '/siembra', label: 'Siembra' },
-  { key: 'procesos', path: '/procesos', label: 'Procesos' },
-  { key: 'clasificacion', path: '/clasificacion', label: 'Clasificación' },
-  { key: 'despacho', path: '/despacho', label: 'Despacho' },
-  { key: 'reportes', path: '/reportes', label: 'Reportes' },
-  { key: 'usuarios', path: '/usuarios', label: 'Usuarios' }
+  { key: 'siembra', path: '/siembra', label: 'Registro de siembra' },
+  { key: 'procesos', path: '/procesos', label: 'Uniformización y formalización' },
+  { key: 'clasificacion', path: '/clasificacion', label: 'Control de clasificación' },
+  { key: 'despacho', path: '/despacho', label: 'Seguimiento de despacho' },
+  { key: 'reportes', path: '/reportes', label: 'Reportes operativos' },
+  { key: 'usuarios', path: '/usuarios', label: 'Gestión de usuarios' }
 ];
 
 export function routeByKey(key: string) {

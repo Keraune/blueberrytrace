@@ -1,5 +1,5 @@
 import { FormEvent, useState } from 'react';
-import { ArrowRight, CheckCircle2, Leaf, Loader2, ShieldCheck, Tag, Truck } from 'lucide-react';
+import { ArrowRight, KeyRound, Leaf, Loader2, ShieldCheck, Tag, Truck } from 'lucide-react';
 import { blueberryApi } from '../lib/api';
 import type { AuthenticatedUserResponse } from '../types/api';
 
@@ -7,15 +7,10 @@ interface LoginPageProps {
   onAuthenticated: (user: AuthenticatedUserResponse) => Promise<void> | void;
 }
 
-const demoCredentials = {
-  username: 'admin',
-  password: 'admin123'
-};
-
 const featureItems = [
   { label: 'Gestión completa de lotes, camas y bandejas', icon: Leaf },
-  { label: 'Clasificación avanzada por calidad y tamaño', icon: Tag },
-  { label: 'Trazabilidad hasta el despacho y exportación', icon: Truck },
+  { label: 'Clasificación por calidad, tamaño y condición', icon: Tag },
+  { label: 'Trazabilidad hasta la salida de plantas', icon: Truck },
   { label: 'Roles y control de acceso por perfil', icon: ShieldCheck }
 ];
 
@@ -39,12 +34,6 @@ export function LoginPage({ onAuthenticated }: LoginPageProps) {
     }
   }
 
-  function fillDemoCredentials() {
-    setUsername(demoCredentials.username);
-    setPassword(demoCredentials.password);
-    setError(null);
-  }
-
   return (
     <main className="login-shell login-shell--showcase">
       <section className="login-panel login-panel--visual">
@@ -55,17 +44,17 @@ export function LoginPage({ onAuthenticated }: LoginPageProps) {
           <div className="brand__mark">BT</div>
           <div>
             <strong>BlueberryTrace</strong>
-            <span>Agro Intelligence</span>
+            <span>Vivero Los Viñedos</span>
           </div>
         </div>
 
         <div className="login-copy login-copy--hero">
           <h1>
-            Trazabilidad de <span>Excelencia</span> para la Exportación
+            Trazabilidad de <span>excelencia</span> para frutales
           </h1>
           <p>
-            Control integral de arándanos desde el invernadero hasta el despacho internacional,
-            con trazabilidad total por lote y variedad.
+            Control integral de plantas de arándano desde el invernadero hasta el despacho,
+            con seguimiento por lote, cama, variedad y responsable.
           </p>
         </div>
 
@@ -82,8 +71,8 @@ export function LoginPage({ onAuthenticated }: LoginPageProps) {
       <section className="login-panel login-panel--form">
         <div className="login-form-card">
           <div className="login-form-heading login-form-heading--simple">
-            <h2>Iniciar Sesión</h2>
-            <p>Ingresa tus credenciales para continuar.</p>
+            <h2>Iniciar sesión</h2>
+            <p>Ingresa con tu cuenta corporativa para continuar.</p>
           </div>
 
           <form className="login-form" onSubmit={handleSubmit}>
@@ -93,7 +82,7 @@ export function LoginPage({ onAuthenticated }: LoginPageProps) {
                 value={username}
                 onChange={(event) => setUsername(event.target.value)}
                 autoComplete="username"
-                placeholder="admin"
+                placeholder="usuario corporativo"
                 required
               />
             </label>
@@ -113,18 +102,18 @@ export function LoginPage({ onAuthenticated }: LoginPageProps) {
 
             <button className="action-button action-button--wide login-submit-button" type="submit" disabled={loading}>
               {loading ? <Loader2 className="spin" size={16} /> : null}
-              <span>Ingresar al Sistema</span>
+              <span>Ingresar al sistema</span>
               {!loading ? <ArrowRight size={16} /> : null}
             </button>
           </form>
 
-          <button type="button" className="login-demo-card" onClick={fillDemoCredentials}>
-            <span><CheckCircle2 size={15} /> Credenciales de demo</span>
-            <strong>Usuario: {demoCredentials.username}</strong>
-            <strong>Contraseña: {demoCredentials.password}</strong>
-          </button>
+          <div className="login-access-card login-access-card--info">
+            <span><KeyRound size={15} /> Acceso protegido</span>
+            <strong>Usa las credenciales asignadas por administración.</strong>
+            <small>Solicita actualización de acceso si tu cuenta no está habilitada.</small>
+          </div>
 
-          <footer className="login-version">© 2026 BlueberryTrace · v0.1.0</footer>
+          <footer className="login-version">© 2026 BlueberryTrace · Área de frutales</footer>
         </div>
       </section>
     </main>

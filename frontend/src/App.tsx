@@ -427,7 +427,7 @@ export default function App() {
           {activeKey === 'siembra' && <SiembrasPage siembras={siembras} lotes={loteReferences} camas={camas} onSiembrasChange={setSiembras} />}
           {activeKey === 'procesos' && <ProcesosPage procesos={procesos} lotes={loteReferences} camas={camas} siembras={siembras} onProcesosChange={setProcesos} />}
           {activeKey === 'clasificacion' && <ClasificacionPage clasificaciones={clasificaciones} lotes={loteReferences} camas={camas} onClasificacionesChange={setClasificaciones} />}
-          {activeKey === 'despacho' && <DespachoPage despachos={despachos} lotes={loteReferences} modalidades={catalogs?.modalidadesDespacho || ['JABAS', 'BINS_MADERA']} validaciones={catalogs?.validacionesCalidad || ['APROBADO', 'OBSERVADO']} onDespachosChange={setDespachos} />}
+          {activeKey === 'despacho' && <DespachoPage despachos={despachos} lotes={loteReferences} modalidades={catalogs?.modalidadesDespacho || []} validaciones={catalogs?.validacionesCalidad || []} onDespachosChange={setDespachos} />}
           {activeKey === 'reportes' && <ReportesPage trazabilidad={trazabilidad} />}
           {activeKey === 'usuarios' && <UsuariosPage usuarios={usuarios} roles={catalogs?.roles || []} onUsuariosChange={setUsuarios} />}
         </div>

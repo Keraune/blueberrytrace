@@ -1,12 +1,14 @@
 import { useMemo, useState } from 'react';
-import { Download, Pencil, Plus, RotateCcw } from 'lucide-react';
+import { ClipboardList, Download, Pencil, Plus, RotateCcw } from 'lucide-react';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { DataTable } from '../components/DataTable';
+import { EmptyState } from '../components/EmptyState';
 import { Modal } from '../components/Modal';
 import { ModuleHeader } from '../components/ModuleHeader';
 import { ProcesoForm } from '../components/ProcesoForm';
 import { StatusBadge } from '../components/StatusBadge';
 import { blueberryApi } from '../lib/api';
+import { downloadCsv } from '../lib/export';
 import { dateShort, numberCompact } from '../lib/format';
 import { emitToast } from '../lib/uiEvents';
 import type { CamaResponse, FormalizacionFormPayload, FormalizacionResponse, ProcesoOperativoResponse, ReferenceResponse, SiembraResponse, UniformizacionFormPayload, UniformizacionResponse } from '../types/api';
@@ -74,6 +76,35 @@ export function ProcesosPage({ procesos, lotes, camas, siembras, onProcesosChang
     emitToast('success', 'Formalización actualizada', 'Los cambios fueron guardados.');
   }
 
+
+  function exportCsv() {
+    const uniformizacionRows = uniformizaciones.map((item) => [
+      'Uniformización',
+      item.lote?.codigo || '',
+      item.cama?.codigo || '',
+      item.fechaUniformizacion || '',
+      item.cantidadInicial || 0,
+      item.cantidadUniformizada || 0,
+      item.criterio || '',
+      item.estado || '',
+      item.usuarioRegistro?.nombreCompleto || ''
+    ]);
+    const formalizacionRows = formalizaciones.map((item) => [
+      'Formalización',
+      item.lote?.codigo || '',
+      item.cama?.codigo || '',
+      item.fechaFormalizacion || '',
+      item.cantidadBandejas || 0,
+      item.cantidadPlantas || 0,
+      item.detalle || '',
+      item.estado || '',
+      item.usuarioRegistro?.nombreCompleto || ''
+    ]);
+    downloadCsv('blueberrytrace-procesos.csv', [
+      'Proceso', 'Lote', 'Cama', 'Fecha', 'Cantidad base', 'Cantidad procesada', 'Criterio o detalle', 'Estado', 'Responsable'
+    ], [...uniformizacionRows, ...formalizacionRows]);
+  }
+
   async function confirmToggleStatus() {
     if (!pendingStatus) return;
     try {
@@ -102,10 +133,17 @@ export function ProcesosPage({ procesos, lotes, camas, siembras, onProcesosChang
       />
 
       <div className="module-utility-row">
-        <button type="button" className="ghost-button"><Download size={15} /> Exportar reporte</button>
+        <button type="button" className="ghost-button" onClick={exportCsv} disabled={uniformizaciones.length + formalizaciones.length === 0}><Download size={15} /> Exportar CSV</button>
       </div>
 
       <section className="stacked-process-list">
+        {aggregated.length === 0 ? (
+          <EmptyState
+            icon={<ClipboardList size={26} />}
+            title="Sin procesos en seguimiento"
+            description="Registra siembras, uniformizaciones o formalizaciones para visualizar el seguimiento por lote."
+          />
+        ) : null}
         {aggregated.map((item) => (
           <article className="process-card" key={item.lote.id}>
             <div className="process-card__header">
@@ -136,6 +174,8 @@ export function ProcesosPage({ procesos, lotes, camas, siembras, onProcesosChang
           title="Uniformizaciones"
           description="Registros editables por lote y cama."
           items={uniformizaciones}
+          emptyTitle="Sin uniformizaciones registradas"
+          emptyDescription="Los registros aparecerán cuando se complete el proceso por lote y cama."
           columns={[
             { key: 'lote', label: 'Lote', render: (item) => item.lote?.codigo || 'Sin lote' },
             { key: 'cama', label: 'Cama', render: (item) => item.cama?.codigo || 'Sin cama' },
@@ -154,6 +194,8 @@ export function ProcesosPage({ procesos, lotes, camas, siembras, onProcesosChang
           title="Formalizaciones"
           description="Bandejas y plantas formalizadas con edición directa."
           items={formalizaciones}
+          emptyTitle="Sin formalizaciones registradas"
+          emptyDescription="Los registros aparecerán cuando se formalicen bandejas y plantas."
           columns={[
             { key: 'lote', label: 'Lote', render: (item) => item.lote?.codigo || 'Sin lote' },
             { key: 'cama', label: 'Cama', render: (item) => item.cama?.codigo || 'Sin cama' },

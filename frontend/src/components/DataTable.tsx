@@ -1,4 +1,6 @@
 import type { ReactNode } from 'react';
+import { Database } from 'lucide-react';
+import { EmptyState } from './EmptyState';
 
 export interface TableColumn<T> {
   key: keyof T | string;
@@ -11,9 +13,18 @@ interface DataTableProps<T> {
   description: string;
   columns: TableColumn<T>[];
   items: T[];
+  emptyTitle?: string;
+  emptyDescription?: string;
 }
 
-export function DataTable<T extends { id: number }>({ title, description, columns, items }: DataTableProps<T>) {
+export function DataTable<T extends { id: number }>({
+  title,
+  description,
+  columns,
+  items,
+  emptyTitle = 'Sin registros disponibles',
+  emptyDescription = 'Los datos aparecerán cuando se registren operaciones para este módulo.'
+}: DataTableProps<T>) {
   return (
     <section className="panel-card">
       <div className="panel-card__header">
@@ -24,39 +35,35 @@ export function DataTable<T extends { id: number }>({ title, description, column
         <span className="panel-card__count">{items.length} registros</span>
       </div>
 
-      <div className="data-table-wrap">
-        <table className="data-table">
-          <thead>
-            <tr>
-              {columns.map((column) => (
-                <th key={String(column.key)}>{column.label}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {items.map((item) => (
-              <tr key={item.id}>
-                {columns.map((column) => {
-                  const raw = item[column.key as keyof T];
-                  return (
-                    <td key={String(column.key)}>
-                      {column.render ? column.render(item) : String(raw ?? '')}
-                    </td>
-                  );
-                })}
-              </tr>
-            ))}
-            {items.length === 0 && (
+      {items.length > 0 ? (
+        <div className="data-table-wrap">
+          <table className="data-table">
+            <thead>
               <tr>
-                <td colSpan={columns.length} className="data-table__empty">
-                  No hay registros para mostrar.
-                </td>
+                {columns.map((column) => (
+                  <th key={String(column.key)}>{column.label}</th>
+                ))}
               </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {items.map((item) => (
+                <tr key={item.id}>
+                  {columns.map((column) => {
+                    const raw = item[column.key as keyof T];
+                    return (
+                      <td key={String(column.key)}>
+                        {column.render ? column.render(item) : String(raw ?? '')}
+                      </td>
+                    );
+                  })}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      ) : (
+        <EmptyState compact icon={<Database size={24} />} title={emptyTitle} description={emptyDescription} />
+      )}
     </section>
   );
 }
-

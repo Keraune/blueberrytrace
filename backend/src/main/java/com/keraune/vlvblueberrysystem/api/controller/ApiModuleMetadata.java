@@ -12,15 +12,15 @@ final class ApiModuleMetadata {
 
     static List<ModuleResponse> modules() {
         return List.of(
-                new ModuleResponse("dashboard", "Dashboard", "/dashboard", "/api/v1/dashboard/summary"),
-                new ModuleResponse("lotes", "Lotes e Invernaderos", "/lotes", "/api/v1/lotes"),
+                new ModuleResponse("dashboard", "Panel operativo", "/dashboard", "/api/v1/dashboard/summary"),
+                new ModuleResponse("lotes", "Lotes e invernaderos", "/lotes", "/api/v1/lotes"),
                 new ModuleResponse("camas", "Camas", "/camas", "/api/v1/camas"),
-                new ModuleResponse("siembra", "Registro de Siembra", "/siembra", "/api/v1/siembras"),
-                new ModuleResponse("procesos", "Uniformización y Formalización", "/procesos", "/api/v1/procesos"),
-                new ModuleResponse("clasificacion", "Clasificación", "/clasificacion", "/api/v1/clasificaciones"),
-                new ModuleResponse("despacho", "Despacho", "/despacho", "/api/v1/despachos"),
-                new ModuleResponse("reportes", "Reportes", "/reportes", "/api/v1/reportes/trazabilidad"),
-                new ModuleResponse("usuarios", "Usuarios", "/usuarios", "/api/v1/usuarios")
+                new ModuleResponse("siembra", "Registro de siembra", "/siembra", "/api/v1/siembras"),
+                new ModuleResponse("procesos", "Uniformización y formalización", "/procesos", "/api/v1/procesos"),
+                new ModuleResponse("clasificacion", "Control de clasificación", "/clasificacion", "/api/v1/clasificaciones"),
+                new ModuleResponse("despacho", "Seguimiento de despacho", "/despacho", "/api/v1/despachos"),
+                new ModuleResponse("reportes", "Reportes operativos", "/reportes", "/api/v1/reportes/trazabilidad"),
+                new ModuleResponse("usuarios", "Gestión de usuarios", "/usuarios", "/api/v1/usuarios")
         );
     }
 

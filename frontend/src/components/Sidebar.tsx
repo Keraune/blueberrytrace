@@ -38,7 +38,7 @@ export function Sidebar({ modules, activeKey, user, onSelect, onLogout }: Sideba
         <div className="brand__mark">BT</div>
         <div>
           <strong>BlueberryTrace</strong>
-          <span>Agro Intelligence</span>
+          <span>Vivero Los Viñedos</span>
         </div>
       </div>
 
