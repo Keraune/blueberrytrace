@@ -27,6 +27,15 @@ public class User {
     @Column(length = 120)
     private String email;
 
+    @Column(length = 90)
+    private String cargo;
+
+    @Column(length = 30)
+    private String telefono;
+
+    @Column(name = "avatar_color", length = 24)
+    private String avatarColor;
+
     @Column(nullable = false)
     private Boolean estado = true;
 
@@ -54,6 +63,9 @@ public class User {
     public String getUsername() { return username; }
     public String getPassword() { return password; }
     public String getEmail() { return email; }
+    public String getCargo() { return cargo; }
+    public String getTelefono() { return telefono; }
+    public String getAvatarColor() { return avatarColor; }
     public Boolean getEstado() { return estado; }
     public LocalDateTime getFechaCreacion() { return fechaCreacion; }
     public LocalDateTime getFechaActualizacion() { return fechaActualizacion; }
@@ -64,6 +76,9 @@ public class User {
     public void setUsername(String username) { this.username = username; }
     public void setPassword(String password) { this.password = password; }
     public void setEmail(String email) { this.email = email; }
+    public void setCargo(String cargo) { this.cargo = cargo; }
+    public void setTelefono(String telefono) { this.telefono = telefono; }
+    public void setAvatarColor(String avatarColor) { this.avatarColor = avatarColor; }
     public void setEstado(Boolean estado) { this.estado = estado; }
     public void setFechaCreacion(LocalDateTime fechaCreacion) { this.fechaCreacion = fechaCreacion; }
     public void setFechaActualizacion(LocalDateTime fechaActualizacion) { this.fechaActualizacion = fechaActualizacion; }

@@ -48,6 +48,9 @@ public final class ApiPayloads {
             String username,
             String nombreCompleto,
             String email,
+            String cargo,
+            String telefono,
+            String avatarColor,
             String rol,
             Boolean activo,
             LocalDateTime fechaCreacion,
@@ -59,6 +62,9 @@ public final class ApiPayloads {
             String username,
             String nombreCompleto,
             String email,
+            String cargo,
+            String telefono,
+            String avatarColor,
             String rol,
             List<String> authorities
     ) {
@@ -78,6 +84,15 @@ public final class ApiPayloads {
             @Size(max = 120, message = "El correo no debe superar 120 caracteres.")
             String email,
 
+            @Size(max = 90, message = "El cargo no debe superar 90 caracteres.")
+            String cargo,
+
+            @Size(max = 30, message = "El teléfono no debe superar 30 caracteres.")
+            String telefono,
+
+            @Size(max = 24, message = "El color de avatar no debe superar 24 caracteres.")
+            String avatarColor,
+
             @NotBlank(message = "El rol es obligatorio.")
             String rol,
 
@@ -85,6 +100,39 @@ public final class ApiPayloads {
             String password,
 
             Boolean activo
+    ) {
+    }
+
+
+
+    public record ProfileUpdatePayload(
+            @NotBlank(message = "El nombre completo es obligatorio.")
+            @Size(max = 150, message = "El nombre completo no debe superar 150 caracteres.")
+            String nombreCompleto,
+
+            @NotBlank(message = "El correo empresarial es obligatorio.")
+            @Email(message = "Ingresa un correo empresarial válido.")
+            @Size(max = 120, message = "El correo no debe superar 120 caracteres.")
+            String email,
+
+            @Size(max = 90, message = "El cargo no debe superar 90 caracteres.")
+            String cargo,
+
+            @Size(max = 30, message = "El teléfono no debe superar 30 caracteres.")
+            String telefono,
+
+            @Size(max = 24, message = "El color de avatar no debe superar 24 caracteres.")
+            String avatarColor
+    ) {
+    }
+
+    public record PasswordChangePayload(
+            @NotBlank(message = "Ingresa tu contraseña actual.")
+            String currentPassword,
+
+            @NotBlank(message = "Ingresa la nueva contraseña.")
+            @Size(min = 8, max = 120, message = "La nueva contraseña debe tener entre 8 y 120 caracteres.")
+            String newPassword
     ) {
     }
 

@@ -31,6 +31,8 @@ final class ApiModuleMetadata {
                 new EndpointResponse("POST", "/api/v1/auth/logout", "Cierre de sesión JSON para React/Vue."),
                 new EndpointResponse("GET", "/api/v1/frontend/bootstrap", "Configuración inicial para clientes React o Vue."),
                 new EndpointResponse("GET", "/api/v1/session/me", "Usuario autenticado y autoridades activas."),
+                new EndpointResponse("PUT", "/api/v1/session/me", "Actualización del perfil del trabajador autenticado."),
+                new EndpointResponse("PATCH", "/api/v1/session/me/password", "Cambio de contraseña del trabajador autenticado."),
                 new EndpointResponse("GET", "/api/v1/dashboard/summary", "Resumen operativo del panel."),
                 new EndpointResponse("GET", "/api/v1/catalogs/operations", "Catálogos necesarios para formularios del proceso productivo."),
                 new EndpointResponse("GET", "/api/v1/lotes", "Listado de invernaderos."),

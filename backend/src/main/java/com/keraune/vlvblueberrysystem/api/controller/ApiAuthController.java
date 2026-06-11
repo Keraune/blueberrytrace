@@ -96,6 +96,9 @@ public class ApiAuthController {
                 user.getUsername(),
                 user.getNombreCompleto(),
                 user.getEmail(),
+                user.getCargo(),
+                user.getTelefono(),
+                user.getAvatarColor(),
                 user.getRol() == null ? null : user.getRol().getNombre(),
                 authorities
         );

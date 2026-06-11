@@ -23,6 +23,9 @@ function toUserPayload(usuario: UserReferenceResponse): UserFormPayload {
     username: usuario.username,
     nombreCompleto: usuario.nombreCompleto,
     email: usuario.email,
+    cargo: usuario.cargo || '',
+    telefono: usuario.telefono || '',
+    avatarColor: usuario.avatarColor || 'emerald',
     rol: usuario.rol || 'OPERARIO',
     password: '',
     activo: usuario.activo
@@ -138,10 +141,10 @@ export function UsuariosPage({ usuarios, roles, onUsuariosChange }: UsuariosPage
                 <tr key={usuario.id}>
                   <td>
                     <div className="user-row">
-                      <span className="user-row__avatar">{initials(usuario.nombreCompleto)}</span>
+                      <span className={`user-row__avatar user-row__avatar--${usuario.avatarColor || 'emerald'}`}>{initials(usuario.nombreCompleto)}</span>
                       <div>
                         <strong>{usuario.nombreCompleto}</strong>
-                        <small>{usuario.email}</small>
+                        <small>{usuario.cargo || usuario.email}</small>
                       </div>
                     </div>
                   </td>
@@ -197,6 +200,8 @@ export function UsuariosPage({ usuarios, roles, onUsuariosChange }: UsuariosPage
                 { label: 'Rol', value: <StatusBadge value={selectedUser.rol} />, tone: 'purple' },
                 { label: 'Estado', value: selectedUser.activo ? 'Activo' : 'Inactivo', tone: selectedUser.activo ? 'blue' : 'neutral' },
                 { label: 'Correo', value: selectedUser.email },
+                { label: 'Cargo', value: selectedUser.cargo || 'Sin cargo registrado' },
+                { label: 'Teléfono', value: selectedUser.telefono || 'Sin teléfono registrado' },
                 { label: 'Creación', value: dateShort(selectedUser.fechaCreacion), tone: 'orange' },
                 { label: 'Actualización', value: dateShort(selectedUser.fechaActualizacion || selectedUser.fechaCreacion) }
               ]}

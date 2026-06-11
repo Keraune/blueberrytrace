@@ -6,6 +6,9 @@ const defaultPayload: UserFormPayload = {
   username: '',
   nombreCompleto: '',
   email: '',
+  cargo: '',
+  telefono: '',
+  avatarColor: 'emerald',
   rol: '',
   password: '',
   activo: true
@@ -52,6 +55,9 @@ export function UserForm({ roles, initialData, editing = false, submitLabel = 'G
         username: payload.username.trim().toLowerCase(),
         nombreCompleto: payload.nombreCompleto.trim(),
         email: normalizeCorporateEmail(payload.email),
+        cargo: payload.cargo?.trim() || undefined,
+        telefono: payload.telefono?.trim() || undefined,
+        avatarColor: payload.avatarColor || 'emerald',
         password: payload.password?.trim() || undefined
       });
     } catch (exception) {
@@ -111,6 +117,39 @@ export function UserForm({ roles, initialData, editing = false, submitLabel = 'G
           autoComplete="email"
         />
         <small className="field-hint">{emailHint}</small>
+      </label>
+
+      <label>
+        Cargo operativo
+        <input
+          value={payload.cargo || ''}
+          onChange={(event) => setPayload({ ...payload, cargo: event.target.value })}
+          maxLength={90}
+          placeholder="Supervisor de Producción"
+          autoComplete="organization-title"
+        />
+      </label>
+
+      <label>
+        Teléfono corporativo
+        <input
+          value={payload.telefono || ''}
+          onChange={(event) => setPayload({ ...payload, telefono: event.target.value })}
+          maxLength={30}
+          placeholder="+51 956 000 100"
+          autoComplete="tel"
+        />
+      </label>
+
+      <label>
+        Color de avatar
+        <select value={payload.avatarColor || 'emerald'} onChange={(event) => setPayload({ ...payload, avatarColor: event.target.value })}>
+          <option value="emerald">Verde corporativo</option>
+          <option value="blue">Azul operativo</option>
+          <option value="purple">Arándano</option>
+          <option value="orange">Despacho</option>
+          <option value="slate">Administrativo</option>
+        </select>
       </label>
 
       <label>

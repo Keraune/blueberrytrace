@@ -112,3 +112,7 @@ También se avanzó el módulo de usuarios con operaciones reales conectadas al 
 - validar correos `@vlv.com`;
 - consumir roles activos desde el backend.
 
+
+## Perfil corporativo y experiencia visual
+
+Se consolidó la experiencia visual del sistema como producto final: sidebar más compacto, topbar corporativo, modales centrados, avatar por color, perfil editable del trabajador y cambio de contraseña desde la sesión activa. Los usuarios ahora pueden guardar cargo, teléfono y color de avatar como datos persistidos en MySQL.

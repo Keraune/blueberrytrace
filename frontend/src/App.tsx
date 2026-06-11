@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { AlertTriangle, Loader2, RefreshCcw } from 'lucide-react';
 import { CommandPalette, type CommandSearchItem } from './components/CommandPalette';
+import { ProfileSettingsModal } from './components/ProfileSettingsModal';
 import { Sidebar } from './components/Sidebar';
 import { ToastStack, type ToastItem, type ToastTone } from './components/ToastStack';
 import { Topbar, type TopbarNotification } from './components/Topbar';
@@ -189,6 +190,7 @@ export default function App() {
   const [authRequired, setAuthRequired] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [commandOpen, setCommandOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const { activeKey, navigate } = useAppRoute();
 
@@ -403,6 +405,7 @@ export default function App() {
           onOpenSearch={() => setCommandOpen(true)}
           onRefresh={refresh}
           onNavigate={navigate}
+          onOpenProfile={() => setProfileOpen(true)}
           onLogout={handleLogout}
           refreshing={refreshing}
         />
@@ -437,6 +440,16 @@ export default function App() {
         onClose={() => setCommandOpen(false)}
         onSelect={navigate}
         onRefresh={refresh}
+      />
+      <ProfileSettingsModal
+        open={profileOpen}
+        user={user}
+        onClose={() => setProfileOpen(false)}
+        onUpdated={(updatedUser) => {
+          setUser(updatedUser);
+          pushToast('success', 'Perfil actualizado', 'Tus datos corporativos fueron guardados correctamente.');
+        }}
+        onPasswordChanged={() => pushToast('success', 'Contraseña actualizada', 'Tu contraseña fue modificada correctamente.')}
       />
       <ToastStack toasts={toasts} onDismiss={(id) => setToasts((current) => current.filter((toast) => toast.id !== id))} />
     </div>

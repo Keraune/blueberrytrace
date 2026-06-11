@@ -57,6 +57,9 @@ public class DataInitializer {
                 admin.setUsername("admin");
                 admin.setPassword(passwordEncoder.encode("admin123"));
                 admin.setEmail("admin@vlv.com");
+                admin.setCargo("Administrador del Sistema");
+                admin.setTelefono("+51 956 000 100");
+                admin.setAvatarColor("emerald");
                 admin.setEstado(true);
 
                 userRepository.save(admin);
@@ -66,14 +69,30 @@ public class DataInitializer {
                     .findByUsername("admin")
                     .orElseThrow(() -> new IllegalStateException("No existe el usuario administrador."));
 
+            boolean adminUpdated = false;
             if (!"admin@vlv.com".equalsIgnoreCase(admin.getEmail())) {
                 admin.setEmail("admin@vlv.com");
+                adminUpdated = true;
+            }
+            if (admin.getCargo() == null || admin.getCargo().isBlank()) {
+                admin.setCargo("Administrador del Sistema");
+                adminUpdated = true;
+            }
+            if (admin.getTelefono() == null || admin.getTelefono().isBlank()) {
+                admin.setTelefono("+51 956 000 100");
+                adminUpdated = true;
+            }
+            if (admin.getAvatarColor() == null || admin.getAvatarColor().isBlank()) {
+                admin.setAvatarColor("emerald");
+                adminUpdated = true;
+            }
+            if (adminUpdated) {
                 userRepository.save(admin);
             }
 
-            createUserIfNotExists(userRepository, roleRepository, passwordEncoder, "supervisor", "Supervisor de Producción", "supervisor@vlv.com", "SUPERVISOR");
-            createUserIfNotExists(userRepository, roleRepository, passwordEncoder, "calidad", "Control de Calidad", "calidad@vlv.com", "CONTROL_CALIDAD");
-            createUserIfNotExists(userRepository, roleRepository, passwordEncoder, "despacho", "Responsable de Despacho", "despacho@vlv.com", "OPERARIO");
+            createUserIfNotExists(userRepository, roleRepository, passwordEncoder, "supervisor", "Supervisor de Producción", "supervisor@vlv.com", "SUPERVISOR", "Supervisor de Producción", "+51 956 000 110", "blue");
+            createUserIfNotExists(userRepository, roleRepository, passwordEncoder, "calidad", "Control de Calidad", "calidad@vlv.com", "CONTROL_CALIDAD", "Control de Calidad", "+51 956 000 120", "purple");
+            createUserIfNotExists(userRepository, roleRepository, passwordEncoder, "despacho", "Responsable de Despacho", "despacho@vlv.com", "OPERARIO", "Responsable de Despacho", "+51 956 000 130", "orange");
 
             if (loteRepository.count() == 0) {
                 Lote loteUno = new Lote();
@@ -219,8 +238,17 @@ public class DataInitializer {
                                       String username,
                                       String nombreCompleto,
                                       String email,
-                                      String roleName) {
+                                      String roleName,
+                                      String cargo,
+                                      String telefono,
+                                      String avatarColor) {
         if (userRepository.findByUsername(username).isPresent()) {
+            User existing = userRepository.findByUsername(username).orElseThrow();
+            boolean changed = false;
+            if (existing.getCargo() == null || existing.getCargo().isBlank()) { existing.setCargo(cargo); changed = true; }
+            if (existing.getTelefono() == null || existing.getTelefono().isBlank()) { existing.setTelefono(telefono); changed = true; }
+            if (existing.getAvatarColor() == null || existing.getAvatarColor().isBlank()) { existing.setAvatarColor(avatarColor); changed = true; }
+            if (changed) { userRepository.save(existing); }
             return;
         }
 
@@ -233,6 +261,9 @@ public class DataInitializer {
         user.setUsername(username);
         user.setPassword(passwordEncoder.encode("Blueberry2026"));
         user.setEmail(email);
+        user.setCargo(cargo);
+        user.setTelefono(telefono);
+        user.setAvatarColor(avatarColor);
         user.setEstado(true);
         userRepository.save(user);
     }

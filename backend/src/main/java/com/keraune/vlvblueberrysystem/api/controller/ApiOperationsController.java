@@ -401,12 +401,35 @@ public class ApiOperationsController {
         user.setUsername(username);
         user.setEmail(email);
         user.setNombreCompleto(payload.nombreCompleto().trim());
+        user.setCargo(cleanNullable(payload.cargo()));
+        user.setTelefono(cleanNullable(payload.telefono()));
+        user.setAvatarColor(normalizeAvatarColor(payload.avatarColor(), user.getAvatarColor()));
         user.setRol(role);
         user.setEstado(payload.activo() == null || payload.activo());
 
         if (!password.isBlank()) {
             user.setPassword(passwordEncoder.encode(password));
         }
+    }
+
+
+
+    private String cleanNullable(String value) {
+        if (value == null || value.trim().isBlank()) {
+            return null;
+        }
+        return value.trim();
+    }
+
+    private String normalizeAvatarColor(String requestedColor, String currentColor) {
+        String value = requestedColor == null ? "" : requestedColor.trim();
+        if (value.isBlank()) {
+            return currentColor == null || currentColor.isBlank() ? "emerald" : currentColor;
+        }
+        if (!value.matches("^[a-zA-Z0-9_-]{3,24}$")) {
+            throw new IllegalArgumentException("El color del avatar no es válido.");
+        }
+        return value;
     }
 
     private String normalizeUsername(String username) {
@@ -435,6 +458,9 @@ public class ApiOperationsController {
                 user.getUsername(),
                 user.getNombreCompleto(),
                 user.getEmail(),
+                user.getCargo(),
+                user.getTelefono(),
+                user.getAvatarColor(),
                 user.getRol() == null ? null : user.getRol().getNombre(),
                 user.getEstado(),
                 user.getFechaCreacion(),

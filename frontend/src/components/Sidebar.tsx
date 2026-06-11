@@ -82,10 +82,10 @@ export function Sidebar({ modules, activeKey, user, onSelect, onLogout }: Sideba
 
       <div className="sidebar__footer">
         <div className="sidebar-user-card">
-          <span>{initials(user?.nombreCompleto)}</span>
+          <span className={`sidebar-user-card__avatar sidebar-user-card__avatar--${user?.avatarColor || 'emerald'}`}>{initials(user?.nombreCompleto)}</span>
           <div>
             <strong>{user?.nombreCompleto || 'Sesión activa'}</strong>
-            <small>{user?.rol || user?.username || 'Operario'}</small>
+            <small>{user?.cargo || user?.rol || user?.username || 'Operario'}</small>
           </div>
         </div>
         <button type="button" className="sidebar-logout" onClick={onLogout}>

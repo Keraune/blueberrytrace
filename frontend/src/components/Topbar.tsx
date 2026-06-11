@@ -19,6 +19,7 @@ interface TopbarProps {
   onOpenSearch: () => void;
   onRefresh?: () => void | Promise<void>;
   onNavigate?: (key: string) => void;
+  onOpenProfile?: () => void;
   onLogout?: () => void | Promise<void>;
   refreshing?: boolean;
 }
@@ -30,6 +31,7 @@ export function Topbar({
   onOpenSearch,
   onRefresh,
   onNavigate,
+  onOpenProfile,
   onLogout,
   refreshing = false
 }: TopbarProps) {
@@ -39,7 +41,8 @@ export function Topbar({
   const profileRef = useRef<HTMLDivElement>(null);
   const unreadCount = notifications.length;
 
-  const displayRole = useMemo(() => user?.rol || user?.authorities?.[0] || 'Operario', [user]);
+  const displayRole = useMemo(() => user?.cargo || user?.rol || user?.authorities?.[0] || 'Operario', [user]);
+  const avatarColor = user?.avatarColor || 'emerald';
 
   useEffect(() => {
     function onPointerDown(event: MouseEvent) {
@@ -76,9 +79,9 @@ export function Topbar({
       </div>
 
       <div className="topbar__actions">
-        <button className="topbar-search-trigger" type="button" onClick={onOpenSearch} aria-label="Abrir búsqueda global">
+        <button className="topbar-search-trigger topbar-search-trigger--wide" type="button" onClick={onOpenSearch} aria-label="Abrir búsqueda global">
           <Search size={16} />
-          <span>Buscar</span>
+          <span>Buscar en el sistema...</span>
           <kbd>Ctrl K</kbd>
         </button>
 
@@ -146,7 +149,7 @@ export function Topbar({
 
         <div className="topbar-menu" ref={profileRef}>
           <button
-            className={profileOpen ? 'topbar-avatar topbar-avatar--active' : 'topbar-avatar'}
+            className={profileOpen ? `topbar-avatar topbar-avatar--${avatarColor} topbar-avatar--active` : `topbar-avatar topbar-avatar--${avatarColor}`}
             type="button"
             aria-label="Abrir menú de perfil"
             aria-expanded={profileOpen}
@@ -172,9 +175,11 @@ export function Topbar({
                 <p><Mail size={15} /> {user?.email || 'correo no registrado'}</p>
                 <p><UserRound size={15} /> {user?.username || 'usuario'}</p>
                 <p><ShieldCheck size={15} /> {displayRole}</p>
+                {user?.telefono ? <p><Clock3 size={15} /> {user.telefono}</p> : null}
               </div>
 
               <div className="profile-panel__actions">
+                <button type="button" className="ghost-button" onClick={() => { onOpenProfile?.(); setProfileOpen(false); }}>Editar perfil</button>
                 <button type="button" className="ghost-button" onClick={() => onNavigate?.('usuarios')}>Ver usuarios</button>
                 <button type="button" className="action-button action-button--soft" onClick={onLogout}>
                   <LogOut size={15} /> Cerrar sesión

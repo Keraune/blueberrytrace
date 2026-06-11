@@ -20,6 +20,9 @@ export interface UserReferenceResponse {
   username: string;
   nombreCompleto: string;
   email: string;
+  cargo: string | null;
+  telefono: string | null;
+  avatarColor: string | null;
   rol: string | null;
   activo: boolean;
   fechaCreacion: string | null;
@@ -30,6 +33,9 @@ export interface AuthenticatedUserResponse {
   username: string;
   nombreCompleto: string;
   email: string;
+  cargo: string | null;
+  telefono: string | null;
+  avatarColor: string | null;
   rol: string | null;
   authorities: string[];
 }
@@ -38,9 +44,26 @@ export interface UserFormPayload {
   username: string;
   nombreCompleto: string;
   email: string;
+  cargo?: string;
+  telefono?: string;
+  avatarColor?: string;
   rol: string;
   password?: string;
   activo: boolean;
+}
+
+
+export interface ProfileUpdatePayload {
+  nombreCompleto: string;
+  email: string;
+  cargo?: string;
+  telefono?: string;
+  avatarColor?: string;
+}
+
+export interface PasswordChangePayload {
+  currentPassword: string;
+  newPassword: string;
 }
 
 export interface DashboardSummary {
