@@ -9,11 +9,16 @@ export function dateShort(value: string | null | undefined) {
     return 'Sin fecha';
   }
 
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
   return new Intl.DateTimeFormat('es-PE', {
     day: '2-digit',
     month: 'short',
     year: 'numeric'
-  }).format(new Date(value));
+  }).format(date);
 }
 
 export function initials(name: string | null | undefined) {

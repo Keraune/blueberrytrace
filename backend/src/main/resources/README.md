@@ -1,6 +1,5 @@
 # Recursos del backend
 
-El backend de BlueberryTrace quedó en modo API-first.
+El backend de BlueberryTrace trabaja en modo API REST para la interfaz web principal.
 
 Esta carpeta conserva únicamente recursos necesarios para ejecutar Spring Boot, como `application.properties`.
-Los HTML Thymeleaf y assets estáticos del panel antiguo fueron retirados porque la interfaz principal vive en `/frontend` con React/Vite.

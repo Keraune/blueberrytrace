@@ -80,6 +80,12 @@ public class SiembraService {
         siembraRepository.save(siembra);
     }
 
+    @Transactional
+    public void eliminarSiembra(Long id) {
+        Siembra siembra = obtenerPorId(id);
+        siembraRepository.delete(siembra);
+    }
+
     public SiembraForm crearFormularioInicial() {
         SiembraForm form = new SiembraForm();
         form.setFechaSiembra(LocalDate.now());

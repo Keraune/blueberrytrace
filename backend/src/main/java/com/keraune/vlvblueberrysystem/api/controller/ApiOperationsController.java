@@ -192,6 +192,12 @@ public class ApiOperationsController {
         return ApiResponse.ok("Estado de la siembra actualizado.", siembras().data());
     }
 
+    @DeleteMapping("/siembras/{id}")
+    public ApiResponse<ListResponse<SiembraResponse>> eliminarSiembra(@PathVariable Long id) {
+        siembraService.eliminarSiembra(id);
+        return ApiResponse.ok("Siembra eliminada correctamente.", siembras().data());
+    }
+
     @GetMapping("/procesos")
     public ApiResponse<ProcesoOperativoResponse> procesos() {
         List<UniformizacionResponse> uniformizaciones = procesoOperativoService.listarUniformizaciones().stream()

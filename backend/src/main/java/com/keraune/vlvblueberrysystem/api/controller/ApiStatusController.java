@@ -27,7 +27,7 @@ public class ApiStatusController {
         BackendStatusResponse response = new BackendStatusResponse(
                 applicationName,
                 "UP",
-                "API-first backend ready for React/Vue clients.",
+                "Servicio operativo listo para la interfaz de trazabilidad.",
                 OffsetDateTime.now(),
                 List.of(environment.getActiveProfiles())
         );

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { CheckCircle2, ChevronLeft, ChevronRight, ClipboardCheck, MapPin, Pencil, RotateCcw, Sprout } from 'lucide-react';
+import { CheckCircle2, ChevronLeft, ChevronRight, ClipboardCheck, MapPin, Pencil, RotateCcw, Sprout, Trash2 } from 'lucide-react';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { EmptyState } from '../components/EmptyState';
 import { Modal } from '../components/Modal';
@@ -45,6 +45,7 @@ export function SiembrasPage({ siembras, lotes, camas, onSiembrasChange }: Siemb
   const [error, setError] = useState<string | null>(null);
   const [editingSiembra, setEditingSiembra] = useState<SiembraResponse | null>(null);
   const [pendingStatus, setPendingStatus] = useState<SiembraResponse | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<SiembraResponse | null>(null);
   const [confirming, setConfirming] = useState(false);
 
   const camasDisponibles = useMemo(() => camas.filter((cama) => cama.lote?.id === payload.loteId), [camas, payload.loteId]);
@@ -113,6 +114,21 @@ export function SiembrasPage({ siembras, lotes, camas, onSiembrasChange }: Siemb
       setPendingStatus(null);
     } catch (exception) {
       emitToast('error', 'No se pudo cambiar el estado', exception instanceof Error ? exception.message : 'Ocurrió un error inesperado.');
+    } finally {
+      setConfirming(false);
+    }
+  }
+
+  async function confirmDeleteSiembra() {
+    if (!pendingDelete) return;
+    try {
+      setConfirming(true);
+      const response = await blueberryApi.deleteSiembra(pendingDelete.id);
+      onSiembrasChange(response.items);
+      emitToast('warning', 'Siembra eliminada', 'El registro fue retirado de la base operativa.');
+      setPendingDelete(null);
+    } catch (exception) {
+      emitToast('error', 'No se pudo eliminar la siembra', exception instanceof Error ? exception.message : 'Ocurrió un error inesperado.');
     } finally {
       setConfirming(false);
     }
@@ -253,6 +269,7 @@ export function SiembrasPage({ siembras, lotes, camas, onSiembrasChange }: Siemb
                       <div className="icon-actions">
                         <button type="button" className="icon-action" title="Editar" onClick={() => setEditingSiembra(siembra)}><Pencil size={15} /></button>
                         <button type="button" className="icon-action" title="Cambiar estado" onClick={() => setPendingStatus(siembra)}><RotateCcw size={15} /></button>
+                        <button type="button" className="icon-action icon-action--danger" title="Eliminar" onClick={() => setPendingDelete(siembra)}><Trash2 size={15} /></button>
                       </div>
                     </td>
                   </tr>
@@ -277,6 +294,17 @@ export function SiembrasPage({ siembras, lotes, camas, onSiembrasChange }: Siemb
         loading={confirming}
         onCancel={() => setPendingStatus(null)}
         onConfirm={confirmToggleStatus}
+      />
+
+      <ConfirmDialog
+        open={Boolean(pendingDelete)}
+        title="Eliminar registro de siembra"
+        description={pendingDelete ? `Se eliminará la siembra #${pendingDelete.id} del lote ${pendingDelete.lote?.codigo || 'seleccionado'}. Esta acción actualiza la trazabilidad y los reportes.` : ''}
+        confirmLabel="Eliminar"
+        tone="danger"
+        loading={confirming}
+        onCancel={() => setPendingDelete(null)}
+        onConfirm={confirmDeleteSiembra}
       />
     </main>
   );

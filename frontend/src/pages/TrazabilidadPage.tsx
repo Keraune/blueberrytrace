@@ -98,8 +98,8 @@ export function TrazabilidadPage({ lotes, camas, siembras, procesos, clasificaci
       const uniformizacionesLote = uniformizaciones.filter((item) => lotIdOf(item) === lote.id);
       const formalizacionesLote = formalizaciones.filter((item) => lotIdOf(item) === lote.id);
 
-      const planted = row?.plantasSembradas ?? siembrasLote.reduce((total, item) => total + (item.cantidadRegistrada || 0), 0);
-      const shipped = row?.plantasDespachadas ?? despachosLote.reduce((total, item) => total + (item.cantidadDespachada || 0), 0);
+      const planted = siembrasLote.reduce((total, item) => total + (item.cantidadRegistrada || 0), 0) || row?.plantasSembradas || 0;
+      const shipped = despachosLote.reduce((total, item) => total + (item.cantidadDespachada || 0), 0) || row?.plantasDespachadas || 0;
       const latestDates = [
         lote.fechaActualizacion,
         lote.fechaCreacion,
@@ -113,15 +113,16 @@ export function TrazabilidadPage({ lotes, camas, siembras, procesos, clasificaci
 
       return {
         lote,
-        camas: row?.camas ?? camasLote.length,
-        siembras: row?.siembras ?? siembrasLote.length,
+        camas: camasLote.length || row?.camas || 0,
+        siembras: siembrasLote.length || row?.siembras || 0,
         plantasSembradas: planted,
-        uniformizaciones: row?.uniformizaciones ?? uniformizacionesLote.length,
-        formalizaciones: row?.formalizaciones ?? formalizacionesLote.length,
-        clasificaciones: row?.clasificaciones ?? clasificacionesLote.length,
-        despachos: row?.despachos ?? despachosLote.length,
+        uniformizaciones: uniformizacionesLote.length || row?.uniformizaciones || 0,
+        formalizaciones: formalizacionesLote.length || row?.formalizaciones || 0,
+        clasificaciones: clasificacionesLote.length || row?.clasificaciones || 0,
+        despachos: despachosLote.length || row?.despachos || 0,
         plantasDespachadas: shipped,
-        ultimoEvento: row?.ultimoEvento || latestDates.sort((a, b) => new Date(b).getTime() - new Date(a).getTime())[0] || null
+        ultimoEvento: row?.ultimoEvento || 'Solo estructura base',
+        ultimoEventoFecha: latestDates.sort((a, b) => new Date(b).getTime() - new Date(a).getTime())[0] || null
       };
     });
   }, [camas, clasificaciones, despachos, formalizaciones, lotes, siembras, trazabilidad, uniformizaciones]);
@@ -314,7 +315,7 @@ export function TrazabilidadPage({ lotes, camas, siembras, procesos, clasificaci
               <div><span>Camas</span><strong>{selectedRow.camas}</strong></div>
               <div><span>Siembras</span><strong>{selectedRow.siembras}</strong></div>
               <div><span>Despachos</span><strong>{selectedRow.despachos}</strong></div>
-              <div><span>Último evento</span><strong>{dateShort(selectedRow.ultimoEvento)}</strong></div>
+              <div><span>Último evento</span><strong>{selectedRow.ultimoEvento}</strong><small>{dateShort(selectedRow.ultimoEventoFecha)}</small></div>
             </div>
           </article>
 

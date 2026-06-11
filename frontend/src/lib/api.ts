@@ -120,6 +120,7 @@ export const blueberryApi = {
   createSiembra: (payload: SiembraFormPayload) => mutateData<ListResponse<SiembraResponse>>('/siembras', 'POST', payload),
   updateSiembra: (id: number, payload: SiembraFormPayload) => mutateData<ListResponse<SiembraResponse>>(`/siembras/${id}`, 'PUT', payload),
   toggleSiembraStatus: (id: number) => mutateData<ListResponse<SiembraResponse>>(`/siembras/${id}/estado`, 'PATCH'),
+  deleteSiembra: (id: number) => mutateData<ListResponse<SiembraResponse>>(`/siembras/${id}`, 'DELETE'),
   procesos: () => getData<ProcesoOperativoResponse>('/procesos'),
   createUniformizacion: (payload: UniformizacionFormPayload) => mutateData<ProcesoOperativoResponse>('/procesos/uniformizaciones', 'POST', payload),
   updateUniformizacion: (id: number, payload: UniformizacionFormPayload) => mutateData<ProcesoOperativoResponse>(`/procesos/uniformizaciones/${id}`, 'PUT', payload),
