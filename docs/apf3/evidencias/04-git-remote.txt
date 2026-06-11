@@ -1,0 +1,7 @@
+BlueberryTrace — Evidencia APF3
+Repositorio remoto
+Generado: 2026-06-10 21:28:25
+Directorio: /home/keraune/IdeaProjects/blueberrytrace
+
+origin	https://github.com/Keraune/blueberrytrace.git (fetch)
+origin	https://github.com/Keraune/blueberrytrace.git (push)

@@ -20,7 +20,8 @@
     "doctor": "bash scripts/doctor.sh",
     "dev:full": "npm run setup:permissions && npm run backend:run",
     "maven": "bash scripts/maven.sh",
-    "backend:api": "bash scripts/run-backend.sh"
+    "backend:api": "bash scripts/run-backend.sh",
+    "apf3:evidence": "bash scripts/apf3-evidence.sh"
   },
   "workspaces": [
     "frontend"

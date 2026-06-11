@@ -1,0 +1,10 @@
+BlueberryTrace — Evidencia APF3
+Estado del repositorio
+Generado: 2026-06-10 21:28:25
+Directorio: /home/keraune/IdeaProjects/blueberrytrace
+
+## main...origin/main
+ M README.md
+ M package.json
+?? docs/apf3/
+?? scripts/apf3-evidence.sh

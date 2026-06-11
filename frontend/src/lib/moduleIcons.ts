@@ -6,6 +6,7 @@ import {
   Home,
   Layers3,
   PackageCheck,
+  Route,
   Sprout,
   Truck,
   UsersRound,
@@ -20,6 +21,7 @@ export const moduleIcons: Record<string, LucideIcon> = {
   procesos: ClipboardList,
   clasificacion: Boxes,
   despacho: Truck,
+  trazabilidad: Route,
   reportes: BarChart3,
   usuarios: UsersRound
 };

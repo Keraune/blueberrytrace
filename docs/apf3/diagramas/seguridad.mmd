@@ -1,0 +1,10 @@
+flowchart LR
+    Browser[React] -->|Solicita CSRF| CSRF[Endpoint CSRF]
+    Browser -->|Login| Auth[Spring Security]
+    Auth --> BCrypt[BCrypt Password Encoder]
+    Auth --> Session[Sesión]
+    Browser -->|Requests con sesión + CSRF| API[API protegida]
+    API --> Validacion[Validación DTO]
+    Validacion --> Service[Servicios]
+    Service --> Repository[JPA Repository]
+    Repository --> DB[(MySQL)]

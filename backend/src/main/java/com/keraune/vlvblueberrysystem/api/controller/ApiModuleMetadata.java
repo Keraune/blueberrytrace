@@ -19,6 +19,7 @@ final class ApiModuleMetadata {
                 new ModuleResponse("procesos", "Uniformización y formalización", "/procesos", "/api/v1/procesos"),
                 new ModuleResponse("clasificacion", "Control de clasificación", "/clasificacion", "/api/v1/clasificaciones"),
                 new ModuleResponse("despacho", "Seguimiento de despacho", "/despacho", "/api/v1/despachos"),
+                new ModuleResponse("trazabilidad", "Trazabilidad por lote", "/trazabilidad", "/api/v1/reportes/trazabilidad"),
                 new ModuleResponse("reportes", "Reportes operativos", "/reportes", "/api/v1/reportes/trazabilidad"),
                 new ModuleResponse("usuarios", "Gestión de usuarios", "/usuarios", "/api/v1/usuarios")
         );

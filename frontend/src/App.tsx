@@ -16,6 +16,7 @@ import { LoginPage } from './pages/LoginPage';
 import { LotesPage } from './pages/LotesPage';
 import { ProcesosPage } from './pages/ProcesosPage';
 import { ReportesPage } from './pages/ReportesPage';
+import { TrazabilidadPage } from './pages/TrazabilidadPage';
 import { SiembrasPage } from './pages/SiembrasPage';
 import { UsuariosPage } from './pages/UsuariosPage';
 import type {
@@ -429,6 +430,7 @@ export default function App() {
           {activeKey === 'procesos' && <ProcesosPage procesos={procesos} lotes={loteReferences} camas={camas} siembras={siembras} onProcesosChange={setProcesos} />}
           {activeKey === 'clasificacion' && <ClasificacionPage clasificaciones={clasificaciones} lotes={loteReferences} camas={camas} onClasificacionesChange={setClasificaciones} />}
           {activeKey === 'despacho' && <DespachoPage despachos={despachos} lotes={loteReferences} modalidades={catalogs?.modalidadesDespacho || []} validaciones={catalogs?.validacionesCalidad || []} onDespachosChange={setDespachos} />}
+          {activeKey === 'trazabilidad' && <TrazabilidadPage lotes={lotes} camas={camas} siembras={siembras} procesos={procesos} clasificaciones={clasificaciones} despachos={despachos} trazabilidad={trazabilidad} />}
           {activeKey === 'reportes' && <ReportesPage trazabilidad={trazabilidad} />}
           {activeKey === 'usuarios' && <UsuariosPage usuarios={usuarios} roles={catalogs?.roles || []} onUsuariosChange={setUsuarios} />}
         </div>

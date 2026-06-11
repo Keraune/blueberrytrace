@@ -268,3 +268,30 @@ También se avanzó el módulo de usuarios con operaciones reales conectadas al 
 ## Perfil corporativo y experiencia visual
 
 Se consolidó la experiencia visual del sistema como producto final: sidebar más compacto, topbar corporativo, modales centrados, avatar por color, perfil editable del trabajador y cambio de contraseña desde la sesión activa. Los usuarios ahora pueden guardar cargo, teléfono y color de avatar como datos persistidos en MySQL.
+
+## Fase 30 - Preparación académica APF3
+
+Se agregó una carpeta específica para el **Avance de Proyecto Final 3** en `docs/apf3/`, alineada con la Unidad 3 del curso Integrador I: Sistemas Software.
+
+Incluye:
+
+- Informe base APF3 en Markdown.
+- Sustento de arquitectura API-first, MVC, DAO/JPA, SOLID, TDD y seguridad.
+- Recursos Java aplicados en el proyecto.
+- Guía de evidencias Git/GitHub.
+- Guion rápido para exposición.
+- Checklist de entrega.
+- Diagramas Mermaid de arquitectura, MVC/API-first, flujo principal y seguridad.
+- Script para generar evidencias locales.
+
+Comando de evidencia:
+
+```bash
+npm run apf3:evidence
+```
+
+El comando genera archivos en:
+
+```text
+docs/apf3/evidencias/
+```

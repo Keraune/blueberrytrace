@@ -12,6 +12,7 @@ export const appRoutes: AppRoute[] = [
   { key: 'procesos', path: '/procesos', label: 'Uniformización y formalización' },
   { key: 'clasificacion', path: '/clasificacion', label: 'Control de clasificación' },
   { key: 'despacho', path: '/despacho', label: 'Seguimiento de despacho' },
+  { key: 'trazabilidad', path: '/trazabilidad', label: 'Trazabilidad por lote' },
   { key: 'reportes', path: '/reportes', label: 'Reportes operativos' },
   { key: 'usuarios', path: '/usuarios', label: 'Gestión de usuarios' }
 ];

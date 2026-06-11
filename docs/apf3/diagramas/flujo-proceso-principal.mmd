@@ -1,0 +1,12 @@
+flowchart TD
+    A[Inicio de sesión] --> B{Rol autorizado?}
+    B -- No --> C[Denegar acceso]
+    B -- Sí --> D[Seleccionar módulo]
+    D --> E[Registrar lote/cama]
+    E --> F[Registrar siembra]
+    F --> G[Uniformización]
+    G --> H[Formalización]
+    H --> I[Clasificación]
+    I --> J[Despacho]
+    J --> K[Reportes y trazabilidad]
+    K --> L[Fin]

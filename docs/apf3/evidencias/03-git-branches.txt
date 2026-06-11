@@ -1,0 +1,8 @@
+BlueberryTrace — Evidencia APF3
+Ramas locales y remotas
+Generado: 2026-06-10 21:28:25
+Directorio: /home/keraune/IdeaProjects/blueberrytrace
+
+* main
+  remotes/origin/HEAD -> origin/main
+  remotes/origin/main

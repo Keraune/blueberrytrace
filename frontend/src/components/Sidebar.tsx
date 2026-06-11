@@ -8,7 +8,7 @@ import type { AuthenticatedUserResponse, ModuleResponse } from '../types/api';
 const sections = [
   { title: 'Principal', keys: ['dashboard', 'usuarios', 'lotes'] },
   { title: 'Proceso Productivo', keys: ['siembra', 'procesos', 'camas', 'clasificacion', 'despacho'] },
-  { title: 'Análisis', keys: ['reportes'] }
+  { title: 'Análisis', keys: ['trazabilidad', 'reportes'] }
 ] as const;
 
 interface SidebarProps {
