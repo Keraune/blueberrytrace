@@ -7,7 +7,7 @@
 
     <groupId>com.keraune</groupId>
     <artifactId>blueberrytrace</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.0.0</version>
     <packaging>pom</packaging>
 
     <name>blueberrytrace</name>

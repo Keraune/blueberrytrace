@@ -14,7 +14,7 @@
 
 	<groupId>com.keraune</groupId>
 	<artifactId>vlv-blueberry-system</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>1.0.0</version>
 	<name>vlv-blueberry-system</name>
 	<description>Sistema web interno para trazabilidad de plantas de arándano</description>
 
