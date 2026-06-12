@@ -26,7 +26,7 @@ export function DataTable<T extends { id: number }>({
   emptyDescription = 'Los datos aparecerán cuando se registren operaciones para este módulo.'
 }: DataTableProps<T>) {
   return (
-    <section className="panel-card data-table-card">
+    <section className="panel-card">
       <div className="panel-card__header">
         <div>
           <h2>{title}</h2>
