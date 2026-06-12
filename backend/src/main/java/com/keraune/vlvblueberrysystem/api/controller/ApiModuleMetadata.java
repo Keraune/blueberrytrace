@@ -10,7 +10,7 @@ public final class ApiModuleMetadata {
 
     public static List<ModuleResponse> modules() {
         return List.of(
-                new ModuleResponse("dashboard", "Dashboard", "/dashboard", "/api/v1/dashboard/summary"),
+                new ModuleResponse("dashboard", "Inicio", "/dashboard", "/api/v1/dashboard/summary"),
                 new ModuleResponse("lotes", "Lotes", "/lotes", "/api/v1/lotes"),
                 new ModuleResponse("camas", "Camas", "/camas", "/api/v1/camas"),
                 new ModuleResponse("siembra", "Siembra", "/siembra", "/api/v1/siembras"),

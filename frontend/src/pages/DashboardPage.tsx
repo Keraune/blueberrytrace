@@ -1,5 +1,4 @@
-import type { CSSProperties } from 'react';
-import { Boxes, ChevronDown, Factory, Home, Leaf, PackageCheck, Sprout, Tag, Truck } from 'lucide-react';
+import { AlertTriangle, CalendarDays, CheckCircle2, ClipboardList, Factory, Home, Leaf, MoreVertical, PackageCheck, Route, Sprout, Tag, Truck } from 'lucide-react';
 import { dateShort, numberCompact } from '../lib/format';
 import type {
   CamaResponse,
@@ -23,406 +22,333 @@ interface DashboardPageProps {
   trazabilidad: TrazabilidadResponse[];
 }
 
-type ActivityTone = 'green' | 'blue' | 'orange' | 'purple' | 'slate' | 'red';
+type ActivityTone = 'green' | 'purple' | 'amber' | 'slate';
 
 interface ActivityEntry {
   id: string;
   tone: ActivityTone;
   title: string;
   meta: string;
-  date: string | null;
+  time: string;
+  icon: typeof Sprout;
 }
-
-const monthLabels = ['Ene', 'Feb', 'Mar', 'Abr', 'May', 'Jun', 'Jul', 'Ago', 'Sep', 'Oct', 'Nov', 'Dic'];
 
 function valueOf(value: number | null | undefined) {
   return Number.isFinite(value || 0) ? Number(value || 0) : 0;
-}
-
-function monthIndex(value: string | null | undefined) {
-  if (!value) {
-    return -1;
-  }
-
-  const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) {
-    return -1;
-  }
-
-  return parsed.getMonth();
-}
-
-function buildLinePoints(values: number[], maxValue: number, width = 760, height = 200, paddingX = 28, paddingY = 22) {
-  const safeMax = Math.max(maxValue, 1);
-  return values.map((value, index) => {
-    const x = paddingX + (index * ((width - paddingX * 2) / Math.max(values.length - 1, 1)));
-    const y = height - paddingY - ((value / safeMax) * (height - paddingY * 2));
-    return `${x},${y}`;
-  }).join(' ');
-}
-
-function buildAreaPath(points: string, height = 200, paddingY = 22) {
-  const parts = points.split(' ');
-  const first = parts[0];
-  const last = parts.at(-1) || first;
-  const firstX = first.split(',')[0];
-  const lastX = last.split(',')[0];
-  return `M ${first} L ${parts.slice(1).join(' L ')} L ${lastX},${height - paddingY} L ${firstX},${height - paddingY} Z`;
-}
-
-function axisLabels(maxValue: number) {
-  const safeMax = Math.max(maxValue, 1);
-  return [safeMax, safeMax * 0.75, safeMax * 0.5, safeMax * 0.25, 0].map((value) => numberCompact(Math.round(value)));
-}
-
-function navigateTo(path: string) {
-  window.history.pushState({}, '', path);
-  window.dispatchEvent(new PopStateEvent('popstate'));
-}
-
-function qualityBucket(item: ClasificacionResponse) {
-  const source = `${item.estadoPlanta || ''} ${item.condicion || ''} ${item.tamano || ''}`.toLowerCase();
-
-  if (/descarte|rechaz|no apt|dañ|enfer/i.test(source)) {
-    return 'Descarte';
-  }
-
-  if (/primera|óptimo|optimo|excelente|apta/i.test(source)) {
-    return 'Primera';
-  }
-
-  if (/segunda|bueno|media|mediano/i.test(source)) {
-    return 'Segunda';
-  }
-
-  if (/tercera|regular|bajo|pequeño|pequeno/i.test(source)) {
-    return 'Tercera';
-  }
-
-  return 'Sin clasificar';
 }
 
 function recordDate(...values: Array<string | null | undefined>) {
   return values.find(Boolean) || null;
 }
 
+function byLatestDate<T>(items: T[], dateOf: (item: T) => string | null | undefined) {
+  return [...items].sort((left, right) => new Date(dateOf(right) || 0).getTime() - new Date(dateOf(left) || 0).getTime());
+}
+
 function actorName(value: { usuarioRegistro?: { nombreCompleto?: string | null } | null }) {
   return value.usuarioRegistro?.nombreCompleto || 'Sistema';
 }
 
-function byRecent(left: ActivityEntry, right: ActivityEntry) {
-  return new Date(right.date || 0).getTime() - new Date(left.date || 0).getTime();
+function statusClass(value?: string | null) {
+  const source = (value || '').toLowerCase();
+  if (/activo|producci|validado|completado|aprob/i.test(source)) return 'success';
+  if (/proceso|pendiente|revisi/i.test(source)) return 'warning';
+  if (/observ|anulado|inactivo|rechaz/i.test(source)) return 'danger';
+  return 'neutral';
+}
+
+function traceProgress(trace?: TrazabilidadResponse) {
+  const steps = [
+    { label: 'Siembra', active: valueOf(trace?.siembras) > 0, icon: Sprout },
+    { label: 'Uniformización', active: valueOf(trace?.uniformizaciones) > 0, icon: Leaf },
+    { label: 'Formalización', active: valueOf(trace?.formalizaciones) > 0, icon: ClipboardList },
+    { label: 'Clasificación', active: valueOf(trace?.clasificaciones) > 0, icon: Tag },
+    { label: 'Despachado', active: valueOf(trace?.despachos) > 0, icon: Truck }
+  ];
+  return steps;
+}
+
+function monthName(value?: string | null) {
+  const parsed = new Date(value || '');
+  if (Number.isNaN(parsed.getTime())) return 'Actual';
+  return parsed.toLocaleString('es-PE', { month: 'short' }).replace('.', '');
+}
+
+function buildRendimiento(lotes: LoteResponse[], siembras: SiembraResponse[]) {
+  const totals = new Map<string, number>();
+  siembras.forEach((item) => {
+    const key = item.lote?.codigo || 'Sin lote';
+    totals.set(key, (totals.get(key) || 0) + valueOf(item.cantidadRegistrada));
+  });
+
+  if (totals.size === 0) {
+    lotes.slice(0, 5).forEach((lote) => totals.set(lote.codigo, 0));
+  }
+
+  const bars = [...totals.entries()]
+    .map(([label, value]) => ({ label, value }))
+    .sort((left, right) => right.value - left.value)
+    .slice(0, 5);
+  const max = Math.max(...bars.map((item) => item.value), 1);
+  return { bars, max };
 }
 
 export function DashboardPage({ dashboard, lotes, camas, siembras, procesos, clasificaciones, despachos, trazabilidad }: DashboardPageProps) {
   const summary = dashboard?.summary;
-  const updatedAt = new Date().toLocaleString('es-PE', {
-    day: '2-digit',
-    month: '2-digit',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  });
-
-  const currentYear = new Date().getFullYear();
-  const currentMonth = new Date().getMonth();
-  const planted = summary?.plantasSembradas || siembras.reduce((total, item) => total + valueOf(item.cantidadRegistrada), 0);
-  const shipped = summary?.plantasDespachadas || despachos.reduce((total, item) => total + valueOf(item.cantidadDespachada), 0);
-  const classifications = summary?.clasificacionesRegistradas || clasificaciones.length;
-  const pendingClassifications = summary?.clasificacionesPendientes || clasificaciones.filter((item) => /PENDIENTE|OBSERVADA/i.test(item.estado || '')).length;
   const activeLots = summary?.lotesActivos || lotes.filter((lote) => (lote.estado || '').toUpperCase() === 'ACTIVO').length;
-  const totalLots = summary?.lotesRegistrados || lotes.length;
-  const newLotsThisMonth = lotes.filter((lote) => {
-    const date = new Date(lote.fechaRegistro || lote.fechaCreacion || '');
-    return !Number.isNaN(date.getTime()) && date.getMonth() === currentMonth && date.getFullYear() === currentYear;
-  }).length;
-
-  const plantedByMonth = Array.from({ length: 12 }, () => 0);
-  const shippedByMonth = Array.from({ length: 12 }, () => 0);
-  siembras.forEach((item) => {
-    const index = monthIndex(item.fechaSiembra || item.fechaCreacion);
-    if (index >= 0) {
-      plantedByMonth[index] += valueOf(item.cantidadRegistrada);
-    }
-  });
-  despachos.forEach((item) => {
-    const index = monthIndex(item.fechaDespacho || item.fechaCreacion);
-    if (index >= 0) {
-      shippedByMonth[index] += valueOf(item.cantidadDespachada);
-    }
-  });
-
-  const monthlyMax = Math.max(...plantedByMonth, ...shippedByMonth, 1);
-  const hasMonthlyData = plantedByMonth.some(Boolean) || shippedByMonth.some(Boolean);
-  const plantPoints = buildLinePoints(plantedByMonth, monthlyMax);
-  const dispatchPoints = buildLinePoints(shippedByMonth, monthlyMax);
-  const areaPath = buildAreaPath(plantPoints);
-  const yAxisLabels = axisLabels(monthlyMax);
-
-  const lotStatusCounts = {
-    activo: lotes.filter((lote) => (lote.estado || '').toUpperCase() === 'ACTIVO').length,
-    enProceso: lotes.filter((lote) => /PROCESO|MANTENIMIENTO/i.test(lote.estado || '')).length,
-    cosecha: lotes.filter((lote) => /COSECHA/i.test(lote.estado || '')).length,
-    completado: lotes.filter((lote) => /COMPLETADO|INACTIVO/i.test(lote.estado || '')).length,
-    pendiente: lotes.filter((lote) => /PENDIENTE/i.test(lote.estado || '')).length
-  };
-  const totalStatus = Object.values(lotStatusCounts).reduce((total, value) => total + value, 0) || 1;
-  const donutStyle = {
-    '--activo': `${(lotStatusCounts.activo / totalStatus) * 360}deg`,
-    '--proceso': `${(lotStatusCounts.enProceso / totalStatus) * 360}deg`,
-    '--cosecha': `${(lotStatusCounts.cosecha / totalStatus) * 360}deg`,
-    '--completado': `${(lotStatusCounts.completado / totalStatus) * 360}deg`
-  } as CSSProperties;
-
-  const qualityTotals = clasificaciones.reduce<Record<string, number>>((accumulator, item) => {
-    const bucket = qualityBucket(item);
-    accumulator[bucket] = (accumulator[bucket] || 0) + valueOf(item.cantidad);
-    return accumulator;
-  }, { Primera: 0, Segunda: 0, Tercera: 0, Descarte: 0 });
-  const qualityBars = [
-    { label: 'Primera', value: qualityTotals.Primera || 0, tone: 'green' },
-    { label: 'Segunda', value: qualityTotals.Segunda || 0, tone: 'blue' },
-    { label: 'Tercera', value: qualityTotals.Tercera || 0, tone: 'orange' },
-    { label: 'Descarte', value: qualityTotals.Descarte || 0, tone: 'red' }
-  ];
-  const maxQuality = Math.max(...qualityBars.map((item) => item.value), 1);
-  const hasQualityData = qualityBars.some((item) => item.value > 0);
+  const activeBeds = summary?.camasActivas || camas.filter((cama) => (cama.estado || '').toUpperCase() === 'ACTIVA').length;
+  const planted = summary?.plantasSembradas || siembras.reduce((total, item) => total + valueOf(item.cantidadRegistrada), 0);
+  const dispatches = summary?.despachosRegistrados || despachos.length;
+  const shipped = summary?.plantasDespachadas || despachos.reduce((total, item) => total + valueOf(item.cantidadDespachada), 0);
+  const selectedTrace = byLatestDate(trazabilidad, (item) => item.ultimoEvento)[0];
+  const recentLots = byLatestDate(lotes, (item) => recordDate(item.fechaActualizacion, item.fechaCreacion, item.fechaRegistro)).slice(0, 5);
+  const rendimiento = buildRendimiento(lotes, siembras);
 
   const recentActivity: ActivityEntry[] = [
-    ...lotes.map((item) => ({
-      id: `lote-${item.id}`,
-      tone: 'green' as ActivityTone,
-      title: `Lote ${item.codigo} · ${item.estado || 'sin estado'}`,
-      meta: `${actorName(item)} · ${dateShort(recordDate(item.fechaActualizacion, item.fechaCreacion, item.fechaRegistro))}`,
-      date: recordDate(item.fechaActualizacion, item.fechaCreacion, item.fechaRegistro)
+    ...despachos.map((item) => ({
+      id: `despacho-${item.id}`,
+      tone: 'purple' as ActivityTone,
+      title: `Despacho registrado`,
+      meta: `${item.lote?.codigo || 'Lote'} · ${numberCompact(item.cantidadDespachada)} plantas`,
+      time: dateShort(recordDate(item.fechaActualizacion, item.fechaCreacion, item.fechaDespacho)),
+      icon: Truck
     })),
     ...siembras.map((item) => ({
       id: `siembra-${item.id}`,
-      tone: 'blue' as ActivityTone,
-      title: `Siembra #${item.id} · ${numberCompact(item.cantidadRegistrada)} plantas`,
-      meta: `${actorName(item)} · ${dateShort(recordDate(item.fechaActualizacion, item.fechaCreacion, item.fechaSiembra))}`,
-      date: recordDate(item.fechaActualizacion, item.fechaCreacion, item.fechaSiembra)
+      tone: 'green' as ActivityTone,
+      title: `Siembra registrada`,
+      meta: `${item.lote?.codigo || 'Lote'} · ${numberCompact(item.cantidadRegistrada)} plantas`,
+      time: dateShort(recordDate(item.fechaActualizacion, item.fechaCreacion, item.fechaSiembra)),
+      icon: Sprout
     })),
     ...(procesos?.uniformizaciones.items || []).map((item) => ({
       id: `uniformizacion-${item.id}`,
-      tone: 'purple' as ActivityTone,
-      title: `Uniformización #${item.id} · ${item.estado || 'sin estado'}`,
-      meta: `${actorName(item)} · ${dateShort(recordDate(item.fechaActualizacion, item.fechaCreacion, item.fechaUniformizacion))}`,
-      date: recordDate(item.fechaActualizacion, item.fechaCreacion, item.fechaUniformizacion)
+      tone: 'amber' as ActivityTone,
+      title: `Uniformización completada`,
+      meta: `${item.lote?.codigo || 'Lote'} · ${item.cama?.codigo || 'Cama'}`,
+      time: dateShort(recordDate(item.fechaActualizacion, item.fechaCreacion, item.fechaUniformizacion)),
+      icon: Leaf
     })),
     ...clasificaciones.map((item) => ({
       id: `clasificacion-${item.id}`,
-      tone: (item.estado && /PENDIENTE|OBSERVADA/i.test(item.estado) ? 'orange' : 'green') as ActivityTone,
-      title: `Clasificación #${item.id} · ${item.estado || 'sin estado'}`,
-      meta: `${actorName(item)} · ${dateShort(recordDate(item.fechaActualizacion, item.fechaCreacion, item.fechaClasificacion))}`,
-      date: recordDate(item.fechaActualizacion, item.fechaCreacion, item.fechaClasificacion)
-    })),
-    ...despachos.map((item) => ({
-      id: `despacho-${item.id}`,
-      tone: 'blue' as ActivityTone,
-      title: `Despacho #${item.id} · ${numberCompact(item.cantidadDespachada)} plantas`,
-      meta: `${actorName(item)} · ${dateShort(recordDate(item.fechaActualizacion, item.fechaCreacion, item.fechaDespacho))}`,
-      date: recordDate(item.fechaActualizacion, item.fechaCreacion, item.fechaDespacho)
+      tone: 'slate' as ActivityTone,
+      title: `Clasificación registrada`,
+      meta: `${item.lote?.codigo || 'Lote'} · ${numberCompact(item.cantidad)} plantas`,
+      time: dateShort(recordDate(item.fechaActualizacion, item.fechaCreacion, item.fechaClasificacion)),
+      icon: Tag
     }))
-  ].sort(byRecent).slice(0, 6);
+  ].slice(0, 4);
+
+  const alerts = [
+    {
+      icon: AlertTriangle,
+      tone: 'amber',
+      title: clasificaciones.filter((item) => /PENDIENTE|OBSERVADA/i.test(item.estado || '')).length > 0 ? 'Clasificación pendiente' : 'Control operativo',
+      text: clasificaciones.filter((item) => /PENDIENTE|OBSERVADA/i.test(item.estado || '')).length > 0
+        ? 'Existen registros que requieren revisión de calidad.'
+        : 'Los registros principales se encuentran disponibles.',
+      time: 'Actual'
+    },
+    {
+      icon: Route,
+      tone: 'purple',
+      title: 'Trazabilidad disponible',
+      text: `${trazabilidad.length} lotes cuentan con seguimiento consolidado.`,
+      time: 'Sistema'
+    },
+    {
+      icon: CheckCircle2,
+      tone: 'green',
+      title: 'Despachos registrados',
+      text: `${dispatches} movimientos de despacho cargados desde la base de datos.`,
+      time: 'Sistema'
+    }
+  ] as const;
+
+  const metricCards = [
+    { label: 'Lotes activos', value: activeLots, detail: `${lotes.length} lotes registrados`, icon: Leaf, tone: 'green', spark: 'M2 28 C14 24 18 32 30 18 S52 22 62 9' },
+    { label: 'Camas operativas', value: activeBeds, detail: `${camas.length} camas registradas`, icon: Sprout, tone: 'green', spark: 'M2 30 C12 26 18 30 26 18 S42 8 62 15' },
+    { label: 'Siembras registradas', value: siembras.length, detail: `${numberCompact(planted)} plantas`, icon: Factory, tone: 'purple', spark: 'M2 27 C15 24 20 19 31 23 S51 16 62 7' },
+    { label: 'Despachos del día', value: dispatches, detail: `${numberCompact(shipped)} plantas enviadas`, icon: Truck, tone: 'purple', spark: 'M2 31 C12 18 22 29 32 17 S51 10 62 14' }
+  ];
 
   return (
-    <main className="content-grid dashboard-screen dashboard-screen--refined">
-      <section className="screen-header dashboard-header-refined">
-        <div className="module-header__identity">
-          <span className="module-header__icon module-header__icon--green"><Home size={21} /></span>
-          <div>
-            <span className="hero-panel__tag">Resumen</span>
-            <h1>Panel operativo</h1>
-            <p>Resumen general del sistema · Actualizado: {updatedAt}</p>
-          </div>
+    <main className="content-grid dashboard-screen dashboard-screen--vlv">
+      <section className="vlv-dashboard-title">
+        <div>
+          <h1>Panel principal</h1>
+          <p>Resumen general de operaciones</p>
         </div>
+        <span>Datos sincronizados desde MySQL</span>
       </section>
 
-      <section className="dashboard-metrics dashboard-metrics--refined">
-        <article className="stat-card stat-card--green">
-          <div className="stat-card__icon"><Factory size={20} /></div>
-          <div>
-            <span>Lotes activos</span>
-            <strong>{activeLots}</strong>
-            <small>{newLotsThisMonth} registrados este mes · {totalLots} total</small>
-          </div>
-        </article>
-        <article className="stat-card stat-card--purple">
-          <div className="stat-card__icon"><Leaf size={20} /></div>
-          <div>
-            <span>Total plantas</span>
-            <strong>{numberCompact(planted)}</strong>
-            <small>{summary?.siembrasRegistradas || siembras.length} siembras registradas</small>
-          </div>
-        </article>
-        <article className="stat-card stat-card--blue">
-          <div className="stat-card__icon"><Truck size={20} /></div>
-          <div>
-            <span>Despachos</span>
-            <strong>{summary?.despachosRegistrados || despachos.length}</strong>
-            <small>{numberCompact(shipped)} plantas enviadas</small>
-          </div>
-        </article>
-        <article className="stat-card stat-card--orange">
-          <div className="stat-card__icon"><Tag size={20} /></div>
-          <div>
-            <span>Clasificaciones</span>
-            <strong>{classifications}</strong>
-            <small>{pendingClassifications} pendientes de validación</small>
-          </div>
-        </article>
-      </section>
-
-      <section className="dashboard-grid dashboard-grid--main">
-        <article className="panel-card chart-panel chart-panel--line refined-card">
-          <div className="panel-card__header refined-card__header">
-            <div>
-              <h2>Producción anual {currentYear}</h2>
-              <p>Plantas registradas y despachadas según registros reales.</p>
-            </div>
-            <button type="button" className="soft-chip">{currentYear} <ChevronDown size={14} /></button>
-          </div>
-          <div className="chart-with-axis">
-            <div className="chart-y-axis">
-              {yAxisLabels.map((label) => <span key={label}>{label}</span>)}
-            </div>
-            <div className="line-chart line-chart--refined">
-              <svg viewBox="0 0 760 210" preserveAspectRatio="none" aria-hidden="true">
-                <defs>
-                  <linearGradient id="productionGradient" x1="0" x2="0" y1="0" y2="1">
-                    <stop offset="0%" stopColor="#7c3aed" stopOpacity="0.2" />
-                    <stop offset="100%" stopColor="#7c3aed" stopOpacity="0" />
-                  </linearGradient>
-                </defs>
-                {[0, 1, 2, 3, 4].map((row) => <line key={row} x1="24" y1={22 + row * 40} x2="736" y2={22 + row * 40} />)}
-                {monthLabels.map((month, index) => (
-                  <g key={month}>
-                    <line x1={28 + index * 64} y1="22" x2={28 + index * 64} y2="180" className="line-chart__column" />
-                    <text x={28 + index * 64} y="203">{month}</text>
-                  </g>
-                ))}
-                {hasMonthlyData ? (
-                  <>
-                    <path d={areaPath} className="line-chart__area" />
-                    <polyline points={plantPoints} />
-                    <polyline points={dispatchPoints} className="line-chart__secondary" />
-                  </>
-                ) : null}
-              </svg>
-              {!hasMonthlyData ? (
-                <div className="chart-empty-state">
-                  <strong>Sin datos mensuales suficientes</strong>
-                  <small>Registra siembras y despachos para construir la tendencia anual.</small>
-                </div>
-              ) : null}
-            </div>
-          </div>
-          <div className="chart-legend chart-legend--right">
-            <span><i className="legend-dot legend-dot--green" /> Plantas registradas</span>
-            <span><i className="legend-dot legend-dot--purple" /> Plantas despachadas</span>
-          </div>
-        </article>
-
-        <article className="panel-card chart-panel chart-panel--donut refined-card">
-          <div className="panel-card__header refined-card__header">
-            <div>
-              <h2>Estado de lotes</h2>
-              <p>Distribución actual — {lotes.length} lotes</p>
-            </div>
-          </div>
-          <div className="donut-layout donut-layout--refined">
-            <div className="donut-chart donut-chart--refined" style={donutStyle}>
-              <span>{Math.round((activeLots / Math.max(totalLots, 1)) * 100)}%</span>
-            </div>
-            <div className="donut-legend donut-legend--refined">
-              <span><i className="legend-dot legend-dot--green" /> Activo <b>{lotStatusCounts.activo}</b></span>
-              <span><i className="legend-dot legend-dot--blue" /> En Proceso <b>{lotStatusCounts.enProceso}</b></span>
-              <span><i className="legend-dot legend-dot--purple" /> Cosecha <b>{lotStatusCounts.cosecha}</b></span>
-              <span><i className="legend-dot legend-dot--slate" /> Completado <b>{lotStatusCounts.completado}</b></span>
-              <span><i className="legend-dot legend-dot--orange" /> Pendiente <b>{lotStatusCounts.pendiente}</b></span>
-            </div>
-          </div>
-        </article>
-      </section>
-
-      <section className="dashboard-grid dashboard-grid--main">
-        <article className="panel-card chart-panel chart-panel--bars refined-card">
-          <div className="panel-card__header refined-card__header">
-            <div>
-              <h2>Clasificación por calidad</h2>
-              <p>Totales por categoría calculados desde las clasificaciones registradas.</p>
-            </div>
-          </div>
-          <div className="quality-chart-layout">
-            <div className="quality-axis">{axisLabels(maxQuality).map((label) => <span key={label}>{label}</span>)}</div>
-            <div className="bar-chart bar-chart--refined">
-              {qualityBars.map((item) => (
-                <div className="bar-chart__item" key={item.label}>
-                  <div className={`bar-chart__bar bar-chart__bar--${item.tone}`} style={{ height: `${hasQualityData ? Math.max((item.value / maxQuality) * 100, 4) : 0}%` }} />
-                  <span>{item.label}</span>
-                </div>
-              ))}
-            </div>
-            {!hasQualityData ? (
-              <div className="chart-empty-state chart-empty-state--compact">
-                <strong>Sin clasificación por calidad</strong>
-                <small>Los valores aparecerán al registrar clasificaciones reales.</small>
+      <section className="vlv-metric-grid">
+        {metricCards.map((metric) => {
+          const Icon = metric.icon;
+          return (
+            <article className={`vlv-metric-card vlv-metric-card--${metric.tone}`} key={metric.label}>
+              <div className="vlv-metric-card__icon"><Icon size={28} /></div>
+              <div className="vlv-metric-card__body">
+                <span>{metric.label}</span>
+                <strong>{numberCompact(metric.value)}</strong>
+                <small>↑ Operativo · {metric.detail}</small>
               </div>
-            ) : null}
+              <svg className="vlv-metric-card__spark" viewBox="0 0 64 36" aria-hidden="true">
+                <path d={metric.spark} />
+              </svg>
+            </article>
+          );
+        })}
+      </section>
+
+      <section className="vlv-dashboard-main-grid">
+        <article className="vlv-panel-card vlv-panel-card--table">
+          <header className="vlv-panel-header">
+            <div>
+              <ClipboardList size={18} />
+              <h2>Lotes recientes</h2>
+            </div>
+            <button type="button">Ver todos</button>
+          </header>
+
+          <div className="vlv-table-wrap">
+            <table className="vlv-table">
+              <thead>
+                <tr>
+                  <th>Lote</th>
+                  <th>Variedad</th>
+                  <th>Estado</th>
+                  <th>Fecha</th>
+                  <th>Responsable</th>
+                  <th>Acción</th>
+                </tr>
+              </thead>
+              <tbody>
+                {recentLots.length > 0 ? recentLots.map((lote) => (
+                  <tr key={lote.id}>
+                    <td>{lote.codigo}</td>
+                    <td>{lote.variedad || lote.cultivo || 'Sin variedad'}</td>
+                    <td><span className={`vlv-status vlv-status--${statusClass(lote.estado)}`}>{lote.estado || 'Sin estado'}</span></td>
+                    <td>{dateShort(recordDate(lote.fechaActualizacion, lote.fechaCreacion, lote.fechaRegistro))}</td>
+                    <td>{actorName(lote)}</td>
+                    <td><button className="vlv-row-action" type="button" aria-label="Ver acciones"><MoreVertical size={16} /></button></td>
+                  </tr>
+                )) : (
+                  <tr><td colSpan={6}>No hay lotes registrados.</td></tr>
+                )}
+              </tbody>
+            </table>
           </div>
         </article>
 
-        <article className="panel-card activity-panel refined-card">
-          <div className="panel-card__header refined-card__header">
+        <article className="vlv-panel-card vlv-trace-card">
+          <header className="vlv-panel-header">
             <div>
-              <h2>Actividad reciente</h2>
-              <p>Últimos eventos cargados desde los registros del sistema.</p>
+              <Route size={18} />
+              <h2>Trazabilidad por lote</h2>
+            </div>
+            <button type="button">Ver detalle</button>
+          </header>
+
+          <div className="vlv-trace-card__title">
+            <strong>{selectedTrace?.lote?.codigo || 'Sin lote seleccionado'}</strong>
+            <span>{selectedTrace?.lote?.descripcion || 'Seguimiento consolidado'}</span>
+          </div>
+
+          <div className="vlv-trace-line">
+            {traceProgress(selectedTrace).map((step) => {
+              const Icon = step.icon;
+              return (
+                <div className={step.active ? 'vlv-trace-step vlv-trace-step--active' : 'vlv-trace-step'} key={step.label}>
+                  <span><Icon size={18} /></span>
+                  <strong>{step.label}</strong>
+                  <small>{step.active ? monthName(selectedTrace?.ultimoEvento) : 'Pendiente'}</small>
+                </div>
+              );
+            })}
+          </div>
+
+          <div className="vlv-trace-summary">
+            <div>
+              <span>Estado actual</span>
+              <strong>{valueOf(selectedTrace?.despachos) > 0 ? 'Despachado' : valueOf(selectedTrace?.clasificaciones) > 0 ? 'Clasificado' : 'En producción'}</strong>
+            </div>
+            <div>
+              <span>Último evento</span>
+              <strong>{dateShort(selectedTrace?.ultimoEvento)}</strong>
             </div>
           </div>
-          {recentActivity.length > 0 ? (
-            <ul className="activity-list activity-list--refined">
-              {recentActivity.map((entry) => (
-                <li key={entry.id}>
-                  <span className={`activity-dot activity-dot--${entry.tone}`} />
+        </article>
+      </section>
+
+      <section className="vlv-dashboard-bottom-grid">
+        <article className="vlv-panel-card vlv-bars-card">
+          <header className="vlv-panel-header">
+            <div>
+              <Factory size={18} />
+              <h2>Rendimiento agrícola</h2>
+            </div>
+            <button type="button">Esta semana</button>
+          </header>
+          <div className="vlv-bars">
+            {rendimiento.bars.length > 0 ? rendimiento.bars.map((bar) => (
+              <div className="vlv-bar" key={bar.label}>
+                <span style={{ height: `${Math.max((bar.value / rendimiento.max) * 100, bar.value > 0 ? 10 : 2)}%` }} />
+                <strong>{numberCompact(bar.value)}</strong>
+                <small>{bar.label}</small>
+              </div>
+            )) : <p className="vlv-muted">Sin datos de rendimiento.</p>}
+          </div>
+        </article>
+
+        <article className="vlv-panel-card vlv-activity-card">
+          <header className="vlv-panel-header">
+            <div>
+              <PackageCheck size={18} />
+              <h2>Actividad reciente</h2>
+            </div>
+          </header>
+          <div className="vlv-activity-list">
+            {recentActivity.length > 0 ? recentActivity.map((entry) => {
+              const Icon = entry.icon;
+              return (
+                <article className={`vlv-activity-item vlv-activity-item--${entry.tone}`} key={entry.id}>
+                  <span><Icon size={18} /></span>
                   <div>
                     <strong>{entry.title}</strong>
                     <small>{entry.meta}</small>
                   </div>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <div className="empty-state empty-state--compact">
-              <PackageCheck size={24} />
-              <strong>Sin actividad reciente</strong>
-              <small>Los movimientos aparecerán cuando existan registros operativos.</small>
-            </div>
-          )}
+                  <time>{entry.time}</time>
+                </article>
+              );
+            }) : <p className="vlv-muted">Sin actividad reciente.</p>}
+          </div>
         </article>
-      </section>
 
-      <section className="quick-actions-grid quick-actions-grid--refined">
-        <button type="button" className="quick-action quick-action--green" onClick={() => navigateTo('/siembra')}>
-          <Sprout size={16} /> Registrar siembra
-        </button>
-        <button type="button" className="quick-action quick-action--blue" onClick={() => navigateTo('/procesos')}>
-          <Boxes size={16} /> Registrar uniformización
-        </button>
-        <button type="button" className="quick-action quick-action--purple" onClick={() => navigateTo('/clasificacion')}>
-          <Tag size={16} /> Nueva clasificación
-        </button>
-        <button type="button" className="quick-action quick-action--orange" onClick={() => navigateTo('/despacho')}>
-          <Truck size={16} /> Registrar despacho
-        </button>
-        <button type="button" className="quick-action quick-action--slate" onClick={() => navigateTo('/reportes')}>
-          <PackageCheck size={16} /> Ver reportes
-        </button>
-      </section>
-
-      <section className="data-origin-note">
-        <strong>Fuente de datos</strong>
-        <span>{trazabilidad.length} registros de trazabilidad disponibles.</span>
+        <article className="vlv-panel-card vlv-alert-card">
+          <header className="vlv-panel-header">
+            <div>
+              <AlertTriangle size={18} />
+              <h2>Alertas y notificaciones</h2>
+            </div>
+            <button type="button">Ver todas</button>
+          </header>
+          <div className="vlv-alert-list">
+            {alerts.map((alert) => {
+              const Icon = alert.icon;
+              return (
+                <article className={`vlv-alert-item vlv-alert-item--${alert.tone}`} key={alert.title}>
+                  <span><Icon size={18} /></span>
+                  <div>
+                    <strong>{alert.title}</strong>
+                    <small>{alert.text}</small>
+                  </div>
+                  <time>{alert.time}</time>
+                </article>
+              );
+            })}
+          </div>
+        </article>
       </section>
     </main>
   );

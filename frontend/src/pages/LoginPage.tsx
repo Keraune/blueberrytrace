@@ -1,21 +1,23 @@
 import { FormEvent, useState } from 'react';
-import { ArrowRight, Asterisk, Eye, Leaf, Loader2, LockKeyhole, Mail, ShieldCheck, Sprout } from 'lucide-react';
+import { ArrowRight, Eye, HelpCircle, Loader2, LockKeyhole, ShieldCheck, UserRound } from 'lucide-react';
 import { blueberryApi } from '../lib/api';
+import vlvLogo from '../assets/vlv-logo.png';
 import type { AuthenticatedUserResponse } from '../types/api';
 
 interface LoginPageProps {
   onAuthenticated: (user: AuthenticatedUserResponse) => Promise<void> | void;
 }
 
-const quickProof = [
-  { label: 'Lotes', value: 'Control' },
-  { label: 'Trazabilidad', value: 'Operativa' },
-  { label: 'Despachos', value: 'Calidad' }
+const loginSteps = [
+  { label: 'Cultivo', value: '01' },
+  { label: 'Clasificación', value: '02' },
+  { label: 'Despacho', value: '03' }
 ];
 
 export function LoginPage({ onAuthenticated }: LoginPageProps) {
   const [identifier, setIdentifier] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -34,88 +36,104 @@ export function LoginPage({ onAuthenticated }: LoginPageProps) {
   }
 
   return (
-    <main className="login-shell login-shell--saleskip">
-      <section className="login-panel login-panel--visual login-panel--blueprint">
-        <div className="login-grid-lines" aria-hidden="true" />
-        <div className="login-radial-lines" aria-hidden="true" />
-        <div className="login-noise" aria-hidden="true" />
-
-        <div className="login-mark-large" aria-hidden="true">
-          <Asterisk size={98} strokeWidth={3.6} />
+    <main className="vlv-login-shell">
+      <section className="vlv-login-hero" aria-label="Presentación BlueberryTrace">
+        <div className="vlv-login-hero__glow" aria-hidden="true" />
+        <div className="vlv-login-hero__lines" aria-hidden="true" />
+        <div className="vlv-login-hero__orbits" aria-hidden="true">
+          <span className="trace-node trace-node--leaf">☘</span>
+          <span className="trace-node trace-node--pin">⌖</span>
+          <span className="trace-node trace-node--check">✓</span>
         </div>
 
-        <div className="login-copy login-copy--big">
-          <span className="login-kicker"><Sprout size={17} /> Vivero Los Viñedos</span>
-          <h1>
-            Hola<br />BlueberryTrace!
-          </h1>
+        <div className="vlv-login-brand">
+          <img src={vlvLogo} alt="Logo Vivero Los Viñedos" />
+          <strong><span>Blueberry</span>Trace</strong>
+        </div>
+
+        <div className="vlv-login-copy">
+          <h1>Control y trazabilidad de plantas de arándano</h1>
           <p>
-            Controla lotes, camas, siembras, clasificación, despacho y trazabilidad
-            de plantas de arándano desde una plataforma interna.
+            Gestione cada etapa del cultivo con información confiable, en tiempo real
+            y desde un solo lugar.
           </p>
         </div>
 
-        <div className="login-proof-row" aria-label="Módulos principales">
-          {quickProof.map((item) => (
+        <div className="vlv-login-flow" aria-label="Flujo operativo principal">
+          {loginSteps.map((item) => (
             <article key={item.label}>
-              <strong>{item.value}</strong>
-              <span>{item.label}</span>
+              <span>{item.value}</span>
+              <strong>{item.label}</strong>
             </article>
           ))}
         </div>
-
-        <footer className="login-left-footer">© 2026 BlueberryTrace. Área de frutales.</footer>
       </section>
 
-      <section className="login-panel login-panel--form login-panel--minimal">
-        <div className="login-form-card login-form-card--flat">
-          <div className="login-product-brand">
-            <div className="login-product-icon"><Leaf size={18} /></div>
-            <strong>BlueberryTrace</strong>
+      <section className="vlv-login-form-panel" aria-label="Inicio de sesión">
+        <form className="vlv-login-card" onSubmit={handleSubmit}>
+          <div className="vlv-login-card__heading">
+            <span>BlueberryTrace</span>
+            <h2>Bienvenido</h2>
+            <p>Ingrese a su cuenta para continuar.</p>
           </div>
 
-          <div className="login-form-heading login-form-heading--clean">
-            <h2>Bienvenido de nuevo</h2>
-            <p>Ingresa con tu usuario o correo corporativo para continuar.</p>
-          </div>
-
-          <form className="login-form login-form--underline" onSubmit={handleSubmit}>
-            <label>
-              <span><Mail size={15} /> Usuario o correo</span>
+          <label className="vlv-field">
+            <span>Usuario o correo</span>
+            <div className="vlv-field__control">
+              <UserRound size={18} />
               <input
                 value={identifier}
                 onChange={(event) => setIdentifier(event.target.value)}
                 autoComplete="username"
-                placeholder="admin o admin@vlv.com"
+                placeholder="Usuario o correo"
                 required
               />
-            </label>
-            <label>
-              <span><LockKeyhole size={15} /> Contraseña</span>
+            </div>
+          </label>
+
+          <label className="vlv-field">
+            <span>Contraseña</span>
+            <div className="vlv-field__control">
+              <LockKeyhole size={18} />
               <input
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                type="password"
+                type={showPassword ? 'text' : 'password'}
                 autoComplete="current-password"
                 placeholder="Contraseña"
                 required
               />
-            </label>
+              <button
+                type="button"
+                className="vlv-field__icon-button"
+                aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
+                onClick={() => setShowPassword((current) => !current)}
+              >
+                <Eye size={18} />
+              </button>
+            </div>
+          </label>
 
-            {error && <p className="form-error form-error--login">{error}</p>}
+          {error && <p className="vlv-login-error">{error}</p>}
 
-            <button className="login-primary-button" type="submit" disabled={loading}>
-              {loading ? <Loader2 className="spin" size={16} /> : <ShieldCheck size={16} />}
-              <span>Iniciar sesión</span>
-              {!loading ? <ArrowRight size={16} /> : null}
-            </button>
-          </form>
+          <button className="vlv-login-submit" type="submit" disabled={loading}>
+            <span>{loading ? 'Validando acceso' : 'Iniciar sesión'}</span>
+            {loading ? <Loader2 className="spin" size={18} /> : <ArrowRight size={20} />}
+          </button>
 
-          <div className="login-helper-row">
-            <span><Eye size={15} /> Acceso protegido</span>
-            <small>Usa las credenciales asignadas por administración.</small>
+          <button type="button" className="vlv-login-help">
+            <HelpCircle size={17} />
+            ¿Necesita ayuda para iniciar sesión?
+          </button>
+
+          <div className="vlv-login-secure-note">
+            <ShieldCheck size={24} />
+            <div>
+              <strong>Acceso seguro y confidencial</strong>
+              <small>BlueberryTrace es una aplicación interna.</small>
+            </div>
           </div>
-        </div>
+        </form>
       </section>
     </main>
   );
