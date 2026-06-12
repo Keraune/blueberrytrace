@@ -9262,3 +9262,1799 @@ body {
     transform: none !important;
   }
 }
+
+/* --------------------------------------------------------------------------
+   Corrección final de ventana, login y dashboard BlueberryTrace
+   - Evita cortes en el encabezado.
+   - Alinea perfil/notificaciones.
+   - Rediseña login inspirado en layout split moderno.
+   - Reduce el efecto blancoso de assets agrícolas con overlays controlados.
+   -------------------------------------------------------------------------- */
+:root {
+  --bt-green-950: #082817;
+  --bt-green-900: #0b341f;
+  --bt-green-800: #14582f;
+  --bt-green-700: #227848;
+  --bt-green-500: #65a92d;
+  --bt-purple-900: #431056;
+  --bt-purple-800: #5f1f76;
+  --bt-purple-700: #72228a;
+  --bt-cream-50: #fbfaf6;
+  --bt-cream-100: #f6f3e9;
+  --bt-cream-200: #ede8d7;
+  --bt-line: rgba(25, 45, 30, 0.10);
+  --bt-line-strong: rgba(25, 45, 30, 0.16);
+  --bt-text: #17221b;
+  --bt-muted: #6c776f;
+  --bt-sidebar-width: 14.75rem;
+  --bt-topbar-height: 4.95rem;
+  --bt-page-x: clamp(1.1rem, 1.65vw, 1.85rem);
+  --bt-panel-shadow: 0 12px 32px rgba(21, 34, 24, 0.065);
+  --bt-panel-shadow-soft: 0 7px 20px rgba(21, 34, 24, 0.045);
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+}
+
+body {
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at 85% -10%, rgba(116, 34, 139, 0.035), transparent 28rem),
+    linear-gradient(180deg, #fbfaf6 0%, #f7f5ed 100%) !important;
+}
+
+/* Login: layout tipo SaleSkip con paleta BlueberryTrace. */
+.vlv-login-shell--reference {
+  min-height: 100dvh !important;
+  grid-template-columns: minmax(0, 1.34fr) minmax(29rem, 0.92fr) !important;
+  background: #ffffff !important;
+  color: var(--bt-text) !important;
+  overflow: hidden !important;
+}
+
+.vlv-login-shell--reference .vlv-login-hero {
+  position: relative !important;
+  min-height: 100dvh !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  padding: clamp(3.2rem, 6vw, 6.3rem) clamp(3rem, 8vw, 10rem) !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  color: #ffffff !important;
+  overflow: hidden !important;
+  background:
+    radial-gradient(circle at 17% 18%, rgba(140, 210, 72, 0.28), transparent 18rem),
+    radial-gradient(circle at 78% 86%, rgba(117, 34, 138, 0.48), transparent 23rem),
+    linear-gradient(135deg, rgba(9, 42, 24, 0.96) 0%, rgba(23, 91, 47, 0.94) 46%, rgba(86, 27, 106, 0.96) 100%),
+    url('./assets/brand/blueberry-login-hero.webp') center bottom / cover no-repeat !important;
+  background-blend-mode: normal, normal, multiply, normal !important;
+}
+
+.vlv-login-shell--reference .vlv-login-hero::before {
+  display: block !important;
+  content: "" !important;
+  position: absolute !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  background:
+    repeating-radial-gradient(circle at 18% 17%, transparent 0 5.35rem, rgba(255,255,255,0.075) 5.42rem 5.48rem),
+    linear-gradient(90deg, rgba(8, 35, 20, 0.82), rgba(8, 35, 20, 0.54) 38%, rgba(85, 24, 107, 0.48) 100%) !important;
+  mix-blend-mode: normal !important;
+}
+
+.vlv-login-shell--reference .vlv-login-brand,
+.vlv-login-shell--reference .vlv-login-copy,
+.vlv-login-shell--reference .vlv-login-hero-footer {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.vlv-login-shell--reference .vlv-login-brand {
+  width: auto !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-items: start !important;
+  gap: 0.9rem !important;
+  margin: 0 0 clamp(4rem, 8vh, 7rem) !important;
+  padding: 0 !important;
+  text-align: left !important;
+  filter: none !important;
+}
+
+.vlv-login-shell--reference .vlv-login-brand img {
+  width: clamp(4.4rem, 7vw, 6.6rem) !important;
+  height: auto !important;
+  max-height: none !important;
+  object-fit: contain !important;
+  filter: drop-shadow(0 13px 24px rgba(0, 0, 0, 0.23)) !important;
+}
+
+.vlv-login-shell--reference .vlv-login-brand strong {
+  margin: 0 !important;
+  color: #f1eaff !important;
+  font-size: clamp(1.35rem, 2.4vw, 2.15rem) !important;
+  line-height: 0.95 !important;
+  letter-spacing: -0.065em !important;
+  text-shadow: 0 12px 28px rgba(0, 0, 0, 0.22) !important;
+}
+
+.vlv-login-shell--reference .vlv-login-brand strong span {
+  color: #dff7b9 !important;
+}
+
+.vlv-login-shell--reference .vlv-login-copy {
+  width: min(41rem, 100%) !important;
+  margin: 0 !important;
+  filter: none !important;
+}
+
+.vlv-login-shell--reference .vlv-login-copy h1 {
+  max-width: 12ch !important;
+  color: #ffffff !important;
+  font-size: clamp(3.4rem, 6vw, 6rem) !important;
+  line-height: 0.98 !important;
+  letter-spacing: -0.075em !important;
+  font-weight: 950 !important;
+  text-shadow: 0 18px 42px rgba(0, 0, 0, 0.25) !important;
+}
+
+.vlv-login-shell--reference .vlv-login-copy p {
+  width: min(38rem, 100%) !important;
+  margin-top: 1.8rem !important;
+  color: rgba(255, 255, 255, 0.84) !important;
+  font-size: clamp(1.05rem, 1.35vw, 1.36rem) !important;
+  line-height: 1.45 !important;
+  font-weight: 560 !important;
+  letter-spacing: -0.025em !important;
+}
+
+.vlv-login-hero-footer {
+  position: absolute !important;
+  left: clamp(3rem, 8vw, 10rem) !important;
+  bottom: clamp(2rem, 4.5vw, 4rem) !important;
+  margin: 0 !important;
+  color: rgba(255, 255, 255, 0.58) !important;
+  font-size: clamp(0.9rem, 1vw, 1.08rem) !important;
+  font-weight: 600 !important;
+  letter-spacing: -0.015em !important;
+}
+
+.vlv-login-shell--reference .vlv-login-form-panel {
+  min-height: 100dvh !important;
+  margin: 0 !important;
+  padding: clamp(2rem, 5vw, 5.5rem) clamp(2.25rem, 5vw, 5.8rem) !important;
+  display: grid !important;
+  place-items: center !important;
+  background:
+    radial-gradient(circle at left center, rgba(83, 23, 108, 0.065), transparent 18rem),
+    #ffffff !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: -18px 0 42px rgba(36, 25, 58, 0.06) !important;
+}
+
+.vlv-login-shell--reference .vlv-login-card {
+  width: min(26.8rem, 100%) !important;
+  gap: 1.55rem !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  transform: none !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+
+.vlv-login-product {
+  display: block !important;
+  margin-bottom: clamp(2rem, 7vh, 5.4rem) !important;
+  color: #111714 !important;
+  font-size: clamp(1.55rem, 2.4vw, 2.15rem) !important;
+  line-height: 1 !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.06em !important;
+}
+
+.vlv-login-shell--reference .vlv-login-card__heading {
+  margin: 0 0 0.55rem !important;
+}
+
+.vlv-login-shell--reference .vlv-login-card__heading h2 {
+  color: #111714 !important;
+  font-size: clamp(2rem, 3.3vw, 2.85rem) !important;
+  line-height: 1.02 !important;
+  letter-spacing: -0.065em !important;
+  font-weight: 950 !important;
+}
+
+.vlv-login-shell--reference .vlv-login-card__heading p {
+  max-width: 25rem !important;
+  margin-top: 0.55rem !important;
+  color: #6b6f69 !important;
+  font-size: 0.98rem !important;
+  line-height: 1.42 !important;
+  font-weight: 560 !important;
+}
+
+.vlv-login-shell--reference .vlv-field {
+  display: grid !important;
+  gap: 0.22rem !important;
+  color: #141a16 !important;
+  font-size: 0.86rem !important;
+  font-weight: 850 !important;
+}
+
+.vlv-login-shell--reference .vlv-field > span {
+  display: none !important;
+}
+
+.vlv-login-shell--reference .vlv-field__control {
+  height: 3.45rem !important;
+  padding: 0 !important;
+  gap: 0.72rem !important;
+  border: 0 !important;
+  border-bottom: 2px solid #d8d8d2 !important;
+  border-radius: 0 !important;
+  color: #8b908a !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.vlv-login-shell--reference .vlv-field__control:focus-within {
+  border-color: #151515 !important;
+  box-shadow: none !important;
+}
+
+.vlv-login-shell--reference .vlv-field__control svg {
+  color: #8d928d !important;
+}
+
+.vlv-login-shell--reference .vlv-field input {
+  color: #141a16 !important;
+  font-size: 1rem !important;
+  font-weight: 760 !important;
+}
+
+.vlv-login-shell--reference .vlv-field input::placeholder {
+  color: #9a9f99 !important;
+  font-weight: 640 !important;
+}
+
+.vlv-login-shell--reference .vlv-field__icon-button {
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  color: #7e857f !important;
+  border-radius: 999px !important;
+}
+
+.vlv-login-shell--reference .vlv-login-submit {
+  height: 3.55rem !important;
+  margin-top: 0.6rem !important;
+  justify-content: center !important;
+  gap: 0.8rem !important;
+  border-radius: 0.42rem !important;
+  color: #ffffff !important;
+  background: linear-gradient(135deg, #111714 0%, var(--bt-green-900) 58%, var(--bt-purple-900) 100%) !important;
+  box-shadow: 0 16px 32px rgba(20, 23, 20, 0.18) !important;
+  font-size: 0.98rem !important;
+  font-weight: 900 !important;
+}
+
+.vlv-login-shell--reference .vlv-login-submit:hover:not(:disabled) {
+  transform: translateY(-1px) !important;
+  box-shadow: 0 18px 36px rgba(20, 23, 20, 0.22) !important;
+}
+
+.vlv-login-shell--reference .vlv-login-help {
+  justify-content: center !important;
+  min-height: 2rem !important;
+  color: #1b4f2d !important;
+  font-size: 0.88rem !important;
+  font-weight: 780 !important;
+}
+
+.vlv-login-shell--reference .vlv-login-secure-note {
+  margin-top: 0.4rem !important;
+  padding-top: 1.25rem !important;
+  border-top: 1px solid #e7e7e2 !important;
+}
+
+.vlv-login-shell--reference .vlv-login-secure-note strong,
+.vlv-login-shell--reference .vlv-login-secure-note small {
+  color: #737a74 !important;
+}
+
+.vlv-login-error {
+  margin: -0.3rem 0 0 !important;
+  border: 1px solid rgba(239, 68, 68, 0.18) !important;
+  border-radius: 0.7rem !important;
+  background: #fff1f1 !important;
+  color: #ad2727 !important;
+  padding: 0.75rem 0.9rem !important;
+  font-size: 0.86rem !important;
+  font-weight: 750 !important;
+}
+
+/* Ventana principal: proporción limpia y sin encabezados pisados. */
+.app-shell {
+  grid-template-columns: var(--bt-sidebar-width) minmax(0, 1fr) !important;
+  min-height: 100dvh !important;
+  background: linear-gradient(180deg, #fbfaf6, #f8f6ee) !important;
+  overflow: clip !important;
+}
+
+.main-shell {
+  min-width: 0 !important;
+  min-height: 100dvh !important;
+  background:
+    radial-gradient(circle at 92% 4%, rgba(114, 34, 138, 0.035), transparent 22rem),
+    linear-gradient(180deg, #fbfaf6 0%, #f8f6ef 100%) !important;
+}
+
+.sidebar--reference {
+  width: var(--bt-sidebar-width) !important;
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  padding: 1.25rem 0.72rem 1rem !important;
+  background:
+    linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.97) 58%, rgba(255,255,255,0.44) 76%, rgba(255,255,255,0.10) 100%),
+    linear-gradient(180deg, rgba(255,255,255,0) 52%, rgba(12, 54, 27, 0.18) 100%),
+    url('./assets/brand/blueberry-sidebar-hero.webp') center bottom / 124% auto no-repeat,
+    #ffffff !important;
+  border-right: 1px solid var(--bt-line) !important;
+  box-shadow: 8px 0 28px rgba(21, 34, 24, 0.05) !important;
+  overflow: hidden !important;
+}
+
+.sidebar__brand-row {
+  display: block !important;
+}
+
+.sidebar--reference .brand--sidebar {
+  margin-bottom: 1rem !important;
+}
+
+.sidebar--reference .brand--sidebar img {
+  width: 4.35rem !important;
+  max-height: 3.3rem !important;
+}
+
+.sidebar--reference .brand--sidebar strong {
+  font-size: 0.9rem !important;
+}
+
+.sidebar--reference .sidebar__nav--reference {
+  gap: 0.28rem !important;
+}
+
+.sidebar--reference .sidebar__link {
+  min-height: 2.47rem !important;
+  padding: 0 0.82rem !important;
+  gap: 0.72rem !important;
+  border-radius: 0.66rem !important;
+  color: #59625e !important;
+  font-size: 0.82rem !important;
+  font-weight: 720 !important;
+  transition: background-color 150ms ease, color 150ms ease !important;
+}
+
+.sidebar--reference .sidebar__link:hover {
+  transform: none !important;
+  color: var(--bt-purple-800) !important;
+  background: rgba(95, 31, 118, 0.055) !important;
+}
+
+.sidebar--reference .sidebar__link--active {
+  color: var(--bt-purple-800) !important;
+  background: linear-gradient(90deg, rgba(95, 31, 118, 0.13), rgba(95, 31, 118, 0.055)) !important;
+}
+
+/* Topbar alineado: título, búsqueda y perfil en una sola línea estable. */
+.topbar--reference {
+  height: var(--bt-topbar-height) !important;
+  min-height: var(--bt-topbar-height) !important;
+  display: block !important;
+  background: rgba(255, 255, 255, 0.955) !important;
+  border-bottom: 1px solid var(--bt-line) !important;
+  box-shadow: 0 8px 22px rgba(21, 34, 24, 0.035) !important;
+  overflow: visible !important;
+}
+
+.topbar--reference .topbar__inner {
+  height: var(--bt-topbar-height) !important;
+  min-height: var(--bt-topbar-height) !important;
+  width: 100% !important;
+  max-width: none !important;
+  display: grid !important;
+  grid-template-columns: minmax(12rem, 1fr) minmax(17rem, 28rem) minmax(16rem, max-content) !important;
+  align-items: center !important;
+  gap: clamp(0.9rem, 1.5vw, 1.45rem) !important;
+  padding: 0 var(--bt-page-x) !important;
+}
+
+.topbar-menu-trigger {
+  display: none !important;
+}
+
+.topbar--reference .topbar__page-title {
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: 0.18rem !important;
+  transform: none !important;
+}
+
+.topbar--reference .topbar__page-title h1 {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--bt-green-950) !important;
+  font-size: clamp(1.3rem, 1.55vw, 1.62rem) !important;
+  line-height: 1.06 !important;
+  letter-spacing: -0.055em !important;
+  font-weight: 950 !important;
+}
+
+.topbar--reference .topbar__page-title p {
+  margin: 0 !important;
+  color: var(--bt-muted) !important;
+  font-size: 0.82rem !important;
+  line-height: 1.18 !important;
+  font-weight: 560 !important;
+}
+
+.topbar--reference .topbar-search-trigger--wide {
+  width: 100% !important;
+  height: 2.38rem !important;
+  min-height: 2.38rem !important;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 0.6rem !important;
+  justify-self: stretch !important;
+  border: 1px solid #dfe3dc !important;
+  border-radius: 0.7rem !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+}
+
+.topbar--reference .topbar__actions {
+  min-width: 0 !important;
+  width: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 0.62rem !important;
+  justify-self: end !important;
+}
+
+.topbar--reference .topbar-refresh {
+  display: inline-grid !important;
+}
+
+.topbar--reference .icon-button,
+.topbar--reference .icon-button.notification-button {
+  width: 2.35rem !important;
+  height: 2.35rem !important;
+  flex: 0 0 auto !important;
+  display: inline-grid !important;
+  place-items: center !important;
+  border: 1px solid transparent !important;
+  border-radius: 0.75rem !important;
+  background: transparent !important;
+  color: #404944 !important;
+  box-shadow: none !important;
+}
+
+.topbar--reference .icon-button:hover,
+.topbar--reference .notification-button--active {
+  border-color: var(--bt-line) !important;
+  background: #f7f8f4 !important;
+}
+
+.topbar--reference .topbar-menu,
+.topbar--reference .topbar-menu--profile {
+  height: 2.65rem !important;
+  display: flex !important;
+  align-items: center !important;
+  position: relative !important;
+}
+
+.topbar--reference .topbar-avatar {
+  height: 2.65rem !important;
+  min-width: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 0.68rem !important;
+  padding: 0 0.18rem !important;
+  border: 0 !important;
+  border-radius: 0.75rem !important;
+  background: transparent !important;
+  color: var(--bt-text) !important;
+  box-shadow: none !important;
+  line-height: 1 !important;
+}
+
+.topbar--reference .topbar-avatar:hover,
+.topbar--reference .topbar-avatar--active {
+  background: #f7f8f4 !important;
+}
+
+.topbar--reference .topbar-avatar__photo {
+  width: 2.56rem !important;
+  height: 2.56rem !important;
+  flex: 0 0 2.56rem !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 999px !important;
+  color: #ffffff !important;
+  background: linear-gradient(145deg, #0d3921 0%, #1e6a3f 52%, #c5d4b8 53%, #f2efe4 100%) !important;
+  box-shadow: 0 0 0 3px #f6f5ed, 0 7px 16px rgba(15, 35, 24, 0.12) !important;
+  font-size: 0.72rem !important;
+  font-weight: 950 !important;
+}
+
+.topbar--reference .topbar-avatar__meta {
+  min-width: 0 !important;
+  max-width: clamp(8.4rem, 13vw, 13rem) !important;
+  display: grid !important;
+  gap: 0.18rem !important;
+}
+
+.topbar--reference .topbar-avatar__meta strong,
+.topbar--reference .topbar-avatar__meta small {
+  display: block !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  line-height: 1.05 !important;
+}
+
+.topbar--reference .topbar-avatar__meta strong {
+  color: #111814 !important;
+  font-size: 0.84rem !important;
+  font-weight: 890 !important;
+}
+
+.topbar--reference .topbar-avatar__meta small {
+  color: #747d75 !important;
+  font-size: 0.72rem !important;
+  font-weight: 560 !important;
+}
+
+.topbar--reference .topbar-avatar > svg {
+  flex: 0 0 auto !important;
+  color: #414a44 !important;
+}
+
+/* Dashboard balanceado y sin sensación de zoom desproporcionado. */
+.content-grid,
+.dashboard-screen--vlv {
+  width: 100% !important;
+  max-width: none !important;
+  padding: 1rem var(--bt-page-x) 1.8rem !important;
+  gap: 0.86rem !important;
+}
+
+.dashboard-screen--vlv {
+  min-height: calc(100dvh - var(--bt-topbar-height)) !important;
+  align-content: start !important;
+}
+
+.vlv-dashboard-title {
+  display: none !important;
+}
+
+.vlv-metric-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(11rem, 1fr)) !important;
+  gap: 0.78rem !important;
+}
+
+.vlv-metric-card,
+.vlv-panel-card {
+  border: 1px solid var(--bt-line) !important;
+  box-shadow: var(--bt-panel-shadow-soft) !important;
+  transition: border-color 150ms ease, box-shadow 150ms ease !important;
+}
+
+.vlv-metric-card:hover,
+.vlv-panel-card:hover,
+.panel-card:hover,
+.stat-card:hover,
+.summary-pill:hover,
+.report-card:hover,
+.process-card:hover,
+.quality-card:hover {
+  transform: none !important;
+  box-shadow: var(--bt-panel-shadow-soft) !important;
+}
+
+.vlv-metric-card {
+  min-height: 6.85rem !important;
+  grid-template-columns: auto minmax(0, 1fr) !important;
+  padding: 0.88rem 0.94rem !important;
+  gap: 0.72rem !important;
+  align-items: center !important;
+  border-radius: 0.92rem !important;
+  background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(249, 251, 243, 0.92)) !important;
+}
+
+.vlv-metric-card--purple {
+  background: linear-gradient(135deg, rgba(255,255,255,0.97), rgba(249, 243, 251, 0.9)) !important;
+}
+
+.vlv-metric-card__icon {
+  width: 2.85rem !important;
+  height: 2.85rem !important;
+  border-radius: 0.9rem !important;
+}
+
+.vlv-metric-card__icon svg {
+  width: 1.35rem !important;
+  height: 1.35rem !important;
+}
+
+.vlv-metric-card__body span {
+  font-size: 0.78rem !important;
+  line-height: 1.1 !important;
+}
+
+.vlv-metric-card__body strong {
+  margin-top: 0.28rem !important;
+  font-size: clamp(1.45rem, 1.65vw, 1.85rem) !important;
+}
+
+.vlv-metric-card__meta {
+  margin-top: 0.44rem !important;
+  font-size: 0.68rem !important;
+  line-height: 1.18 !important;
+}
+
+.vlv-metric-card__spark {
+  right: 0.82rem !important;
+  bottom: 0.72rem !important;
+  width: 3.4rem !important;
+  height: 1.8rem !important;
+  opacity: 0.86 !important;
+}
+
+.vlv-dashboard-main-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.46fr) minmax(22rem, 1fr) !important;
+  gap: 0.78rem !important;
+}
+
+.vlv-dashboard-bottom-grid {
+  display: grid !important;
+  grid-template-columns: minmax(17rem, 0.96fr) minmax(17rem, 1.06fr) minmax(17rem, 1.06fr) !important;
+  gap: 0.78rem !important;
+}
+
+.vlv-panel-card {
+  border-radius: 0.92rem !important;
+  background: rgba(255, 255, 255, 0.94) !important;
+}
+
+.vlv-panel-card--table,
+.vlv-trace-card {
+  min-height: clamp(13.1rem, 24dvh, 16.5rem) !important;
+}
+
+.vlv-bars-card,
+.vlv-activity-card,
+.vlv-alert-card {
+  min-height: clamp(11.8rem, 21dvh, 14.2rem) !important;
+}
+
+.vlv-panel-header {
+  min-height: 2.72rem !important;
+  padding: 0.72rem 0.9rem 0.64rem !important;
+}
+
+.vlv-panel-header h2 {
+  font-size: 0.9rem !important;
+}
+
+.vlv-panel-header button {
+  font-size: 0.7rem !important;
+}
+
+.vlv-table th,
+.vlv-table td {
+  padding: 0.58rem 0.84rem !important;
+  font-size: 0.72rem !important;
+}
+
+.vlv-table-empty {
+  height: 5.9rem !important;
+  color: #69746c !important;
+  background: linear-gradient(180deg, #ffffff, #fbfaf6) !important;
+}
+
+.vlv-trace-card__title {
+  padding: 0.9rem 1rem 0.55rem !important;
+}
+
+.vlv-trace-line {
+  padding: 0.9rem 0.9rem 0.62rem !important;
+}
+
+.vlv-trace-line::before {
+  top: 2.05rem !important;
+  left: 2.4rem !important;
+  right: 2.4rem !important;
+}
+
+.vlv-trace-step span {
+  width: 1.9rem !important;
+  height: 1.9rem !important;
+}
+
+.vlv-trace-step strong {
+  font-size: 0.6rem !important;
+}
+
+.vlv-trace-step small {
+  font-size: 0.6rem !important;
+}
+
+.vlv-trace-summary {
+  margin: 0.42rem 0.9rem 0 !important;
+  padding-top: 0.62rem !important;
+}
+
+.vlv-bars {
+  height: 9.7rem !important;
+  min-height: 9.7rem !important;
+  padding: 0.78rem 0.86rem !important;
+}
+
+.vlv-bars > .vlv-muted,
+.vlv-activity-list > .vlv-muted {
+  min-height: 6.8rem !important;
+  border: 1px dashed rgba(25, 45, 30, 0.14) !important;
+  border-radius: 0.78rem !important;
+  background: #fbfaf6 !important;
+}
+
+.vlv-activity-list,
+.vlv-alert-list {
+  padding: 0.38rem 0.84rem 0.62rem !important;
+}
+
+.vlv-activity-item,
+.vlv-alert-item {
+  padding: 0.48rem 0 !important;
+  gap: 0.62rem !important;
+}
+
+.vlv-activity-item > span,
+.vlv-alert-item > span {
+  width: 1.9rem !important;
+  height: 1.9rem !important;
+}
+
+.vlv-activity-item strong,
+.vlv-alert-item strong {
+  font-size: 0.78rem !important;
+}
+
+.vlv-activity-item small,
+.vlv-alert-item small {
+  font-size: 0.69rem !important;
+}
+
+.vlv-activity-item time,
+.vlv-alert-item time {
+  font-size: 0.62rem !important;
+}
+
+/* Responsive real. */
+@media (max-width: 1360px) {
+  :root {
+    --bt-sidebar-width: 13.8rem;
+    --bt-page-x: 1rem;
+  }
+
+  .topbar--reference .topbar__inner {
+    grid-template-columns: minmax(10.5rem, 1fr) minmax(15rem, 23rem) max-content !important;
+  }
+
+  .topbar--reference .topbar-avatar__meta {
+    max-width: 8.8rem !important;
+  }
+
+  .vlv-metric-card__spark {
+    display: none !important;
+  }
+
+  .vlv-dashboard-main-grid,
+  .vlv-dashboard-bottom-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .vlv-panel-card--table,
+  .vlv-trace-card,
+  .vlv-bars-card,
+  .vlv-activity-card,
+  .vlv-alert-card {
+    min-height: auto !important;
+  }
+}
+
+@media (max-width: 1100px) {
+  .vlv-metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 980px) {
+  :root {
+    --bt-topbar-height: auto;
+  }
+
+  .app-shell {
+    display: block !important;
+    overflow: visible !important;
+  }
+
+  .main-shell {
+    min-height: 100dvh !important;
+  }
+
+  .topbar-menu-trigger {
+    display: inline-grid !important;
+  }
+
+  .topbar--reference {
+    height: auto !important;
+    min-height: 4.6rem !important;
+  }
+
+  .topbar--reference .topbar__inner {
+    height: auto !important;
+    min-height: 4.6rem !important;
+    display: grid !important;
+    grid-template-columns: 2.4rem minmax(0, 1fr) auto !important;
+    grid-template-areas:
+      "menu title actions"
+      "search search search" !important;
+    gap: 0.65rem !important;
+    padding: 0.72rem 0.9rem !important;
+  }
+
+  .topbar--reference .topbar-menu-trigger { grid-area: menu !important; }
+  .topbar--reference .topbar__page-title { grid-area: title !important; }
+  .topbar--reference .topbar-search-trigger--wide { grid-area: search !important; }
+  .topbar--reference .topbar__actions { grid-area: actions !important; }
+
+  .topbar--reference .topbar-avatar__meta,
+  .topbar--reference .topbar-avatar > svg {
+    display: none !important;
+  }
+
+  .sidebar--reference {
+    position: fixed !important;
+    inset: 0 auto 0 0 !important;
+    z-index: 80 !important;
+    width: min(18rem, calc(100vw - 3rem)) !important;
+    transform: translateX(-110%) !important;
+    transition: transform 220ms ease !important;
+  }
+
+  .app-shell--sidebar-open .sidebar--reference {
+    transform: translateX(0) !important;
+  }
+
+  .mobile-sidebar-backdrop {
+    display: none !important;
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 70 !important;
+    border: 0 !important;
+    background: rgba(8, 24, 16, 0.42) !important;
+    backdrop-filter: blur(6px) !important;
+  }
+
+  .app-shell--sidebar-open .mobile-sidebar-backdrop {
+    display: block !important;
+  }
+
+  .sidebar__brand-row {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: flex-start !important;
+  }
+
+  .sidebar-close {
+    display: inline-grid !important;
+  }
+}
+
+@media (max-width: 860px) {
+  .vlv-login-shell--reference {
+    min-height: 100dvh !important;
+    grid-template-columns: 1fr !important;
+    background:
+      linear-gradient(135deg, rgba(8, 40, 23, 0.92), rgba(92, 27, 112, 0.9)),
+      url('./assets/brand/blueberry-login-hero.webp') center bottom / cover no-repeat !important;
+  }
+
+  .vlv-login-shell--reference .vlv-login-hero {
+    min-height: auto !important;
+    padding: 1.25rem 1.25rem 0 !important;
+    background: transparent !important;
+  }
+
+  .vlv-login-shell--reference .vlv-login-hero::before,
+  .vlv-login-shell--reference .vlv-login-copy,
+  .vlv-login-hero-footer {
+    display: none !important;
+  }
+
+  .vlv-login-shell--reference .vlv-login-brand {
+    margin: 0 !important;
+  }
+
+  .vlv-login-shell--reference .vlv-login-brand img {
+    width: 3.6rem !important;
+  }
+
+  .vlv-login-shell--reference .vlv-login-brand strong {
+    font-size: 1.25rem !important;
+  }
+
+  .vlv-login-shell--reference .vlv-login-form-panel {
+    min-height: calc(100dvh - 5rem) !important;
+    padding: 1.25rem !important;
+    place-items: center !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .vlv-login-shell--reference .vlv-login-card {
+    width: min(27rem, 100%) !important;
+    padding: 1.45rem !important;
+    border-radius: 1.1rem !important;
+    background: rgba(255, 255, 255, 0.96) !important;
+    box-shadow: 0 24px 60px rgba(0,0,0,0.22) !important;
+  }
+
+  .vlv-login-product {
+    margin-bottom: 1rem !important;
+  }
+}
+
+@media (max-width: 720px) {
+  :root {
+    --bt-page-x: 0.78rem;
+  }
+
+  .topbar--reference .topbar__page-title h1 {
+    font-size: 1.18rem !important;
+  }
+
+  .topbar--reference .topbar__page-title p {
+    font-size: 0.72rem !important;
+  }
+
+  .vlv-metric-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .vlv-table {
+    min-width: 42rem !important;
+  }
+
+  .vlv-trace-line {
+    grid-template-columns: 1fr !important;
+    gap: 0.65rem !important;
+  }
+
+  .vlv-trace-line::before {
+    display: none !important;
+  }
+
+  .vlv-trace-step {
+    grid-template-columns: auto minmax(0, 1fr) auto !important;
+    justify-items: start !important;
+    text-align: left !important;
+  }
+
+  .vlv-trace-summary {
+    grid-template-columns: 1fr !important;
+  }
+
+  .vlv-alert-item,
+  .vlv-activity-item {
+    grid-template-columns: auto minmax(0, 1fr) !important;
+  }
+
+  .vlv-alert-item time,
+  .vlv-activity-item time {
+    grid-column: 2 !important;
+    justify-self: start !important;
+  }
+}
+
+@media (max-width: 430px) {
+  .topbar--reference .topbar__inner {
+    grid-template-columns: 2.3rem minmax(0, 1fr) auto !important;
+  }
+
+  .topbar--reference .topbar__actions {
+    gap: 0.28rem !important;
+  }
+
+  .topbar--reference .topbar-refresh {
+    display: none !important;
+  }
+
+  .topbar--reference .icon-button,
+  .topbar--reference .icon-button.notification-button {
+    width: 2.15rem !important;
+    height: 2.15rem !important;
+  }
+
+  .topbar--reference .topbar-avatar__photo {
+    width: 2.22rem !important;
+    height: 2.22rem !important;
+    flex-basis: 2.22rem !important;
+  }
+
+  .vlv-login-shell--reference .vlv-login-card {
+    padding: 1.18rem !important;
+  }
+}
+
+/* =========================================================
+   Hotfix UI 12/06 - ventana, topbar, sidebar y login estables
+   ========================================================= */
+:root {
+  --bt-final-sidebar: clamp(15.5rem, 15.8vw, 17.25rem);
+  --bt-final-topbar: 5.25rem;
+  --bt-final-gap-x: clamp(1.15rem, 1.9vw, 2rem);
+  --bt-final-gap-y: clamp(1rem, 1.35vw, 1.35rem);
+  --bt-final-card-radius: 1rem;
+  --bt-final-line: rgba(24, 42, 29, 0.11);
+  --bt-final-shadow: 0 12px 30px rgba(21, 34, 24, 0.055);
+  --bt-final-green: #0a3a20;
+  --bt-final-purple: #64227a;
+  --bt-final-bg: #fbfaf5;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden !important;
+}
+
+body {
+  background: linear-gradient(180deg, #fbfaf5 0%, #f7f5ed 100%) !important;
+}
+
+.app-shell {
+  width: 100% !important;
+  min-height: 100dvh !important;
+  display: grid !important;
+  grid-template-columns: var(--bt-final-sidebar) minmax(0, 1fr) !important;
+  background: var(--bt-final-bg) !important;
+  overflow: visible !important;
+}
+
+.main-shell {
+  min-width: 0 !important;
+  min-height: 100dvh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  overflow: visible !important;
+  background:
+    radial-gradient(circle at 94% -8%, rgba(100, 34, 122, 0.045), transparent 28rem),
+    linear-gradient(180deg, #fbfaf6 0%, #f8f6ee 100%) !important;
+}
+
+.route-transition {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  overflow: visible !important;
+}
+
+/* Sidebar con la imagen visible, pero sin efecto blanco lavado. */
+.sidebar.sidebar--reference {
+  position: sticky !important;
+  top: 0 !important;
+  width: var(--bt-final-sidebar) !important;
+  height: 100dvh !important;
+  min-height: 100dvh !important;
+  padding: 1.35rem 0.85rem 1rem !important;
+  color: #56635b !important;
+  background:
+    linear-gradient(180deg, #ffffff 0%, rgba(255,255,255,0.96) 47%, rgba(255,255,255,0.72) 66%, rgba(12, 53, 27, 0.20) 100%),
+    linear-gradient(180deg, transparent 55%, rgba(91, 32, 112, 0.12) 100%),
+    url('./assets/brand/blueberry-sidebar-hero.webp') center bottom / 128% auto no-repeat,
+    #ffffff !important;
+  border-right: 1px solid var(--bt-final-line) !important;
+  box-shadow: 10px 0 30px rgba(21, 34, 24, 0.045) !important;
+  overflow: hidden !important;
+}
+
+.sidebar.sidebar--reference .brand--sidebar {
+  margin: 0 0 1.15rem !important;
+}
+
+.sidebar.sidebar--reference .brand--sidebar img {
+  width: 4.55rem !important;
+  height: auto !important;
+  max-height: 3.6rem !important;
+}
+
+.sidebar.sidebar--reference .brand--sidebar strong {
+  font-size: 0.95rem !important;
+}
+
+.sidebar.sidebar--reference .sidebar__nav--reference {
+  gap: 0.28rem !important;
+}
+
+.sidebar.sidebar--reference .sidebar__link {
+  min-height: 2.62rem !important;
+  padding: 0 0.9rem !important;
+  gap: 0.74rem !important;
+  border-radius: 0.78rem !important;
+  color: #56635b !important;
+  font-size: 0.85rem !important;
+  font-weight: 720 !important;
+  background: transparent !important;
+  transform: none !important;
+}
+
+.sidebar.sidebar--reference .sidebar__link:hover {
+  color: var(--bt-final-purple) !important;
+  background: rgba(100, 34, 122, 0.065) !important;
+  transform: none !important;
+}
+
+.sidebar.sidebar--reference .sidebar__link--active {
+  color: var(--bt-final-purple) !important;
+  background: linear-gradient(90deg, rgba(100, 34, 122, 0.14), rgba(100, 34, 122, 0.045)) !important;
+}
+
+/* Topbar: tres zonas fijas para evitar que perfil, buscador y título se monten. */
+.topbar.topbar--reference {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 60 !important;
+  width: 100% !important;
+  height: var(--bt-final-topbar) !important;
+  min-height: var(--bt-final-topbar) !important;
+  display: block !important;
+  padding: 0 !important;
+  overflow: visible !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  border-bottom: 1px solid var(--bt-final-line) !important;
+  box-shadow: 0 8px 24px rgba(21, 34, 24, 0.035) !important;
+  backdrop-filter: blur(16px) saturate(1.05) !important;
+}
+
+.topbar.topbar--reference .topbar__inner {
+  width: 100% !important;
+  max-width: none !important;
+  height: var(--bt-final-topbar) !important;
+  min-height: var(--bt-final-topbar) !important;
+  margin: 0 !important;
+  padding: 0 var(--bt-final-gap-x) !important;
+  display: grid !important;
+  grid-template-columns: minmax(14rem, 1fr) minmax(18rem, 32rem) max-content !important;
+  grid-template-areas: "title search actions" !important;
+  align-items: center !important;
+  gap: clamp(0.9rem, 1.65vw, 1.45rem) !important;
+  overflow: visible !important;
+}
+
+.topbar.topbar--reference .topbar-menu-trigger {
+  display: none !important;
+}
+
+.topbar.topbar--reference .topbar__page-title {
+  grid-area: title !important;
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  gap: 0.2rem !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  transform: none !important;
+  text-align: left !important;
+}
+
+.topbar.topbar--reference .topbar__page-title h1 {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: var(--bt-final-green) !important;
+  font-size: clamp(1.42rem, 1.45vw, 1.72rem) !important;
+  line-height: 1.05 !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.055em !important;
+}
+
+.topbar.topbar--reference .topbar__page-title p {
+  margin: 0 !important;
+  color: #6e7a71 !important;
+  font-size: 0.83rem !important;
+  line-height: 1.2 !important;
+  font-weight: 560 !important;
+}
+
+.topbar.topbar--reference .topbar-search-trigger--wide {
+  grid-area: search !important;
+  grid-column: auto !important;
+  justify-self: stretch !important;
+  width: 100% !important;
+  height: 2.45rem !important;
+  min-height: 2.45rem !important;
+  display: grid !important;
+  grid-template-columns: auto minmax(0, 1fr) auto !important;
+  align-items: center !important;
+  gap: 0.65rem !important;
+  padding: 0 0.72rem 0 0.95rem !important;
+  border: 1px solid #dfe4dd !important;
+  border-radius: 0.78rem !important;
+  background: #ffffff !important;
+  color: #929a94 !important;
+  box-shadow: none !important;
+}
+
+.topbar.topbar--reference .topbar-search-trigger--wide span {
+  min-width: 0 !important;
+  overflow: hidden !important;
+  white-space: nowrap !important;
+  text-overflow: ellipsis !important;
+  font-size: 0.82rem !important;
+}
+
+.topbar.topbar--reference .topbar__actions {
+  grid-area: actions !important;
+  grid-column: auto !important;
+  min-width: 0 !important;
+  width: auto !important;
+  justify-self: end !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  gap: 0.55rem !important;
+}
+
+.topbar.topbar--reference .topbar-menu,
+.topbar.topbar--reference .topbar-menu--profile {
+  position: relative !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  height: 2.65rem !important;
+  flex: 0 0 auto !important;
+}
+
+.topbar.topbar--reference .topbar-refresh,
+.topbar.topbar--reference .notification-button {
+  width: 2.38rem !important;
+  height: 2.38rem !important;
+  display: inline-grid !important;
+  place-items: center !important;
+  flex: 0 0 auto !important;
+  border: 1px solid transparent !important;
+  border-radius: 0.76rem !important;
+  background: transparent !important;
+  color: #3d4640 !important;
+  box-shadow: none !important;
+}
+
+.topbar.topbar--reference .topbar-refresh:hover,
+.topbar.topbar--reference .notification-button:hover,
+.topbar.topbar--reference .notification-button--active {
+  border-color: var(--bt-final-line) !important;
+  background: #f7f8f4 !important;
+}
+
+.topbar.topbar--reference .topbar-avatar {
+  height: 2.65rem !important;
+  max-width: 16.5rem !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 0.66rem !important;
+  padding: 0 0.2rem 0 0.12rem !important;
+  border: 1px solid transparent !important;
+  border-radius: 0.86rem !important;
+  background: transparent !important;
+  color: var(--bt-text) !important;
+  box-shadow: none !important;
+  line-height: 1 !important;
+}
+
+.topbar.topbar--reference .topbar-avatar:hover,
+.topbar.topbar--reference .topbar-avatar--active {
+  border-color: var(--bt-final-line) !important;
+  background: #f7f8f4 !important;
+}
+
+.topbar.topbar--reference .topbar-avatar__photo {
+  width: 2.45rem !important;
+  height: 2.45rem !important;
+  flex: 0 0 2.45rem !important;
+  display: grid !important;
+  place-items: center !important;
+  border-radius: 999px !important;
+  color: #ffffff !important;
+  background: linear-gradient(145deg, #0e3c23 0%, #237246 52%, #bed2b5 53%, #f2eee1 100%) !important;
+  box-shadow: 0 0 0 3px #f7f5ed, 0 7px 15px rgba(15, 35, 24, 0.13) !important;
+  font-size: 0.72rem !important;
+  font-weight: 950 !important;
+}
+
+.topbar.topbar--reference .topbar-avatar__meta {
+  min-width: 0 !important;
+  max-width: 11rem !important;
+  display: grid !important;
+  gap: 0.16rem !important;
+  text-align: left !important;
+}
+
+.topbar.topbar--reference .topbar-avatar__meta strong,
+.topbar.topbar--reference .topbar-avatar__meta small {
+  display: block !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  line-height: 1.08 !important;
+}
+
+.topbar.topbar--reference .topbar-avatar__meta strong {
+  color: #111814 !important;
+  font-size: 0.84rem !important;
+  font-weight: 900 !important;
+}
+
+.topbar.topbar--reference .topbar-avatar__meta small {
+  color: #727b74 !important;
+  font-size: 0.72rem !important;
+  font-weight: 560 !important;
+}
+
+.topbar.topbar--reference .topbar-avatar > svg {
+  flex: 0 0 auto !important;
+}
+
+/* Dashboard: baja el zoom visual y usa el ancho correctamente. */
+.content-grid.dashboard-screen--vlv {
+  width: 100% !important;
+  max-width: none !important;
+  min-height: calc(100dvh - var(--bt-final-topbar)) !important;
+  display: grid !important;
+  align-content: start !important;
+  padding: var(--bt-final-gap-y) var(--bt-final-gap-x) 1.8rem !important;
+  gap: 0.95rem !important;
+}
+
+.vlv-dashboard-title {
+  display: none !important;
+}
+
+.vlv-metric-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(12rem, 1fr)) !important;
+  gap: 0.9rem !important;
+}
+
+.vlv-dashboard-main-grid {
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.42fr) minmax(23.5rem, 1fr) !important;
+  gap: 0.9rem !important;
+}
+
+.vlv-dashboard-bottom-grid {
+  display: grid !important;
+  grid-template-columns: minmax(18rem, 0.95fr) minmax(18rem, 1fr) minmax(18rem, 1fr) !important;
+  gap: 0.9rem !important;
+}
+
+.vlv-metric-card,
+.vlv-panel-card {
+  border: 1px solid var(--bt-final-line) !important;
+  border-radius: var(--bt-final-card-radius) !important;
+  box-shadow: var(--bt-final-shadow) !important;
+  transform: none !important;
+}
+
+.vlv-metric-card {
+  min-height: 7.35rem !important;
+  padding: 1rem 1.05rem !important;
+  gap: 0.78rem !important;
+  align-items: center !important;
+}
+
+.vlv-metric-card__icon {
+  width: 3.1rem !important;
+  height: 3.1rem !important;
+  border-radius: 0.95rem !important;
+}
+
+.vlv-metric-card__body strong {
+  font-size: clamp(1.55rem, 1.85vw, 1.95rem) !important;
+}
+
+.vlv-metric-card__meta {
+  margin-top: 0.48rem !important;
+  font-size: 0.7rem !important;
+  line-height: 1.2 !important;
+}
+
+.vlv-panel-card--table,
+.vlv-trace-card {
+  min-height: clamp(13.5rem, 25vh, 17rem) !important;
+}
+
+.vlv-bars-card,
+.vlv-activity-card,
+.vlv-alert-card {
+  min-height: clamp(12rem, 22vh, 15rem) !important;
+}
+
+.vlv-panel-header {
+  min-height: 2.9rem !important;
+  padding: 0.8rem 0.95rem 0.7rem !important;
+}
+
+.vlv-table th,
+.vlv-table td {
+  padding: 0.66rem 0.9rem !important;
+}
+
+.vlv-bars {
+  min-height: 10.4rem !important;
+  height: 10.4rem !important;
+}
+
+.vlv-bars > .vlv-muted,
+.vlv-activity-list > .vlv-muted,
+.vlv-alert-list > .vlv-muted {
+  width: 100% !important;
+  min-height: 7.2rem !important;
+  margin: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  border: 1px dashed rgba(25, 45, 30, 0.16) !important;
+  border-radius: 0.85rem !important;
+  background: #fbfaf6 !important;
+  color: #6d786f !important;
+}
+
+/* Login rediseñado tipo split moderno con paleta BlueberryTrace. */
+.vlv-login-shell.vlv-login-shell--reference {
+  min-height: 100dvh !important;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1.35fr) minmax(28rem, 0.9fr) !important;
+  padding: 0 !important;
+  background: #ffffff !important;
+  overflow: hidden !important;
+}
+
+.vlv-login-shell--reference .vlv-login-hero {
+  position: relative !important;
+  min-height: 100dvh !important;
+  padding: clamp(3rem, 6vw, 6rem) clamp(3rem, 8vw, 10rem) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  justify-content: center !important;
+  color: #ffffff !important;
+  background:
+    radial-gradient(circle at 18% 18%, rgba(137, 209, 67, 0.35), transparent 19rem),
+    radial-gradient(circle at 84% 84%, rgba(104, 34, 126, 0.55), transparent 25rem),
+    linear-gradient(135deg, rgba(7, 38, 21, 0.97) 0%, rgba(20, 91, 47, 0.94) 46%, rgba(78, 24, 99, 0.97) 100%),
+    url('./assets/brand/blueberry-login-hero.webp') center bottom / cover no-repeat !important;
+  background-blend-mode: normal, normal, multiply, normal !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  overflow: hidden !important;
+}
+
+.vlv-login-shell--reference .vlv-login-hero::before {
+  content: "" !important;
+  display: block !important;
+  position: absolute !important;
+  inset: 0 !important;
+  pointer-events: none !important;
+  background:
+    repeating-radial-gradient(circle at 18% 18%, transparent 0 5rem, rgba(255,255,255,0.075) 5.06rem 5.12rem),
+    linear-gradient(90deg, rgba(7, 33, 19, 0.86), rgba(7, 33, 19, 0.58) 44%, rgba(78, 24, 99, 0.48) 100%) !important;
+  z-index: 0 !important;
+}
+
+.vlv-login-shell--reference .vlv-login-brand,
+.vlv-login-shell--reference .vlv-login-copy,
+.vlv-login-shell--reference .vlv-login-hero-footer {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.vlv-login-shell--reference .vlv-login-brand {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.9rem !important;
+  width: auto !important;
+  margin: 0 0 clamp(4rem, 8vh, 6.8rem) !important;
+  justify-items: start !important;
+  text-align: left !important;
+}
+
+.vlv-login-shell--reference .vlv-login-brand img {
+  width: clamp(4rem, 6.2vw, 6rem) !important;
+  height: auto !important;
+  filter: drop-shadow(0 14px 24px rgba(0,0,0,.24)) !important;
+}
+
+.vlv-login-shell--reference .vlv-login-brand strong {
+  margin: 0 !important;
+  color: #f1eaff !important;
+  font-size: clamp(1.35rem, 2.35vw, 2.1rem) !important;
+  line-height: 0.95 !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.065em !important;
+  text-shadow: 0 12px 28px rgba(0,0,0,.22) !important;
+}
+
+.vlv-login-shell--reference .vlv-login-brand strong span {
+  color: #e4f8c3 !important;
+}
+
+.vlv-login-shell--reference .vlv-login-copy {
+  width: min(42rem, 100%) !important;
+  margin: 0 !important;
+}
+
+.vlv-login-shell--reference .vlv-login-copy h1 {
+  color: #ffffff !important;
+  max-width: 12ch !important;
+  margin: 0 !important;
+  font-size: clamp(3.2rem, 5.7vw, 5.8rem) !important;
+  line-height: 0.98 !important;
+  font-weight: 950 !important;
+  letter-spacing: -0.075em !important;
+  text-shadow: 0 18px 42px rgba(0,0,0,.26) !important;
+}
+
+.vlv-login-shell--reference .vlv-login-copy p {
+  width: min(38rem, 100%) !important;
+  margin: 1.75rem 0 0 !important;
+  color: rgba(255,255,255,.86) !important;
+  font-size: clamp(1.02rem, 1.28vw, 1.28rem) !important;
+  line-height: 1.45 !important;
+  font-weight: 560 !important;
+}
+
+.vlv-login-shell--reference .vlv-login-form-panel {
+  min-height: 100dvh !important;
+  display: grid !important;
+  place-items: center !important;
+  padding: clamp(2rem, 5vw, 5.5rem) clamp(2.25rem, 5vw, 5.8rem) !important;
+  background: #ffffff !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: -18px 0 42px rgba(36, 25, 58, 0.06) !important;
+}
+
+.vlv-login-shell--reference .vlv-login-card {
+  width: min(27rem, 100%) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: grid !important;
+  gap: 1.55rem !important;
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+.vlv-login-shell--reference .vlv-field__control {
+  height: 3.45rem !important;
+}
+
+@media (max-width: 1420px) {
+  :root {
+    --bt-final-sidebar: 14.35rem;
+    --bt-final-gap-x: 1.15rem;
+  }
+
+  .topbar.topbar--reference .topbar__inner {
+    grid-template-columns: minmax(11rem, 1fr) minmax(15rem, 24rem) max-content !important;
+  }
+
+  .topbar.topbar--reference .topbar-avatar__meta {
+    max-width: 8.4rem !important;
+  }
+
+  .vlv-metric-card__spark {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1240px) {
+  .vlv-metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+
+  .vlv-dashboard-main-grid,
+  .vlv-dashboard-bottom-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 980px) {
+  :root {
+    --bt-final-topbar: auto;
+    --bt-final-gap-x: 0.95rem;
+  }
+
+  .app-shell {
+    display: block !important;
+    min-height: 100dvh !important;
+  }
+
+  .sidebar.sidebar--reference {
+    position: fixed !important;
+    inset: 0 auto 0 0 !important;
+    z-index: 260 !important;
+    width: min(19rem, calc(100vw - 3rem)) !important;
+    transform: translateX(-110%) !important;
+    transition: transform 220ms ease !important;
+    box-shadow: 30px 0 70px rgba(8, 24, 16, 0.24) !important;
+  }
+
+  .app-shell--sidebar-open .sidebar.sidebar--reference {
+    transform: translateX(0) !important;
+  }
+
+  .mobile-sidebar-backdrop {
+    position: fixed !important;
+    inset: 0 !important;
+    z-index: 240 !important;
+    border: 0 !important;
+    display: none !important;
+    background: rgba(8, 24, 16, 0.42) !important;
+    backdrop-filter: blur(6px) !important;
+  }
+
+  .app-shell--sidebar-open .mobile-sidebar-backdrop {
+    display: block !important;
+  }
+
+  .topbar.topbar--reference {
+    height: auto !important;
+    min-height: 4.65rem !important;
+  }
+
+  .topbar.topbar--reference .topbar__inner {
+    height: auto !important;
+    min-height: 4.65rem !important;
+    grid-template-columns: 2.4rem minmax(0, 1fr) max-content !important;
+    grid-template-areas:
+      "menu title actions"
+      "search search search" !important;
+    gap: 0.68rem !important;
+    padding: 0.72rem 0.95rem !important;
+  }
+
+  .topbar.topbar--reference .topbar-menu-trigger {
+    grid-area: menu !important;
+    display: inline-grid !important;
+  }
+
+  .topbar.topbar--reference .topbar__page-title {
+    grid-area: title !important;
+  }
+
+  .topbar.topbar--reference .topbar-search-trigger--wide {
+    grid-area: search !important;
+  }
+
+  .topbar.topbar--reference .topbar__actions {
+    grid-area: actions !important;
+    gap: 0.35rem !important;
+  }
+
+  .topbar.topbar--reference .topbar-avatar__meta,
+  .topbar.topbar--reference .topbar-avatar > svg {
+    display: none !important;
+  }
+
+  .sidebar__brand-row {
+    display: flex !important;
+    align-items: flex-start !important;
+    justify-content: space-between !important;
+  }
+
+  .sidebar-close {
+    display: inline-grid !important;
+  }
+
+  .vlv-login-shell.vlv-login-shell--reference {
+    grid-template-columns: 1fr !important;
+    min-height: 100dvh !important;
+    background:
+      linear-gradient(135deg, rgba(7, 38, 21, .94), rgba(85, 24, 99, .92)),
+      url('./assets/brand/blueberry-login-hero.webp') center bottom / cover no-repeat !important;
+  }
+
+  .vlv-login-shell--reference .vlv-login-hero {
+    min-height: auto !important;
+    padding: 1.25rem 1.25rem 0 !important;
+    background: transparent !important;
+  }
+
+  .vlv-login-shell--reference .vlv-login-hero::before,
+  .vlv-login-shell--reference .vlv-login-copy,
+  .vlv-login-hero-footer {
+    display: none !important;
+  }
+
+  .vlv-login-shell--reference .vlv-login-brand {
+    margin: 0 !important;
+  }
+
+  .vlv-login-shell--reference .vlv-login-brand img {
+    width: 3.6rem !important;
+  }
+
+  .vlv-login-shell--reference .vlv-login-form-panel {
+    min-height: calc(100dvh - 5rem) !important;
+    padding: 1.25rem !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .vlv-login-shell--reference .vlv-login-card {
+    width: min(27rem, 100%) !important;
+    padding: 1.45rem !important;
+    border-radius: 1.15rem !important;
+    background: rgba(255, 255, 255, .97) !important;
+    box-shadow: 0 24px 60px rgba(0,0,0,.22) !important;
+  }
+}
+
+@media (max-width: 720px) {
+  .vlv-metric-grid {
+    grid-template-columns: 1fr !important;
+  }
+
+  .vlv-table {
+    min-width: 42rem !important;
+  }
+
+  .vlv-trace-line {
+    grid-template-columns: 1fr !important;
+    gap: 0.72rem !important;
+  }
+
+  .vlv-trace-line::before {
+    display: none !important;
+  }
+}
+
+@media (max-width: 430px) {
+  .topbar.topbar--reference .topbar-refresh {
+    display: none !important;
+  }
+
+  .topbar.topbar--reference .topbar-search-trigger--wide span,
+  .topbar.topbar--reference .topbar-search-trigger--wide kbd {
+    display: none !important;
+  }
+}

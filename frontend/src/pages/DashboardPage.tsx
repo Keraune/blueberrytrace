@@ -149,31 +149,57 @@ export function DashboardPage({ dashboard, lotes, camas, siembras, procesos, cla
     }))
   ].slice(0, 4);
 
-  const alerts = [
-    {
+  const pendingQuality = clasificaciones.filter((item) => /PENDIENTE|OBSERVADA/i.test(item.estado || '')).length;
+  const observedDispatches = despachos.filter((item) => /OBSERVADO|ANULADO/i.test(item.estado || item.validacionCalidad || '')).length;
+  const inactiveBeds = camas.filter((item) => (item.estado || '').toUpperCase() !== 'ACTIVA').length;
+  const hasOperationalData = lotes.length + camas.length + siembras.length + clasificaciones.length + despachos.length + trazabilidad.length > 0;
+  const alerts: Array<{
+    icon: typeof AlertTriangle;
+    tone: 'amber' | 'purple' | 'green';
+    title: string;
+    text: string;
+    time: string;
+  }> = [];
+
+  if (pendingQuality > 0) {
+    alerts.push({
       icon: AlertTriangle,
       tone: 'amber',
-      title: clasificaciones.filter((item) => /PENDIENTE|OBSERVADA/i.test(item.estado || '')).length > 0 ? 'Clasificación pendiente' : 'Control operativo',
-      text: clasificaciones.filter((item) => /PENDIENTE|OBSERVADA/i.test(item.estado || '')).length > 0
-        ? 'Existen registros que requieren revisión de calidad.'
-        : 'Los registros principales se encuentran disponibles.',
+      title: 'Clasificación pendiente',
+      text: `${pendingQuality} registros requieren revisión de calidad.`,
       time: 'Actual'
-    },
-    {
-      icon: Route,
+    });
+  }
+
+  if (observedDispatches > 0) {
+    alerts.push({
+      icon: Truck,
       tone: 'purple',
-      title: 'Trazabilidad disponible',
-      text: `${trazabilidad.length} lotes cuentan con seguimiento consolidado.`,
+      title: 'Despachos observados',
+      text: `${observedDispatches} despachos necesitan seguimiento operativo.`,
+      time: 'Actual'
+    });
+  }
+
+  if (inactiveBeds > 0) {
+    alerts.push({
+      icon: AlertTriangle,
+      tone: 'amber',
+      title: 'Camas no activas',
+      text: `${inactiveBeds} camas figuran fuera de operación.`,
       time: 'Sistema'
-    },
-    {
+    });
+  }
+
+  if (alerts.length === 0 && hasOperationalData) {
+    alerts.push({
       icon: CheckCircle2,
       tone: 'green',
-      title: 'Despachos registrados',
-      text: `${dispatches} movimientos de despacho cargados desde la base de datos.`,
-      time: 'Sistema'
-    }
-  ] as const;
+      title: 'Sin alertas operativas',
+      text: 'Los datos actuales no generan observaciones críticas.',
+      time: 'Actual'
+    });
+  }
 
   const metricCards = [
     {
@@ -316,11 +342,11 @@ export function DashboardPage({ dashboard, lotes, camas, siembras, procesos, cla
           <div className="vlv-trace-summary">
             <div>
               <span>Estado actual</span>
-              <strong>{valueOf(selectedTrace?.despachos) > 0 ? 'Despachado' : valueOf(selectedTrace?.clasificaciones) > 0 ? 'Clasificado' : 'En producción'}</strong>
+              <strong>{selectedTrace ? valueOf(selectedTrace.despachos) > 0 ? 'Despachado' : valueOf(selectedTrace.clasificaciones) > 0 ? 'Clasificado' : 'En producción' : 'Sin seguimiento'}</strong>
             </div>
             <div>
               <span>Último evento</span>
-              <strong>{dateShort(selectedTrace?.ultimoEvento)}</strong>
+              <strong>{selectedTrace ? dateShort(selectedTrace.ultimoEvento) : 'Sin fecha'}</strong>
             </div>
           </div>
         </article>
@@ -379,7 +405,7 @@ export function DashboardPage({ dashboard, lotes, camas, siembras, procesos, cla
             <button type="button">Ver todas</button>
           </header>
           <div className="vlv-alert-list">
-            {alerts.map((alert) => {
+            {alerts.length > 0 ? alerts.map((alert) => {
               const Icon = alert.icon;
               return (
                 <article className={`vlv-alert-item vlv-alert-item--${alert.tone}`} key={alert.title}>
@@ -391,7 +417,7 @@ export function DashboardPage({ dashboard, lotes, camas, siembras, procesos, cla
                   <time>{alert.time}</time>
                 </article>
               );
-            })}
+            }) : <p className="vlv-muted">Sin alertas generadas por los datos actuales.</p>}
           </div>
         </article>
       </section>

@@ -31,26 +31,29 @@ export function LoginPage({ onAuthenticated }: LoginPageProps) {
 
   return (
     <main className="vlv-login-shell vlv-login-shell--reference">
-      <section className="vlv-login-hero" aria-label="Presentación BlueberryTrace">
-        <div className="vlv-login-brand" aria-label="BlueberryTrace">
-          <img src={blueberryLogoMark} alt="Logo BlueberryTrace" />
-          <strong><span>Blueberry</span>Trace</strong>
-        </div>
+        <section className="vlv-login-hero vlv-login-hero--solid" aria-label="Presentación BlueberryTrace">
+            <div className="vlv-login-brand" aria-label="BlueberryTrace">
+                <img src={blueberryLogoMark} alt="Logo BlueberryTrace" />
+                <strong><span>Blueberry</span>Trace</strong>
+            </div>
 
-        <div className="vlv-login-copy">
-          <h1>Control y trazabilidad de plantas de arándano</h1>
-          <p>
-            Gestione cada etapa del cultivo con información confiable, en tiempo real
-            y desde un solo lugar.
-          </p>
-        </div>
-      </section>
+            <div className="vlv-login-copy">
+                <h1>Control agrícola inteligente</h1>
+                <p>
+                    Gestione lotes, camas, siembras, clasificaciones y despachos desde una
+                    plataforma segura, moderna y conectada al backend.
+                </p>
+            </div>
+
+            <p className="vlv-login-hero-footer">© 2026 BlueberryTrace. Sistema interno del vivero.</p>
+        </section>
 
       <section className="vlv-login-form-panel" aria-label="Inicio de sesión">
         <form className="vlv-login-card" onSubmit={handleSubmit}>
+          <strong className="vlv-login-product">BlueberryTrace</strong>
           <div className="vlv-login-card__heading">
             <h2>Bienvenido</h2>
-            <p>Ingrese a su cuenta</p>
+            <p>Ingrese con su usuario o correo institucional.</p>
           </div>
 
           <label className="vlv-field">
