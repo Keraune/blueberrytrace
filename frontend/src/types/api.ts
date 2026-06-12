@@ -23,6 +23,7 @@ export interface UserReferenceResponse {
   cargo: string | null;
   telefono: string | null;
   avatarColor: string | null;
+  avatarImage: string | null;
   rol: string | null;
   activo: boolean;
   fechaCreacion: string | null;
@@ -36,6 +37,7 @@ export interface AuthenticatedUserResponse {
   cargo: string | null;
   telefono: string | null;
   avatarColor: string | null;
+  avatarImage: string | null;
   rol: string | null;
   authorities: string[];
 }
@@ -59,6 +61,7 @@ export interface ProfileUpdatePayload {
   cargo?: string;
   telefono?: string;
   avatarColor?: string;
+  avatarImage?: string | null;
 }
 
 export interface PasswordChangePayload {

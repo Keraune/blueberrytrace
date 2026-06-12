@@ -32,7 +32,8 @@ const subtitles: Record<string, string> = {
   lotes: 'Gestión de lotes e invernaderos',
   camas: 'Control de camas productivas',
   siembra: 'Registro de siembras por lote',
-  procesos: 'Uniformizaciones y formalizaciones',
+  uniformizaciones: 'Seguimiento y control de uniformizaciones',
+  formalizaciones: 'Seguimiento y control de formalizaciones',
   clasificacion: 'Control de calidad y clasificación',
   despacho: 'Despachos y salidas registradas',
   trazabilidad: 'Seguimiento por lote productivo',
@@ -64,6 +65,7 @@ export function Topbar({
 
   const displayRole = useMemo(() => user?.cargo || user?.rol || user?.authorities?.[0] || 'Operario', [user]);
   const avatarColor = user?.avatarColor || 'emerald';
+  const avatarImage = user?.avatarImage || null;
   const pageTitle = titles[activeKey] || activeModule;
   const pageSubtitle = subtitles[activeKey] || 'Gestión operativa BlueberryTrace';
 
@@ -185,7 +187,7 @@ export function Topbar({
                 setNotificationsOpen(false);
               }}
             >
-              <span className="topbar-avatar__photo">{initials(user?.nombreCompleto)}</span>
+              <span className={avatarImage ? "topbar-avatar__photo topbar-avatar__photo--image" : "topbar-avatar__photo"}>{avatarImage ? <img src={avatarImage} alt="Foto de perfil" /> : initials(user?.nombreCompleto)}</span>
               <span className="topbar-avatar__meta">
                 <strong>{user?.nombreCompleto || user?.username || 'Usuario autenticado'}</strong>
                 <small>{displayRole}</small>
@@ -196,7 +198,7 @@ export function Topbar({
             {profileOpen ? (
               <section className="topbar-popover profile-panel" aria-label="Menú de perfil">
                 <header className="profile-panel__hero">
-                  <span>{initials(user?.nombreCompleto)}</span>
+                  <span className={avatarImage ? "profile-panel__avatar profile-panel__avatar--image" : "profile-panel__avatar"}>{avatarImage ? <img src={avatarImage} alt="Foto de perfil" /> : initials(user?.nombreCompleto)}</span>
                   <div>
                     <strong>{user?.nombreCompleto || 'Sesión activa'}</strong>
                     <small>{displayRole}</small>

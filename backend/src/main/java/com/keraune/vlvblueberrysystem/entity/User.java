@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Lob;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
@@ -42,6 +43,10 @@ public class User extends AuditableEntity {
     @Column(name = "avatar_color", length = 30)
     private String avatarColor;
 
+    @Lob
+    @Column(name = "avatar_image", columnDefinition = "LONGTEXT")
+    private String avatarImage;
+
     @Column(name = "estado", nullable = false)
     private Boolean estado = true;
 
@@ -63,6 +68,8 @@ public class User extends AuditableEntity {
     public void setTelefono(String telefono) { this.telefono = telefono; }
     public String getAvatarColor() { return avatarColor; }
     public void setAvatarColor(String avatarColor) { this.avatarColor = avatarColor; }
+    public String getAvatarImage() { return avatarImage; }
+    public void setAvatarImage(String avatarImage) { this.avatarImage = avatarImage; }
     public Boolean getEstado() { return estado; }
     public void setEstado(Boolean estado) { this.estado = estado; }
 }

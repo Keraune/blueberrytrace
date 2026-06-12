@@ -30,6 +30,7 @@ public final class ApiPayloads {
             String cargo,
             String telefono,
             String avatarColor,
+            String avatarImage,
             String rol,
             boolean activo,
             LocalDateTime fechaCreacion,
@@ -43,6 +44,7 @@ public final class ApiPayloads {
             String cargo,
             String telefono,
             String avatarColor,
+            String avatarImage,
             String rol,
             List<String> authorities
     ) {}
@@ -64,7 +66,8 @@ public final class ApiPayloads {
             @NotBlank @Email @Size(max = 120) String email,
             @Size(max = 90) String cargo,
             @Size(max = 30) String telefono,
-            @Size(max = 30) String avatarColor
+            @Size(max = 30) String avatarColor,
+            @Size(max = 1_500_000) String avatarImage
     ) {}
 
     public record PasswordChangePayload(

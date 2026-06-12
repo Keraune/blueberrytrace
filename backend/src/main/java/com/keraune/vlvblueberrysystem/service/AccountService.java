@@ -53,7 +53,7 @@ public class AccountService {
     public AuthenticatedUserResponse authenticatedUser(User user) {
         List<String> authorities = List.of("ROLE_" + (user.getRole() != null ? user.getRole().getNombre() : "OPERARIO"));
         return new AuthenticatedUserResponse(user.getUsername(), user.getNombreCompleto(), user.getEmail(), user.getCargo(),
-                user.getTelefono(), user.getAvatarColor(), user.getRole() != null ? user.getRole().getNombre() : null, authorities);
+                user.getTelefono(), user.getAvatarColor(), user.getAvatarImage(), user.getRole() != null ? user.getRole().getNombre() : null, authorities);
     }
 
     public AuthenticatedUserResponse authenticatedUser(Authentication authentication) {
@@ -61,7 +61,7 @@ public class AccountService {
                 .orElseThrow(() -> new IllegalArgumentException("Usuario autenticado no encontrado"));
         List<String> authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList();
         return new AuthenticatedUserResponse(user.getUsername(), user.getNombreCompleto(), user.getEmail(), user.getCargo(),
-                user.getTelefono(), user.getAvatarColor(), user.getRole() != null ? user.getRole().getNombre() : null, authorities);
+                user.getTelefono(), user.getAvatarColor(), user.getAvatarImage(), user.getRole() != null ? user.getRole().getNombre() : null, authorities);
     }
 
     @Transactional(readOnly = true)
@@ -124,6 +124,7 @@ public class AccountService {
         user.setCargo(trimToNull(payload.cargo()));
         user.setTelefono(trimToNull(payload.telefono()));
         user.setAvatarColor(trimToDefault(payload.avatarColor(), "emerald"));
+        user.setAvatarImage(normalizeAvatarImage(payload.avatarImage()));
         return authenticatedUser(user);
     }
 
@@ -147,6 +148,22 @@ public class AccountService {
         if (creating || (payload.password() != null && !payload.password().isBlank())) {
             user.setPassword(passwordEncoder.encode(payload.password()));
         }
+    }
+
+    private String normalizeAvatarImage(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        String clean = value.trim();
+        if (!clean.startsWith("data:image/png;base64,")
+                && !clean.startsWith("data:image/jpeg;base64,")
+                && !clean.startsWith("data:image/webp;base64,")) {
+            throw new IllegalArgumentException("La imagen de perfil debe ser PNG, JPG o WEBP.");
+        }
+        if (clean.length() > 1_500_000) {
+            throw new IllegalArgumentException("La imagen de perfil supera el tamaño permitido.");
+        }
+        return clean;
     }
 
     private String trimToNull(String value) {

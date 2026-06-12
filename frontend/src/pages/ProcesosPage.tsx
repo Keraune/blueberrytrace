@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { CheckCircle2, ClipboardCheck, ClipboardList, Download, GitBranch, Pencil, Plus, RotateCcw } from 'lucide-react';
+import { CheckCircle2, ClipboardCheck, Download, GitBranch, Leaf, Pencil, Plus, RotateCcw } from 'lucide-react';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { DataTable } from '../components/DataTable';
 import { EmptyState } from '../components/EmptyState';
@@ -11,9 +11,19 @@ import { blueberryApi } from '../lib/api';
 import { downloadCsv } from '../lib/export';
 import { dateShort, numberCompact } from '../lib/format';
 import { emitToast } from '../lib/uiEvents';
-import type { CamaResponse, FormalizacionFormPayload, FormalizacionResponse, ProcesoOperativoResponse, ReferenceResponse, SiembraResponse, UniformizacionFormPayload, UniformizacionResponse } from '../types/api';
+import type {
+  CamaResponse,
+  FormalizacionFormPayload,
+  FormalizacionResponse,
+  ProcesoOperativoResponse,
+  ReferenceResponse,
+  SiembraResponse,
+  UniformizacionFormPayload,
+  UniformizacionResponse
+} from '../types/api';
 
 interface ProcesosPageProps {
+  mode: 'uniformizacion' | 'formalizacion';
   procesos: ProcesoOperativoResponse | null;
   lotes: ReferenceResponse[];
   camas: CamaResponse[];
@@ -21,7 +31,7 @@ interface ProcesosPageProps {
   onProcesosChange: (items: ProcesoOperativoResponse) => void;
 }
 
-export function ProcesosPage({ procesos, lotes, camas, siembras, onProcesosChange }: ProcesosPageProps) {
+export function ProcesosPage({ mode, procesos, lotes, camas, siembras, onProcesosChange }: ProcesosPageProps) {
   const [modal, setModal] = useState<'uniformizacion' | 'formalizacion' | null>(null);
   const [editingUniformizacion, setEditingUniformizacion] = useState<UniformizacionResponse | null>(null);
   const [editingFormalizacion, setEditingFormalizacion] = useState<FormalizacionResponse | null>(null);
@@ -30,25 +40,47 @@ export function ProcesosPage({ procesos, lotes, camas, siembras, onProcesosChang
 
   const uniformizaciones = procesos?.uniformizaciones.items || [];
   const formalizaciones = procesos?.formalizaciones.items || [];
+  const isUniformizacion = mode === 'uniformizacion';
+
+  const pageCopy = isUniformizacion
+    ? {
+      eyebrow: 'Proceso productivo',
+      title: 'Uniformizaciones',
+      description: 'Controla la nivelación y selección operativa de plantas por lote y cama.',
+      icon: <Leaf size={21} />,
+      tone: 'green' as const,
+      addLabel: 'Nueva uniformización'
+    }
+    : {
+      eyebrow: 'Proceso productivo',
+      title: 'Formalizaciones',
+      description: 'Gestiona bandejas, plantas formalizadas y cierres del proceso productivo.',
+      icon: <ClipboardCheck size={21} />,
+      tone: 'orange' as const,
+      addLabel: 'Nueva formalización'
+    };
 
   const aggregated = useMemo(() => {
     return lotes.map((lote) => {
       const siembrasLote = siembras.filter((siembra) => siembra.lote?.id === lote.id);
       const planted = siembrasLote.reduce((total, siembra) => total + (siembra.cantidadRegistrada || 0), 0);
-      const registros = uniformizaciones.filter((registro) => registro.lote?.id === lote.id);
-      const uniformized = registros.reduce((total, registro) => total + (registro.cantidadUniformizada || 0), 0);
-      const latest = registros[0];
-      const progress = planted === 0 ? 0 : Math.min(100, Math.round((uniformized / planted) * 100));
+      const registrosUniformizacion = uniformizaciones.filter((registro) => registro.lote?.id === lote.id);
+      const registrosFormalizacion = formalizaciones.filter((registro) => registro.lote?.id === lote.id);
+      const processed = isUniformizacion
+        ? registrosUniformizacion.reduce((total, registro) => total + (registro.cantidadUniformizada || 0), 0)
+        : registrosFormalizacion.reduce((total, registro) => total + (registro.cantidadPlantas || 0), 0);
+      const latest = isUniformizacion ? registrosUniformizacion[0] : registrosFormalizacion[0];
+      const progress = planted === 0 ? 0 : Math.min(100, Math.round((processed / planted) * 100));
       return {
         lote,
         planted,
-        uniformized,
+        processed,
         progress,
         latest,
         status: progress >= 100 ? 'COMPLETADO' : progress > 0 ? 'EN PROCESO' : 'PENDIENTE'
       };
-    }).filter((item) => item.planted > 0 || item.uniformized > 0).slice(0, 6);
-  }, [lotes, siembras, uniformizaciones]);
+    }).filter((item) => item.planted > 0 || item.processed > 0).slice(0, 6);
+  }, [formalizaciones, isUniformizacion, lotes, siembras, uniformizaciones]);
 
   async function createUniformizacion(payload: UniformizacionFormPayload | FormalizacionFormPayload) {
     onProcesosChange(await blueberryApi.createUniformizacion(payload as UniformizacionFormPayload));
@@ -76,20 +108,27 @@ export function ProcesosPage({ procesos, lotes, camas, siembras, onProcesosChang
     emitToast('success', 'Formalización actualizada', 'Los cambios fueron guardados.');
   }
 
-
   function exportCsv() {
-    const uniformizacionRows = uniformizaciones.map((item) => [
-      'Uniformización',
-      item.lote?.codigo || '',
-      item.cama?.codigo || '',
-      item.fechaUniformizacion || '',
-      item.cantidadInicial || 0,
-      item.cantidadUniformizada || 0,
-      item.criterio || '',
-      item.estado || '',
-      item.usuarioRegistro?.nombreCompleto || ''
-    ]);
-    const formalizacionRows = formalizaciones.map((item) => [
+    if (isUniformizacion) {
+      downloadCsv('blueberrytrace-uniformizaciones.csv', [
+        'Proceso', 'Lote', 'Cama', 'Fecha', 'Cantidad inicial', 'Cantidad uniformizada', 'Criterio', 'Estado', 'Responsable'
+      ], uniformizaciones.map((item) => [
+        'Uniformización',
+        item.lote?.codigo || '',
+        item.cama?.codigo || '',
+        item.fechaUniformizacion || '',
+        item.cantidadInicial || 0,
+        item.cantidadUniformizada || 0,
+        item.criterio || '',
+        item.estado || '',
+        item.usuarioRegistro?.nombreCompleto || ''
+      ]));
+      return;
+    }
+
+    downloadCsv('blueberrytrace-formalizaciones.csv', [
+      'Proceso', 'Lote', 'Cama', 'Fecha', 'Bandejas', 'Plantas formalizadas', 'Detalle', 'Estado', 'Responsable'
+    ], formalizaciones.map((item) => [
       'Formalización',
       item.lote?.codigo || '',
       item.cama?.codigo || '',
@@ -99,10 +138,7 @@ export function ProcesosPage({ procesos, lotes, camas, siembras, onProcesosChang
       item.detalle || '',
       item.estado || '',
       item.usuarioRegistro?.nombreCompleto || ''
-    ]);
-    downloadCsv('blueberrytrace-procesos.csv', [
-      'Proceso', 'Lote', 'Cama', 'Fecha', 'Cantidad base', 'Cantidad procesada', 'Criterio o detalle', 'Estado', 'Responsable'
-    ], [...uniformizacionRows, ...formalizacionRows]);
+    ]));
   }
 
   async function confirmToggleStatus() {
@@ -124,30 +160,41 @@ export function ProcesosPage({ procesos, lotes, camas, siembras, onProcesosChang
   }
 
   return (
-    <main className="content-grid">
+    <main className="content-grid process-module-screen">
       <ModuleHeader
-        eyebrow="Proceso productivo"
-        title="Uniformización y Formalización"
-        description="Control, edición y seguimiento del proceso productivo por lote."
-        icon={<ClipboardList size={21} />}
-        tone="orange"
-        actions={<div className="button-group"><button type="button" className="ghost-button" onClick={() => setModal('uniformizacion')}><ClipboardCheck size={15} /> Uniformización</button><button type="button" className="action-button" onClick={() => setModal('formalizacion')}><CheckCircle2 size={15} /> Formalización</button></div>}
+        eyebrow={pageCopy.eyebrow}
+        title={pageCopy.title}
+        description={pageCopy.description}
+        icon={pageCopy.icon}
+        tone={pageCopy.tone}
+        actions={<button type="button" className="action-button" onClick={() => setModal(mode)}><Plus size={16} /> {pageCopy.addLabel}</button>}
       />
 
-      <div className="module-utility-row">
-        <button type="button" className="ghost-button" onClick={exportCsv} disabled={uniformizaciones.length + formalizaciones.length === 0}><Download size={15} /> Exportar CSV</button>
+      <div className="module-utility-row module-utility-row--split">
+        <div className="process-switch-note">
+          <strong>{isUniformizacion ? 'Bloque de uniformización' : 'Bloque de formalización'}</strong>
+          <span>{isUniformizacion ? 'Muestra solo registros de uniformización.' : 'Muestra solo registros de formalización.'}</span>
+        </div>
+        <button
+          type="button"
+          className="ghost-button"
+          onClick={exportCsv}
+          disabled={isUniformizacion ? uniformizaciones.length === 0 : formalizaciones.length === 0}
+        >
+          <Download size={15} /> Exportar CSV
+        </button>
       </div>
 
-      <section className="stacked-process-list">
+      <section className="stacked-process-list stacked-process-list--modern">
         {aggregated.length === 0 ? (
           <EmptyState
-            icon={<ClipboardList size={26} />}
-            title="Sin procesos en seguimiento"
-            description="Registra siembras, uniformizaciones o formalizaciones para visualizar el seguimiento por lote."
+            icon={isUniformizacion ? <Leaf size={26} /> : <ClipboardCheck size={26} />}
+            title={isUniformizacion ? 'Sin uniformizaciones en seguimiento' : 'Sin formalizaciones en seguimiento'}
+            description={isUniformizacion ? 'Registra siembras y uniformizaciones para visualizar el avance por lote.' : 'Registra formalizaciones para visualizar plantas y bandejas formalizadas por lote.'}
           />
         ) : null}
         {aggregated.map((item) => (
-          <article className="process-card" key={item.lote.id}>
+          <article className="process-card process-card--modern" key={item.lote.id}>
             <div className="process-card__header">
               <div className="process-card__identity">
                 <span className="process-card__icon"><GitBranch size={18} /></span>
@@ -161,57 +208,64 @@ export function ProcesosPage({ procesos, lotes, camas, siembras, onProcesosChang
                 <strong>{item.progress}%</strong>
               </div>
             </div>
-            <span className="process-card__caption">Progreso de uniformización</span>
+            <span className="process-card__caption">{isUniformizacion ? 'Progreso de uniformización' : 'Progreso de formalización'}</span>
             <div className="progress-track progress-track--wide"><span style={{ width: `${item.progress}%` }} /></div>
             <div className="process-card__footer">
-              <span>{numberCompact(item.uniformized)} uniformizadas</span>
+              <span>{numberCompact(item.processed)} {isUniformizacion ? 'uniformizadas' : 'formalizadas'}</span>
               <span>{numberCompact(item.planted)} sembradas</span>
             </div>
           </article>
         ))}
       </section>
 
-      <section className="tables-grid">
-        <DataTable<UniformizacionResponse>
-          title="Uniformizaciones"
-          description="Registros editables por lote y cama."
-          items={uniformizaciones}
-          emptyTitle="Sin uniformizaciones registradas"
-          emptyDescription="Los registros aparecerán cuando se complete el proceso por lote y cama."
-          columns={[
-            { key: 'lote', label: 'Lote', render: (item) => item.lote?.codigo || 'Sin lote' },
-            { key: 'cama', label: 'Cama', render: (item) => item.cama?.codigo || 'Sin cama' },
-            { key: 'fechaUniformizacion', label: 'Fecha', render: (item) => dateShort(item.fechaUniformizacion) },
-            { key: 'cantidadUniformizada', label: 'Cantidad', render: (item) => numberCompact(item.cantidadUniformizada || 0) },
-            { key: 'estado', label: 'Estado', render: (item) => <StatusBadge value={item.estado} /> },
-            { key: 'acciones', label: 'Acciones', render: (item) => (
-              <div className="icon-actions">
-                <button type="button" className="icon-action" onClick={() => setEditingUniformizacion(item)}><Pencil size={15} /></button>
-                <button type="button" className="icon-action" onClick={() => setPendingStatus({ type: 'uniformizacion', id: item.id, code: item.lote?.codigo || `UNI-${item.id}` })}><RotateCcw size={15} /></button>
-              </div>
-            ) }
-          ]}
-        />
-        <DataTable<FormalizacionResponse>
-          title="Formalizaciones"
-          description="Bandejas y plantas formalizadas con edición directa."
-          items={formalizaciones}
-          emptyTitle="Sin formalizaciones registradas"
-          emptyDescription="Los registros aparecerán cuando se formalicen bandejas y plantas."
-          columns={[
-            { key: 'lote', label: 'Lote', render: (item) => item.lote?.codigo || 'Sin lote' },
-            { key: 'cama', label: 'Cama', render: (item) => item.cama?.codigo || 'Sin cama' },
-            { key: 'fechaFormalizacion', label: 'Fecha', render: (item) => dateShort(item.fechaFormalizacion) },
-            { key: 'cantidadPlantas', label: 'Plantas', render: (item) => numberCompact(item.cantidadPlantas || 0) },
-            { key: 'estado', label: 'Estado', render: (item) => <StatusBadge value={item.estado} /> },
-            { key: 'acciones', label: 'Acciones', render: (item) => (
-              <div className="icon-actions">
-                <button type="button" className="icon-action" onClick={() => setEditingFormalizacion(item)}><Pencil size={15} /></button>
-                <button type="button" className="icon-action" onClick={() => setPendingStatus({ type: 'formalizacion', id: item.id, code: item.lote?.codigo || `FOR-${item.id}` })}><RotateCcw size={15} /></button>
-              </div>
-            ) }
-          ]}
-        />
+      <section className="tables-grid tables-grid--single">
+        {isUniformizacion ? (
+          <DataTable<UniformizacionResponse>
+            title="Uniformizaciones"
+            description="Registros editables por lote y cama."
+            items={uniformizaciones}
+            emptyTitle="Sin uniformizaciones registradas"
+            emptyDescription="Los registros aparecerán cuando se complete el proceso por lote y cama."
+            columns={[
+              { key: 'lote', label: 'Lote', render: (item) => item.lote?.codigo || 'Sin lote' },
+              { key: 'cama', label: 'Cama', render: (item) => item.cama?.codigo || 'Sin cama' },
+              { key: 'fechaUniformizacion', label: 'Fecha', render: (item) => dateShort(item.fechaUniformizacion) },
+              { key: 'criterio', label: 'Criterio', render: (item) => item.criterio || 'No definido' },
+              { key: 'cantidadInicial', label: 'Inicial', render: (item) => numberCompact(item.cantidadInicial || 0) },
+              { key: 'cantidadUniformizada', label: 'Uniformizada', render: (item) => numberCompact(item.cantidadUniformizada || 0) },
+              { key: 'estado', label: 'Estado', render: (item) => <StatusBadge value={item.estado} /> },
+              { key: 'acciones', label: 'Acciones', render: (item) => (
+                <div className="icon-actions">
+                  <button type="button" className="icon-action" onClick={() => setEditingUniformizacion(item)}><Pencil size={15} /></button>
+                  <button type="button" className="icon-action" onClick={() => setPendingStatus({ type: 'uniformizacion', id: item.id, code: item.lote?.codigo || `UNI-${item.id}` })}><RotateCcw size={15} /></button>
+                </div>
+              ) }
+            ]}
+          />
+        ) : (
+          <DataTable<FormalizacionResponse>
+            title="Formalizaciones"
+            description="Bandejas y plantas formalizadas con edición directa."
+            items={formalizaciones}
+            emptyTitle="Sin formalizaciones registradas"
+            emptyDescription="Los registros aparecerán cuando se formalicen bandejas y plantas."
+            columns={[
+              { key: 'lote', label: 'Lote', render: (item) => item.lote?.codigo || 'Sin lote' },
+              { key: 'cama', label: 'Cama', render: (item) => item.cama?.codigo || 'Sin cama' },
+              { key: 'fechaFormalizacion', label: 'Fecha', render: (item) => dateShort(item.fechaFormalizacion) },
+              { key: 'detalle', label: 'Detalle', render: (item) => item.detalle || 'No definido' },
+              { key: 'cantidadBandejas', label: 'Bandejas', render: (item) => numberCompact(item.cantidadBandejas || 0) },
+              { key: 'cantidadPlantas', label: 'Plantas', render: (item) => numberCompact(item.cantidadPlantas || 0) },
+              { key: 'estado', label: 'Estado', render: (item) => <StatusBadge value={item.estado} /> },
+              { key: 'acciones', label: 'Acciones', render: (item) => (
+                <div className="icon-actions">
+                  <button type="button" className="icon-action" onClick={() => setEditingFormalizacion(item)}><Pencil size={15} /></button>
+                  <button type="button" className="icon-action" onClick={() => setPendingStatus({ type: 'formalizacion', id: item.id, code: item.lote?.codigo || `FOR-${item.id}` })}><RotateCcw size={15} /></button>
+                </div>
+              ) }
+            ]}
+          />
+        )}
       </section>
 
       <Modal open={modal === 'uniformizacion'} title="Nueva uniformización" description="Registra cantidad inicial y cantidad uniformizada." onClose={() => setModal(null)}>

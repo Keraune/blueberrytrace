@@ -1,5 +1,5 @@
-import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { KeyRound, Loader2, Mail, Phone, Save, ShieldCheck, UserRound } from 'lucide-react';
+import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { ImagePlus, KeyRound, Loader2, Mail, Phone, Save, ShieldCheck, Trash2, UploadCloud, UserRound } from 'lucide-react';
 import { blueberryApi } from '../lib/api';
 import { initials } from '../lib/format';
 import type { AuthenticatedUserResponse, PasswordChangePayload, ProfileUpdatePayload } from '../types/api';
@@ -21,6 +21,9 @@ const avatarColors = [
   { key: 'slate', label: 'Administrativo' }
 ];
 
+const allowedAvatarTypes = ['image/jpeg', 'image/png', 'image/webp'];
+const maxAvatarSize = 1_100_000;
+
 function normalizeCorporateEmail(value: string) {
   const clean = value.trim().toLowerCase();
   if (!clean || clean.includes('@')) {
@@ -29,19 +32,31 @@ function normalizeCorporateEmail(value: string) {
   return `${clean}@vlv.com`;
 }
 
+function readAvatarFile(file: File) {
+  return new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ''));
+    reader.onerror = () => reject(new Error('No se pudo leer la imagen seleccionada.'));
+    reader.readAsDataURL(file);
+  });
+}
+
 export function ProfileSettingsModal({ open, user, onClose, onUpdated, onPasswordChanged }: ProfileSettingsModalProps) {
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const [profile, setProfile] = useState<ProfileUpdatePayload>({
     nombreCompleto: '',
     email: '',
     cargo: '',
     telefono: '',
-    avatarColor: 'emerald'
+    avatarColor: 'emerald',
+    avatarImage: null
   });
   const [passwordPayload, setPasswordPayload] = useState<PasswordChangePayload>({ currentPassword: '', newPassword: '' });
   const [savingProfile, setSavingProfile] = useState(false);
   const [savingPassword, setSavingPassword] = useState(false);
   const [profileError, setProfileError] = useState<string | null>(null);
   const [passwordError, setPasswordError] = useState<string | null>(null);
+  const [avatarMessage, setAvatarMessage] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user || !open) {
@@ -52,14 +67,43 @@ export function ProfileSettingsModal({ open, user, onClose, onUpdated, onPasswor
       email: user.email || '',
       cargo: user.cargo || '',
       telefono: user.telefono || '',
-      avatarColor: user.avatarColor || 'emerald'
+      avatarColor: user.avatarColor || 'emerald',
+      avatarImage: user.avatarImage || null
     });
     setPasswordPayload({ currentPassword: '', newPassword: '' });
     setProfileError(null);
     setPasswordError(null);
+    setAvatarMessage(null);
   }, [user, open]);
 
   const roleLabel = useMemo(() => user?.rol || user?.authorities?.[0] || 'Operario', [user]);
+  const avatarPreview = profile.avatarImage || null;
+
+  async function handleAvatarFile(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    event.target.value = '';
+    if (!file) {
+      return;
+    }
+
+    if (!allowedAvatarTypes.includes(file.type)) {
+      setAvatarMessage('Formato no permitido. Usa PNG, JPG o WEBP.');
+      return;
+    }
+
+    if (file.size > maxAvatarSize) {
+      setAvatarMessage('La imagen debe pesar menos de 1 MB para guardarse en el perfil.');
+      return;
+    }
+
+    try {
+      const avatarImage = await readAvatarFile(file);
+      setProfile((current) => ({ ...current, avatarImage }));
+      setAvatarMessage('Imagen lista para guardar.');
+    } catch (exception) {
+      setAvatarMessage(exception instanceof Error ? exception.message : 'No se pudo cargar la imagen.');
+    }
+  }
 
   async function submitProfile(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -72,7 +116,8 @@ export function ProfileSettingsModal({ open, user, onClose, onUpdated, onPasswor
         email: normalizeCorporateEmail(profile.email),
         cargo: profile.cargo?.trim() || undefined,
         telefono: profile.telefono?.trim() || undefined,
-        avatarColor: profile.avatarColor || 'emerald'
+        avatarColor: profile.avatarColor || 'emerald',
+        avatarImage: profile.avatarImage || null
       });
       onUpdated(updated);
     } catch (exception) {
@@ -104,13 +149,15 @@ export function ProfileSettingsModal({ open, user, onClose, onUpdated, onPasswor
     <Modal
       open={open}
       title="Perfil del trabajador"
-      description="Gestiona tus datos corporativos, color de avatar y credenciales de acceso."
+      description="Gestiona tus datos corporativos, foto de perfil y credenciales de acceso."
       size="xl"
       onClose={onClose}
     >
-      <div className="profile-settings-layout">
-        <aside className="profile-identity-card">
-          <span className={`profile-avatar profile-avatar--${profile.avatarColor || 'emerald'}`}>{initials(profile.nombreCompleto || user?.nombreCompleto)}</span>
+      <div className="profile-settings-layout profile-settings-layout--modern">
+        <aside className="profile-identity-card profile-identity-card--modern">
+          <span className={`profile-avatar profile-avatar--${profile.avatarColor || 'emerald'} ${avatarPreview ? 'profile-avatar--image' : ''}`}>
+            {avatarPreview ? <img src={avatarPreview} alt="Foto de perfil" /> : initials(profile.nombreCompleto || user?.nombreCompleto)}
+          </span>
           <strong>{profile.nombreCompleto || user?.nombreCompleto || 'Trabajador VLV'}</strong>
           <small>{profile.cargo || roleLabel}</small>
           <div className="profile-identity-card__meta">
@@ -121,7 +168,7 @@ export function ProfileSettingsModal({ open, user, onClose, onUpdated, onPasswor
         </aside>
 
         <div className="profile-settings-panels">
-          <form className="profile-settings-panel" onSubmit={submitProfile}>
+          <form className="profile-settings-panel profile-settings-panel--modern" onSubmit={submitProfile}>
             <header>
               <span><UserRound size={18} /></span>
               <div>
@@ -131,6 +178,26 @@ export function ProfileSettingsModal({ open, user, onClose, onUpdated, onPasswor
             </header>
 
             {profileError ? <div className="form-alert">{profileError}</div> : null}
+
+            <section className="avatar-upload-card" aria-label="Foto de perfil">
+              <input ref={fileInputRef} type="file" accept="image/png,image/jpeg,image/webp" hidden onChange={handleAvatarFile} />
+              <div className="avatar-upload-card__icon"><ImagePlus size={20} /></div>
+              <div className="avatar-upload-card__content">
+                <strong>Foto de perfil</strong>
+                <small>Sube una imagen desde tu dispositivo. Formatos PNG, JPG o WEBP.</small>
+                {avatarMessage ? <em>{avatarMessage}</em> : null}
+              </div>
+              <div className="avatar-upload-card__actions">
+                <button type="button" className="ghost-button" onClick={() => fileInputRef.current?.click()}>
+                  <UploadCloud size={15} /> Subir imagen
+                </button>
+                {avatarPreview ? (
+                  <button type="button" className="ghost-button ghost-button--danger" onClick={() => { setProfile((current) => ({ ...current, avatarImage: null })); setAvatarMessage('La foto se quitará al guardar.'); }}>
+                    <Trash2 size={15} /> Quitar
+                  </button>
+                ) : null}
+              </div>
+            </section>
 
             <div className="form-grid form-grid--two">
               <label>
@@ -172,7 +239,7 @@ export function ProfileSettingsModal({ open, user, onClose, onUpdated, onPasswor
             </footer>
           </form>
 
-          <form className="profile-settings-panel" onSubmit={submitPassword}>
+          <form className="profile-settings-panel profile-settings-panel--modern" onSubmit={submitPassword}>
             <header>
               <span><KeyRound size={18} /></span>
               <div>

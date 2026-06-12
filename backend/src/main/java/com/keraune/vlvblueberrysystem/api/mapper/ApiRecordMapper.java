@@ -19,6 +19,7 @@ public class ApiRecordMapper {
                 user.getCargo(),
                 user.getTelefono(),
                 user.getAvatarColor(),
+                user.getAvatarImage(),
                 user.getRole() != null ? user.getRole().getNombre() : null,
                 Boolean.TRUE.equals(user.getEstado()),
                 user.getFechaCreacion(),

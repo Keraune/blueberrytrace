@@ -47,8 +47,8 @@ const sidebarNavigation: SidebarNavigationItem[] = [
   { key: 'lotes', label: 'Lotes', icon: ClipboardCheck, targetKey: 'lotes', requiresModule: 'lotes' },
   { key: 'camas', label: 'Camas', icon: Layers3, targetKey: 'camas', requiresModule: 'camas' },
   { key: 'siembra', label: 'Siembras', icon: Sprout, targetKey: 'siembra', requiresModule: 'siembra' },
-  { key: 'uniformizaciones', label: 'Uniformizaciones', icon: Leaf, targetKey: 'procesos', requiresModule: 'procesos', activeWhen: ['procesos'] },
-  { key: 'formalizaciones', label: 'Formalizaciones', icon: ClipboardList, targetKey: 'procesos', requiresModule: 'procesos' },
+  { key: 'uniformizaciones', label: 'Uniformizaciones', icon: Leaf, targetKey: 'uniformizaciones', requiresModule: 'procesos' },
+  { key: 'formalizaciones', label: 'Formalizaciones', icon: ClipboardList, targetKey: 'formalizaciones', requiresModule: 'procesos' },
   { key: 'clasificacion', label: 'Clasificaciones', icon: ShieldCheck, targetKey: 'clasificacion', requiresModule: 'clasificacion' },
   { key: 'despacho', label: 'Despachos', icon: Truck, targetKey: 'despacho', requiresModule: 'despacho' },
   { key: 'trazabilidad', label: 'Trazabilidad', icon: Route, targetKey: 'trazabilidad', requiresModule: 'trazabilidad' },
@@ -101,7 +101,7 @@ export function Sidebar({ modules, activeKey, user, onSelect, onLogout, onOpenPr
 
       <div className="sidebar__footer">
         <div className="sidebar-user-card">
-          <span className={`sidebar-user-card__avatar sidebar-user-card__avatar--${user?.avatarColor || 'emerald'}`}>{initials(user?.nombreCompleto)}</span>
+          <span className={`sidebar-user-card__avatar sidebar-user-card__avatar--${user?.avatarColor || 'emerald'} ${user?.avatarImage ? 'sidebar-user-card__avatar--image' : ''}`}>{user?.avatarImage ? <img src={user.avatarImage} alt="Foto de perfil" /> : initials(user?.nombreCompleto)}</span>
           <div>
             <strong>{user?.nombreCompleto || 'Sesión activa'}</strong>
             <small>{user?.cargo || user?.rol || user?.username || 'Operario'}</small>

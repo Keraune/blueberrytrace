@@ -6,6 +6,7 @@ import { Sidebar } from './components/Sidebar';
 import { ToastStack, type ToastItem, type ToastTone } from './components/ToastStack';
 import { Topbar, type TopbarNotification } from './components/Topbar';
 import { useAppRoute } from './hooks/useAppRoute';
+import { routeByKey } from './lib/routes';
 import { BLUEBERRY_TOAST_EVENT, type BlueberryToastDetail } from './lib/uiEvents';
 import { ApiError, blueberryApi } from './lib/api';
 import { CamasPage } from './pages/CamasPage';
@@ -139,15 +140,15 @@ function buildSearchItems(
       id: `uniformizacion-${item.id}`,
       label: `Uniformización #${item.id}`,
       description: [item.lote?.codigo, item.cama?.codigo, item.estado].filter(Boolean).join(' · '),
-      moduleKey: 'procesos',
-      type: 'Proceso'
+      moduleKey: 'uniformizaciones',
+      type: 'Uniformización'
     })),
     ...(procesos?.formalizaciones.items || []).map((item) => ({
       id: `formalizacion-${item.id}`,
       label: `Formalización #${item.id}`,
       description: [item.lote?.codigo, item.cama?.codigo, item.estado].filter(Boolean).join(' · '),
-      moduleKey: 'procesos',
-      type: 'Proceso'
+      moduleKey: 'formalizaciones',
+      type: 'Formalización'
     })),
     ...clasificaciones.map((item) => ({
       id: `clasificacion-${item.id}`,
@@ -359,6 +360,7 @@ export default function App() {
 
   const modules = useMemo(() => bootstrap?.modules || dashboard?.modules || [], [bootstrap, dashboard]);
   const activeModule = modules.find((module) => module.key === activeKey);
+  const activeRoute = routeByKey(activeKey);
   const loteReferences = catalogs?.lotes || lotes.map((lote) => ({ id: lote.id, codigo: lote.codigo, descripcion: lote.descripcion }));
   const notifications = useMemo(() => buildNotifications(lotes, camas, clasificaciones, despachos), [lotes, camas, clasificaciones, despachos]);
   const searchItems = useMemo(() => buildSearchItems(lotes, camas, siembras, procesos, clasificaciones, despachos, usuarios), [
@@ -425,7 +427,7 @@ export default function App() {
       <section className="main-shell">
         <Topbar
           user={user}
-          activeModule={activeModule?.label || 'Control de trazabilidad'}
+          activeModule={activeModule?.label || activeRoute.label || 'Control de trazabilidad'}
           activeKey={activeKey}
           notifications={notifications}
           onOpenSearch={() => setCommandOpen(true)}
@@ -452,7 +454,8 @@ export default function App() {
           {activeKey === 'lotes' && <LotesPage lotes={lotes} camas={camas} siembras={siembras} onLotesChange={setLotes} />}
           {activeKey === 'camas' && <CamasPage camas={camas} lotes={loteReferences} onCamasChange={setCamas} />}
           {activeKey === 'siembra' && <SiembrasPage siembras={siembras} lotes={loteReferences} camas={camas} onSiembrasChange={setSiembras} />}
-          {activeKey === 'procesos' && <ProcesosPage procesos={procesos} lotes={loteReferences} camas={camas} siembras={siembras} onProcesosChange={setProcesos} />}
+          {activeKey === 'uniformizaciones' && <ProcesosPage mode="uniformizacion" procesos={procesos} lotes={loteReferences} camas={camas} siembras={siembras} onProcesosChange={setProcesos} />}
+          {activeKey === 'formalizaciones' && <ProcesosPage mode="formalizacion" procesos={procesos} lotes={loteReferences} camas={camas} siembras={siembras} onProcesosChange={setProcesos} />}
           {activeKey === 'clasificacion' && <ClasificacionPage clasificaciones={clasificaciones} lotes={loteReferences} camas={camas} onClasificacionesChange={setClasificaciones} />}
           {activeKey === 'despacho' && <DespachoPage despachos={despachos} lotes={loteReferences} modalidades={catalogs?.modalidadesDespacho || []} validaciones={catalogs?.validacionesCalidad || []} onDespachosChange={setDespachos} />}
           {activeKey === 'trazabilidad' && <TrazabilidadPage lotes={lotes} camas={camas} siembras={siembras} procesos={procesos} clasificaciones={clasificaciones} despachos={despachos} trazabilidad={trazabilidad} />}

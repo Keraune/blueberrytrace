@@ -1,7 +1,9 @@
 import {
   BarChart3,
   Boxes,
+  ClipboardCheck,
   ClipboardList,
+  Leaf,
   Factory,
   Home,
   Layers3,
@@ -19,6 +21,8 @@ export const moduleIcons: Record<string, LucideIcon> = {
   camas: Layers3,
   siembra: Sprout,
   procesos: ClipboardList,
+  uniformizaciones: Leaf,
+  formalizaciones: ClipboardCheck,
   clasificacion: Boxes,
   despacho: Truck,
   trazabilidad: Route,
