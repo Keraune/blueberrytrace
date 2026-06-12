@@ -1,4 +1,4 @@
-import { AlertTriangle, CheckCircle2, ClipboardList, Factory, Leaf, MoreVertical, PackageCheck, Route, Sprout, Tag, Truck } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, ClipboardList, Factory, Leaf, MoreVertical, PackageCheck, Route, Sprout, Tag, Truck, type LucideIcon } from 'lucide-react';
 import type { CSSProperties } from 'react';
 import { dateShort, numberCompact } from '../lib/format';
 import type {
@@ -103,13 +103,23 @@ function dashboardMeta(total: number, label: string, percent?: number | null) {
   return percent === undefined || percent === null ? totalText : `${totalText} · ${percentLabel(percent)} activo`;
 }
 
+function DashboardEmpty({ icon: Icon, title, description }: { icon: LucideIcon; title: string; description: string }) {
+  return (
+    <div className="vlv-dashboard-empty">
+      <span><Icon size={22} /></span>
+      <strong>{title}</strong>
+      <small>{description}</small>
+    </div>
+  );
+}
+
 export function DashboardPage({ dashboard, lotes, camas, siembras, procesos, clasificaciones, despachos, trazabilidad }: DashboardPageProps) {
   const summary = dashboard?.summary;
-  const activeLots = summary?.lotesActivos || lotes.filter((lote) => (lote.estado || '').toUpperCase() === 'ACTIVO').length;
-  const activeBeds = summary?.camasActivas || camas.filter((cama) => (cama.estado || '').toUpperCase() === 'ACTIVA').length;
-  const planted = summary?.plantasSembradas || siembras.reduce((total, item) => total + valueOf(item.cantidadRegistrada), 0);
-  const dispatches = summary?.despachosRegistrados || despachos.length;
-  const shipped = summary?.plantasDespachadas || despachos.reduce((total, item) => total + valueOf(item.cantidadDespachada), 0);
+  const activeLots = summary?.lotesActivos ?? lotes.filter((lote) => (lote.estado || '').toUpperCase() === 'ACTIVO').length;
+  const activeBeds = summary?.camasActivas ?? camas.filter((cama) => (cama.estado || '').toUpperCase() === 'ACTIVA').length;
+  const planted = summary?.plantasSembradas ?? siembras.reduce((total, item) => total + valueOf(item.cantidadRegistrada), 0);
+  const dispatches = summary?.despachosRegistrados ?? despachos.length;
+  const shipped = summary?.plantasDespachadas ?? despachos.reduce((total, item) => total + valueOf(item.cantidadDespachada), 0);
   const selectedTrace = byLatestDate(trazabilidad, (item) => item.ultimoEvento)[0];
   const recentLots = byLatestDate(lotes, (item) => recordDate(item.fechaActualizacion, item.fechaCreacion, item.fechaRegistro)).slice(0, 5);
   const rendimiento = buildRendimiento(lotes, siembras);
@@ -205,7 +215,7 @@ export function DashboardPage({ dashboard, lotes, camas, siembras, procesos, cla
     {
       label: 'Lotes activos',
       value: activeLots,
-      meta: dashboardMeta(summary?.lotesRegistrados || lotes.length, 'lotes registrados', summary?.porcentajeLotesActivos),
+      meta: dashboardMeta(summary?.lotesRegistrados ?? lotes.length, 'lotes registrados', summary?.porcentajeLotesActivos),
       icon: Leaf,
       tone: 'green',
       spark: 'M2 28 C14 24 18 32 30 18 S52 22 62 9'
@@ -213,14 +223,14 @@ export function DashboardPage({ dashboard, lotes, camas, siembras, procesos, cla
     {
       label: 'Camas operativas',
       value: activeBeds,
-      meta: dashboardMeta(summary?.camasRegistradas || camas.length, 'camas registradas', summary?.porcentajeCamasActivas),
+      meta: dashboardMeta(summary?.camasRegistradas ?? camas.length, 'camas registradas', summary?.porcentajeCamasActivas),
       icon: Sprout,
       tone: 'green',
       spark: 'M2 30 C12 26 18 30 26 18 S42 8 62 15'
     },
     {
       label: 'Siembras registradas',
-      value: summary?.siembrasRegistradas || siembras.length,
+      value: summary?.siembrasRegistradas ?? siembras.length,
       meta: `${numberCompact(planted)} plantas registradas`,
       icon: Factory,
       tone: 'purple',
@@ -305,7 +315,7 @@ export function DashboardPage({ dashboard, lotes, camas, siembras, procesos, cla
                     <td><button className="vlv-row-action" type="button" aria-label="Ver acciones"><MoreVertical size={16} /></button></td>
                   </tr>
                 )) : (
-                  <tr><td colSpan={6} className="vlv-table-empty">No hay lotes registrados desde el backend.</td></tr>
+                  <tr><td colSpan={6} className="vlv-table-empty"><div><ClipboardList size={22} /><strong>Sin lotes registrados</strong><small>Los lotes creados desde el backend aparecerán en esta tabla.</small></div></td></tr>
                 )}
               </tbody>
             </table>
@@ -368,7 +378,7 @@ export function DashboardPage({ dashboard, lotes, camas, siembras, procesos, cla
                 <strong>{numberCompact(bar.value)}</strong>
                 <small>{bar.label}</small>
               </div>
-            )) : <p className="vlv-muted">Sin datos de rendimiento.</p>}
+            )) : <DashboardEmpty icon={Factory} title="Sin rendimiento registrado" description="Cuando existan siembras con cantidades, se graficará el rendimiento por lote." />}
           </div>
         </article>
 
@@ -392,7 +402,7 @@ export function DashboardPage({ dashboard, lotes, camas, siembras, procesos, cla
                   <time>{entry.time}</time>
                 </article>
               );
-            }) : <p className="vlv-muted">Sin actividad reciente.</p>}
+            }) : <DashboardEmpty icon={PackageCheck} title="Sin actividad reciente" description="Las últimas siembras, clasificaciones y despachos aparecerán aquí." />}
           </div>
         </article>
 
@@ -417,7 +427,7 @@ export function DashboardPage({ dashboard, lotes, camas, siembras, procesos, cla
                   <time>{alert.time}</time>
                 </article>
               );
-            }) : <p className="vlv-muted">Sin alertas generadas por los datos actuales.</p>}
+            }) : <DashboardEmpty icon={CheckCircle2} title="Sin alertas" description="No hay observaciones generadas por los registros actuales." />}
           </div>
         </article>
       </section>
