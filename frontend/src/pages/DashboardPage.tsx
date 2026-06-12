@@ -1,4 +1,5 @@
-import { AlertTriangle, CalendarDays, CheckCircle2, ClipboardList, Factory, Home, Leaf, MoreVertical, PackageCheck, Route, Sprout, Tag, Truck } from 'lucide-react';
+import { AlertTriangle, CheckCircle2, ClipboardList, Factory, Leaf, MoreVertical, PackageCheck, Route, Sprout, Tag, Truck } from 'lucide-react';
+import type { CSSProperties } from 'react';
 import { dateShort, numberCompact } from '../lib/format';
 import type {
   CamaResponse,
@@ -74,16 +75,15 @@ function monthName(value?: string | null) {
   return parsed.toLocaleString('es-PE', { month: 'short' }).replace('.', '');
 }
 
-function buildRendimiento(lotes: LoteResponse[], siembras: SiembraResponse[]) {
+function buildRendimiento(_lotes: LoteResponse[], siembras: SiembraResponse[]) {
   const totals = new Map<string, number>();
   siembras.forEach((item) => {
     const key = item.lote?.codigo || 'Sin lote';
-    totals.set(key, (totals.get(key) || 0) + valueOf(item.cantidadRegistrada));
+    const amount = valueOf(item.cantidadRegistrada);
+    if (amount > 0) {
+      totals.set(key, (totals.get(key) || 0) + amount);
+    }
   });
-
-  if (totals.size === 0) {
-    lotes.slice(0, 5).forEach((lote) => totals.set(lote.codigo, 0));
-  }
 
   const bars = [...totals.entries()]
     .map(([label, value]) => ({ label, value }))
@@ -91,6 +91,16 @@ function buildRendimiento(lotes: LoteResponse[], siembras: SiembraResponse[]) {
     .slice(0, 5);
   const max = Math.max(...bars.map((item) => item.value), 1);
   return { bars, max };
+}
+
+function percentLabel(value: number | null | undefined) {
+  const normalized = Math.max(0, Math.min(100, valueOf(value)));
+  return `${Number.isInteger(normalized) ? normalized : normalized.toFixed(1)}%`;
+}
+
+function dashboardMeta(total: number, label: string, percent?: number | null) {
+  const totalText = `${numberCompact(total)} ${label}`;
+  return percent === undefined || percent === null ? totalText : `${totalText} · ${percentLabel(percent)} activo`;
 }
 
 export function DashboardPage({ dashboard, lotes, camas, siembras, procesos, clasificaciones, despachos, trazabilidad }: DashboardPageProps) {
@@ -166,11 +176,46 @@ export function DashboardPage({ dashboard, lotes, camas, siembras, procesos, cla
   ] as const;
 
   const metricCards = [
-    { label: 'Lotes activos', value: activeLots, detail: `${lotes.length} lotes registrados`, icon: Leaf, tone: 'green', spark: 'M2 28 C14 24 18 32 30 18 S52 22 62 9' },
-    { label: 'Camas operativas', value: activeBeds, detail: `${camas.length} camas registradas`, icon: Sprout, tone: 'green', spark: 'M2 30 C12 26 18 30 26 18 S42 8 62 15' },
-    { label: 'Siembras registradas', value: siembras.length, detail: `${numberCompact(planted)} plantas`, icon: Factory, tone: 'purple', spark: 'M2 27 C15 24 20 19 31 23 S51 16 62 7' },
-    { label: 'Despachos del día', value: dispatches, detail: `${numberCompact(shipped)} plantas enviadas`, icon: Truck, tone: 'purple', spark: 'M2 31 C12 18 22 29 32 17 S51 10 62 14' }
+    {
+      label: 'Lotes activos',
+      value: activeLots,
+      meta: dashboardMeta(summary?.lotesRegistrados || lotes.length, 'lotes registrados', summary?.porcentajeLotesActivos),
+      icon: Leaf,
+      tone: 'green',
+      spark: 'M2 28 C14 24 18 32 30 18 S52 22 62 9'
+    },
+    {
+      label: 'Camas operativas',
+      value: activeBeds,
+      meta: dashboardMeta(summary?.camasRegistradas || camas.length, 'camas registradas', summary?.porcentajeCamasActivas),
+      icon: Sprout,
+      tone: 'green',
+      spark: 'M2 30 C12 26 18 30 26 18 S42 8 62 15'
+    },
+    {
+      label: 'Siembras registradas',
+      value: summary?.siembrasRegistradas || siembras.length,
+      meta: `${numberCompact(planted)} plantas registradas`,
+      icon: Factory,
+      tone: 'purple',
+      spark: 'M2 27 C15 24 20 19 31 23 S51 16 62 7'
+    },
+    {
+      label: 'Despachos registrados',
+      value: dispatches,
+      meta: `${numberCompact(shipped)} plantas despachadas`,
+      icon: Truck,
+      tone: 'purple',
+      spark: 'M2 31 C12 18 22 29 32 17 S51 10 62 14'
+    }
   ];
+
+  const traceSteps = traceProgress(selectedTrace);
+  const completedTraceSteps = traceSteps.filter((step) => step.active).length;
+  const tracePercent = selectedTrace && completedTraceSteps > 0
+    ? ((completedTraceSteps - 1) / Math.max(traceSteps.length - 1, 1)) * 100
+    : 0;
+  const traceLineStyle = { '--trace-progress': `${tracePercent}%` } as CSSProperties;
 
   return (
     <main className="content-grid dashboard-screen dashboard-screen--vlv">
@@ -191,7 +236,7 @@ export function DashboardPage({ dashboard, lotes, camas, siembras, procesos, cla
               <div className="vlv-metric-card__body">
                 <span>{metric.label}</span>
                 <strong>{numberCompact(metric.value)}</strong>
-                <small>↑ Operativo · {metric.detail}</small>
+                <small className="vlv-metric-card__meta">{metric.meta}</small>
               </div>
               <svg className="vlv-metric-card__spark" viewBox="0 0 64 36" aria-hidden="true">
                 <path d={metric.spark} />
@@ -234,7 +279,7 @@ export function DashboardPage({ dashboard, lotes, camas, siembras, procesos, cla
                     <td><button className="vlv-row-action" type="button" aria-label="Ver acciones"><MoreVertical size={16} /></button></td>
                   </tr>
                 )) : (
-                  <tr><td colSpan={6}>No hay lotes registrados.</td></tr>
+                  <tr><td colSpan={6} className="vlv-table-empty">No hay lotes registrados desde el backend.</td></tr>
                 )}
               </tbody>
             </table>
@@ -255,8 +300,8 @@ export function DashboardPage({ dashboard, lotes, camas, siembras, procesos, cla
             <span>{selectedTrace?.lote?.descripcion || 'Seguimiento consolidado'}</span>
           </div>
 
-          <div className="vlv-trace-line">
-            {traceProgress(selectedTrace).map((step) => {
+          <div className={selectedTrace ? 'vlv-trace-line vlv-trace-line--with-data' : 'vlv-trace-line vlv-trace-line--empty'} style={traceLineStyle}>
+            {traceSteps.map((step) => {
               const Icon = step.icon;
               return (
                 <div className={step.active ? 'vlv-trace-step vlv-trace-step--active' : 'vlv-trace-step'} key={step.label}>

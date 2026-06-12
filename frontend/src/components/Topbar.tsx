@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Bell, ChevronRight, Clock3, LogOut, Mail, RefreshCcw, Search, ShieldCheck, UserRound } from 'lucide-react';
+import { Bell, ChevronDown, Clock3, LogOut, Mail, Menu, RefreshCcw, Search, ShieldCheck, UserRound } from 'lucide-react';
 import { dateShort, initials } from '../lib/format';
-import { getModuleIcon } from '../lib/moduleIcons';
 import type { AuthenticatedUserResponse } from '../types/api';
 
 export interface TopbarNotification {
@@ -19,6 +18,7 @@ interface TopbarProps {
   activeKey?: string;
   notifications?: TopbarNotification[];
   onOpenSearch: () => void;
+  onOpenSidebar?: () => void;
   onRefresh?: () => void | Promise<void>;
   onNavigate?: (key: string) => void;
   onOpenProfile?: () => void;
@@ -26,12 +26,30 @@ interface TopbarProps {
   refreshing?: boolean;
 }
 
+const subtitles: Record<string, string> = {
+  dashboard: 'Resumen general de operaciones',
+  usuarios: 'Administración de usuarios y accesos',
+  lotes: 'Gestión de lotes e invernaderos',
+  camas: 'Control de camas productivas',
+  siembra: 'Registro de siembras por lote',
+  procesos: 'Uniformizaciones y formalizaciones',
+  clasificacion: 'Control de calidad y clasificación',
+  despacho: 'Despachos y salidas registradas',
+  trazabilidad: 'Seguimiento por lote productivo',
+  reportes: 'Indicadores y reportes operativos'
+};
+
+const titles: Record<string, string> = {
+  dashboard: 'Panel principal'
+};
+
 export function Topbar({
   user,
   activeModule,
-  activeKey,
+  activeKey = 'dashboard',
   notifications = [],
   onOpenSearch,
+  onOpenSidebar,
   onRefresh,
   onNavigate,
   onOpenProfile,
@@ -43,10 +61,11 @@ export function Topbar({
   const notificationRef = useRef<HTMLDivElement>(null);
   const profileRef = useRef<HTMLDivElement>(null);
   const unreadCount = notifications.length;
-  const ActiveModuleIcon = getModuleIcon(activeKey);
 
   const displayRole = useMemo(() => user?.cargo || user?.rol || user?.authorities?.[0] || 'Operario', [user]);
   const avatarColor = user?.avatarColor || 'emerald';
+  const pageTitle = titles[activeKey] || activeModule;
+  const pageSubtitle = subtitles[activeKey] || 'Gestión operativa BlueberryTrace';
 
   useEffect(() => {
     function onPointerDown(event: MouseEvent) {
@@ -75,23 +94,26 @@ export function Topbar({
   }, [notificationsOpen, profileOpen]);
 
   return (
-    <header className="topbar">
+    <header className="topbar topbar--reference">
       <div className="topbar__inner">
-        <div className="topbar__breadcrumb">
-          <ActiveModuleIcon size={15} />
-          <ChevronRight size={15} />
-          <span>{activeModule}</span>
+        <button className="icon-button topbar-menu-trigger" type="button" aria-label="Abrir menú de navegación" onClick={onOpenSidebar}>
+          <Menu size={20} strokeWidth={2} />
+        </button>
+
+        <div className="topbar__page-title">
+          <h1>{pageTitle}</h1>
+          <p>{pageSubtitle}</p>
         </div>
 
-        <div className="topbar__actions">
-          <button className="topbar-search-trigger topbar-search-trigger--wide" type="button" onClick={onOpenSearch} aria-label="Abrir búsqueda global">
-            <Search size={16} />
-            <span>Buscar en el sistema...</span>
-            <kbd>Ctrl K</kbd>
-          </button>
+        <button className="topbar-search-trigger topbar-search-trigger--wide" type="button" onClick={onOpenSearch} aria-label="Abrir búsqueda global">
+          <Search size={18} strokeWidth={1.9} />
+          <span>Buscar lotes, camas, siembras...</span>
+          <kbd>Ctrl + K</kbd>
+        </button>
 
+        <div className="topbar__actions">
           {onRefresh ? (
-            <button className="icon-button" type="button" aria-label="Sincronizar" onClick={onRefresh} disabled={refreshing}>
+            <button className="icon-button topbar-refresh" type="button" aria-label="Sincronizar" onClick={onRefresh} disabled={refreshing}>
               <RefreshCcw className={refreshing ? 'spin' : undefined} size={17} />
             </button>
           ) : null}
@@ -107,7 +129,7 @@ export function Topbar({
                 setProfileOpen(false);
               }}
             >
-              <Bell size={17} />
+              <Bell size={23} strokeWidth={1.85} />
               {unreadCount > 0 ? <span>{unreadCount > 9 ? '9+' : unreadCount}</span> : null}
             </button>
 
@@ -152,7 +174,7 @@ export function Topbar({
             ) : null}
           </div>
 
-          <div className="topbar-menu" ref={profileRef}>
+          <div className="topbar-menu topbar-menu--profile" ref={profileRef}>
             <button
               className={profileOpen ? `topbar-avatar topbar-avatar--${avatarColor} topbar-avatar--active` : `topbar-avatar topbar-avatar--${avatarColor}`}
               type="button"
@@ -163,7 +185,12 @@ export function Topbar({
                 setNotificationsOpen(false);
               }}
             >
-              {initials(user?.nombreCompleto)}
+              <span className="topbar-avatar__photo">{initials(user?.nombreCompleto)}</span>
+              <span className="topbar-avatar__meta">
+                <strong>{user?.nombreCompleto || user?.username || 'Usuario autenticado'}</strong>
+                <small>{displayRole}</small>
+              </span>
+              <ChevronDown size={17} />
             </button>
 
             {profileOpen ? (

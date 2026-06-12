@@ -192,6 +192,7 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [commandOpen, setCommandOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [toasts, setToasts] = useState<ToastItem[]>([]);
   const { activeKey, navigate } = useAppRoute();
 
@@ -282,6 +283,9 @@ export default function App() {
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        setSidebarOpen(false);
+      }
       if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === 'k') {
         event.preventDefault();
         setCommandOpen(true);
@@ -396,8 +400,28 @@ export default function App() {
   }
 
   return (
-    <div className="app-shell">
-      <Sidebar modules={modules} activeKey={activeKey} user={user} onSelect={navigate} onLogout={handleLogout} />
+    <div className={sidebarOpen ? 'app-shell app-shell--sidebar-open' : 'app-shell'}>
+      <button
+        type="button"
+        className="mobile-sidebar-backdrop"
+        aria-label="Cerrar menú de navegación"
+        onClick={() => setSidebarOpen(false)}
+      />
+      <Sidebar
+        modules={modules}
+        activeKey={activeKey}
+        user={user}
+        onSelect={(key) => {
+          navigate(key);
+          setSidebarOpen(false);
+        }}
+        onLogout={handleLogout}
+        onOpenProfile={() => {
+          setProfileOpen(true);
+          setSidebarOpen(false);
+        }}
+        onClose={() => setSidebarOpen(false)}
+      />
       <section className="main-shell">
         <Topbar
           user={user}
@@ -405,6 +429,7 @@ export default function App() {
           activeKey={activeKey}
           notifications={notifications}
           onOpenSearch={() => setCommandOpen(true)}
+          onOpenSidebar={() => setSidebarOpen(true)}
           onRefresh={refresh}
           onNavigate={navigate}
           onOpenProfile={() => setProfileOpen(true)}

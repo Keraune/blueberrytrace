@@ -1,18 +1,12 @@
 import { FormEvent, useState } from 'react';
-import { ArrowRight, Eye, HelpCircle, Loader2, LockKeyhole, ShieldCheck, UserRound } from 'lucide-react';
+import { ArrowRight, Eye, EyeOff, HelpCircle, Loader2, LockKeyhole, ShieldCheck, UserRound } from 'lucide-react';
 import { blueberryApi } from '../lib/api';
-import vlvLogo from '../assets/vlv-logo.png';
+import blueberryLogoMark from '../assets/brand/blueberry-logo-mark.webp';
 import type { AuthenticatedUserResponse } from '../types/api';
 
 interface LoginPageProps {
   onAuthenticated: (user: AuthenticatedUserResponse) => Promise<void> | void;
 }
-
-const loginSteps = [
-  { label: 'Cultivo', value: '01' },
-  { label: 'Clasificación', value: '02' },
-  { label: 'Despacho', value: '03' }
-];
 
 export function LoginPage({ onAuthenticated }: LoginPageProps) {
   const [identifier, setIdentifier] = useState('');
@@ -36,18 +30,10 @@ export function LoginPage({ onAuthenticated }: LoginPageProps) {
   }
 
   return (
-    <main className="vlv-login-shell">
+    <main className="vlv-login-shell vlv-login-shell--reference">
       <section className="vlv-login-hero" aria-label="Presentación BlueberryTrace">
-        <div className="vlv-login-hero__glow" aria-hidden="true" />
-        <div className="vlv-login-hero__lines" aria-hidden="true" />
-        <div className="vlv-login-hero__orbits" aria-hidden="true">
-          <span className="trace-node trace-node--leaf">☘</span>
-          <span className="trace-node trace-node--pin">⌖</span>
-          <span className="trace-node trace-node--check">✓</span>
-        </div>
-
-        <div className="vlv-login-brand">
-          <img src={vlvLogo} alt="Logo Vivero Los Viñedos" />
+        <div className="vlv-login-brand" aria-label="BlueberryTrace">
+          <img src={blueberryLogoMark} alt="Logo BlueberryTrace" />
           <strong><span>Blueberry</span>Trace</strong>
         </div>
 
@@ -58,29 +44,19 @@ export function LoginPage({ onAuthenticated }: LoginPageProps) {
             y desde un solo lugar.
           </p>
         </div>
-
-        <div className="vlv-login-flow" aria-label="Flujo operativo principal">
-          {loginSteps.map((item) => (
-            <article key={item.label}>
-              <span>{item.value}</span>
-              <strong>{item.label}</strong>
-            </article>
-          ))}
-        </div>
       </section>
 
       <section className="vlv-login-form-panel" aria-label="Inicio de sesión">
         <form className="vlv-login-card" onSubmit={handleSubmit}>
           <div className="vlv-login-card__heading">
-            <span>BlueberryTrace</span>
             <h2>Bienvenido</h2>
-            <p>Ingrese a su cuenta para continuar.</p>
+            <p>Ingrese a su cuenta</p>
           </div>
 
           <label className="vlv-field">
             <span>Usuario o correo</span>
             <div className="vlv-field__control">
-              <UserRound size={18} />
+              <UserRound size={21} strokeWidth={1.8} />
               <input
                 value={identifier}
                 onChange={(event) => setIdentifier(event.target.value)}
@@ -94,7 +70,7 @@ export function LoginPage({ onAuthenticated }: LoginPageProps) {
           <label className="vlv-field">
             <span>Contraseña</span>
             <div className="vlv-field__control">
-              <LockKeyhole size={18} />
+              <LockKeyhole size={21} strokeWidth={1.8} />
               <input
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
@@ -109,7 +85,7 @@ export function LoginPage({ onAuthenticated }: LoginPageProps) {
                 aria-label={showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'}
                 onClick={() => setShowPassword((current) => !current)}
               >
-                <Eye size={18} />
+                {showPassword ? <EyeOff size={19} /> : <Eye size={19} />}
               </button>
             </div>
           </label>
@@ -118,16 +94,16 @@ export function LoginPage({ onAuthenticated }: LoginPageProps) {
 
           <button className="vlv-login-submit" type="submit" disabled={loading}>
             <span>{loading ? 'Validando acceso' : 'Iniciar sesión'}</span>
-            {loading ? <Loader2 className="spin" size={18} /> : <ArrowRight size={20} />}
+            {loading ? <Loader2 className="spin" size={20} /> : <ArrowRight size={22} />}
           </button>
 
           <button type="button" className="vlv-login-help">
-            <HelpCircle size={17} />
+            <HelpCircle size={19} />
             ¿Necesita ayuda para iniciar sesión?
           </button>
 
           <div className="vlv-login-secure-note">
-            <ShieldCheck size={24} />
+            <ShieldCheck size={30} strokeWidth={1.75} />
             <div>
               <strong>Acceso seguro y confidencial</strong>
               <small>BlueberryTrace es una aplicación interna.</small>

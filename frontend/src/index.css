@@ -7188,3 +7188,2077 @@ body {
   .vlv-trace-line { grid-template-columns: 1fr; gap: 0.85rem; }
   .vlv-trace-line::before { display: none; }
 }
+
+/* =========================================================
+   Reference visual recreation - BlueberryTrace login/dashboard
+   Uses optimized assets generated from the provided mockups.
+   ========================================================= */
+:root {
+  --vlv-reference-green: #0a3a20;
+  --vlv-reference-green-2: #4f8f18;
+  --vlv-reference-purple: #6f2b82;
+  --vlv-reference-purple-2: #5b246d;
+  --vlv-reference-ink: #121721;
+  --vlv-reference-muted: #707873;
+  --vlv-reference-line: #e4e5df;
+  --vlv-reference-surface: #ffffff;
+  --vlv-reference-soft: #fbfaf6;
+  --vlv-reference-shadow: 0 22px 62px rgba(24, 37, 25, 0.10);
+}
+
+body {
+  background: #fbfaf6;
+}
+
+/* Login exact layout */
+.vlv-login-shell--reference {
+  min-height: 100vh;
+  display: grid;
+  grid-template-columns: minmax(0, 1.29fr) minmax(34rem, 0.96fr);
+  padding: 0;
+  background: #f9f8f1;
+  overflow: hidden;
+}
+
+.vlv-login-shell--reference .vlv-login-hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  padding: clamp(3rem, 5vw, 5.8rem) clamp(3.8rem, 10vw, 13.8rem);
+  background:
+    linear-gradient(90deg, rgba(247, 248, 229, 0.48), rgba(255, 250, 239, 0.32) 48%, rgba(255, 250, 239, 0.08)),
+    url('./assets/brand/blueberry-login-hero.webp') center bottom / cover no-repeat;
+  border: 1px solid rgba(16, 35, 22, 0.05);
+  border-radius: 0 0 1.45rem 0;
+  isolation: isolate;
+}
+
+.vlv-login-shell--reference .vlv-login-hero::before,
+.vlv-login-shell--reference .vlv-login-hero::after,
+.vlv-login-shell--reference .vlv-login-hero__glow,
+.vlv-login-shell--reference .vlv-login-hero__lines,
+.vlv-login-shell--reference .vlv-login-hero__orbits {
+  display: none !important;
+}
+
+.vlv-login-shell--reference .vlv-login-brand {
+  width: min(34rem, 100%);
+  display: grid;
+  justify-items: center;
+  gap: 1.05rem;
+  margin: -1.4rem 0 2.75rem;
+}
+
+.vlv-login-shell--reference .vlv-login-brand img {
+  width: clamp(11.8rem, 18vw, 18.2rem);
+  max-height: 13.5rem;
+  object-fit: contain;
+  filter: drop-shadow(0 16px 20px rgba(30, 75, 20, 0.16));
+}
+
+.vlv-login-shell--reference .vlv-login-brand strong {
+  margin-top: -0.55rem;
+  color: var(--vlv-reference-purple);
+  font-size: clamp(3.05rem, 4.65vw, 5.15rem);
+  line-height: 0.86;
+  font-weight: 950;
+  letter-spacing: -0.078em;
+}
+
+.vlv-login-shell--reference .vlv-login-brand strong span {
+  color: var(--vlv-reference-green);
+}
+
+.vlv-login-shell--reference .vlv-login-copy {
+  width: min(35rem, 100%);
+  margin-top: 0;
+}
+
+.vlv-login-shell--reference .vlv-login-copy h1 {
+  margin: 0;
+  color: var(--vlv-reference-green);
+  font-size: clamp(2.05rem, 3.05vw, 3.18rem);
+  line-height: 1.08;
+  font-weight: 920;
+  letter-spacing: -0.055em;
+}
+
+.vlv-login-shell--reference .vlv-login-copy p {
+  width: min(34rem, 100%);
+  margin: 1.45rem 0 0;
+  color: #46564d;
+  font-size: clamp(1rem, 1.1vw, 1.16rem);
+  line-height: 1.56;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.vlv-login-shell--reference .vlv-login-form-panel {
+  min-height: calc(100vh - 1.6rem);
+  margin: 0.8rem 0.8rem 0.8rem 0;
+  padding: clamp(2rem, 5vw, 6.5rem) clamp(2.2rem, 6vw, 6.2rem);
+  place-items: center;
+  background: rgba(255, 255, 255, 0.96);
+  border: 1px solid rgba(19, 35, 24, 0.08);
+  border-radius: 1.7rem;
+  box-shadow: -22px 0 62px rgba(30, 38, 28, 0.13), inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.vlv-login-shell--reference .vlv-login-card {
+  width: min(33rem, 100%);
+  display: grid;
+  gap: 1.58rem;
+  margin-top: 1.2rem;
+}
+
+.vlv-login-shell--reference .vlv-login-card__heading {
+  margin: 0 0 1.05rem;
+}
+
+.vlv-login-shell--reference .vlv-login-card__heading span {
+  display: none;
+}
+
+.vlv-login-shell--reference .vlv-login-card__heading h2 {
+  margin: 0;
+  color: var(--vlv-reference-green);
+  font-size: clamp(2.8rem, 4.1vw, 3.7rem);
+  line-height: 0.98;
+  font-weight: 920;
+  letter-spacing: -0.065em;
+}
+
+.vlv-login-shell--reference .vlv-login-card__heading p {
+  margin: 0.85rem 0 0;
+  color: #777a76;
+  font-size: 1.26rem;
+  font-weight: 470;
+  letter-spacing: -0.025em;
+}
+
+.vlv-login-shell--reference .vlv-field {
+  gap: 0.7rem;
+  color: #343d35;
+  font-size: 0.98rem;
+  font-weight: 820;
+}
+
+.vlv-login-shell--reference .vlv-field__control {
+  height: 3.72rem;
+  padding: 0 1.02rem;
+  gap: 0.82rem;
+  border: 1.4px solid #c9d3c2;
+  border-radius: 0.74rem;
+  color: #8a908b;
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.82);
+}
+
+.vlv-login-shell--reference .vlv-field__control:focus-within {
+  border-color: rgba(79, 143, 24, 0.6);
+  box-shadow: 0 0 0 4px rgba(79, 143, 24, 0.08);
+}
+
+.vlv-login-shell--reference .vlv-field input {
+  color: #202820;
+  font-size: 1.02rem;
+  font-weight: 520;
+}
+
+.vlv-login-shell--reference .vlv-field input::placeholder {
+  color: #9b9e99;
+}
+
+.vlv-login-shell--reference .vlv-login-submit {
+  height: 4rem;
+  margin-top: 0.62rem;
+  border-radius: 0.74rem;
+  justify-content: center;
+  gap: clamp(1rem, 8vw, 11.2rem);
+  background: linear-gradient(135deg, var(--vlv-reference-purple), var(--vlv-reference-purple-2));
+  box-shadow: 0 18px 36px rgba(91, 36, 109, 0.24);
+  font-size: 1.05rem;
+  font-weight: 890;
+}
+
+.vlv-login-shell--reference .vlv-login-help {
+  color: var(--vlv-reference-purple);
+  font-size: 0.98rem;
+  font-weight: 760;
+}
+
+.vlv-login-shell--reference .vlv-login-secure-note {
+  margin-top: 1.32rem;
+  padding-top: 1.78rem;
+  border-top: 1px solid #e7e6e0;
+  gap: 0.85rem;
+}
+
+.vlv-login-shell--reference .vlv-login-secure-note strong {
+  color: #777b77;
+  font-size: 0.83rem;
+  font-weight: 670;
+}
+
+.vlv-login-shell--reference .vlv-login-secure-note small {
+  color: #838783;
+  font-size: 0.79rem;
+}
+
+/* Dashboard shell exact layout */
+.app-shell {
+  --sidebar-width: 19.05rem;
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr) !important;
+  min-height: 100vh;
+  background: #fbfaf6 !important;
+}
+
+.main-shell {
+  min-width: 0;
+  background: linear-gradient(180deg, #fbfbf8 0%, #fbfaf6 100%) !important;
+}
+
+.sidebar--reference {
+  width: var(--sidebar-width) !important;
+  height: 100vh !important;
+  padding: 2.15rem 1.05rem 1.1rem !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(255,255,255,0.94) 63%, rgba(255,255,255,0.66) 100%),
+    url('./assets/brand/blueberry-sidebar-hero.webp') center bottom / 100% auto no-repeat,
+    #ffffff !important;
+  border-right: 1px solid rgba(25, 41, 27, 0.085) !important;
+  box-shadow: 18px 0 42px rgba(30, 42, 28, 0.05) !important;
+  color: #5d6662 !important;
+  overflow: hidden;
+}
+
+.sidebar--reference::before,
+.sidebar--reference::after {
+  display: none !important;
+}
+
+.sidebar--reference .brand--sidebar {
+  display: grid !important;
+  justify-items: center !important;
+  gap: 0.28rem !important;
+  margin: 0 0 1.7rem !important;
+  padding: 0 !important;
+  text-align: center !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  border: 0 !important;
+}
+
+.sidebar--reference .brand--sidebar img {
+  display: block;
+  width: 5.15rem;
+  height: 4.25rem;
+  object-fit: contain;
+  filter: drop-shadow(0 8px 10px rgba(43, 94, 24, 0.12));
+}
+
+.sidebar--reference .brand--sidebar strong {
+  color: var(--vlv-reference-purple) !important;
+  font-size: 1.05rem !important;
+  line-height: 1 !important;
+  font-weight: 930 !important;
+  letter-spacing: -0.065em !important;
+}
+
+.sidebar--reference .brand--sidebar strong span {
+  color: var(--vlv-reference-green);
+}
+
+.sidebar--reference .brand--sidebar span:not(strong span) {
+  display: none !important;
+}
+
+.sidebar--reference .sidebar__nav--reference {
+  display: grid !important;
+  gap: 0.34rem !important;
+  padding: 0 !important;
+}
+
+.sidebar--reference .sidebar__sections,
+.sidebar--reference .sidebar__section-title {
+  display: none !important;
+}
+
+.sidebar--reference .sidebar__link {
+  width: 100%;
+  min-height: 3.04rem !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 1.05rem !important;
+  padding: 0 1.28rem !important;
+  border: 0 !important;
+  border-radius: 0.72rem !important;
+  color: #5f6765 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-size: 0.94rem !important;
+  font-weight: 620 !important;
+  letter-spacing: -0.01em !important;
+  text-decoration: none !important;
+  transition: background 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.sidebar--reference .sidebar__link svg {
+  color: #858b8a !important;
+  flex: 0 0 auto;
+}
+
+.sidebar--reference .sidebar__link:hover {
+  color: var(--vlv-reference-green) !important;
+  background: rgba(111, 43, 130, 0.045) !important;
+  transform: translateX(1px);
+}
+
+.sidebar--reference .sidebar__link--active {
+  color: var(--vlv-reference-purple) !important;
+  background: linear-gradient(90deg, rgba(111, 43, 130, 0.13), rgba(111, 43, 130, 0.045)) !important;
+  font-weight: 820 !important;
+}
+
+.sidebar--reference .sidebar__link--active svg {
+  color: var(--vlv-reference-purple) !important;
+  fill: rgba(111, 43, 130, 0.08);
+}
+
+.sidebar--reference .sidebar__link::after {
+  display: none !important;
+}
+
+.sidebar--reference .sidebar__footer {
+  display: none !important;
+}
+
+.topbar--reference {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 40 !important;
+  min-height: 6.55rem !important;
+  padding: 0 !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-bottom: 1px solid rgba(28, 42, 31, 0.08) !important;
+  box-shadow: none !important;
+  backdrop-filter: blur(14px);
+}
+
+.topbar--reference .topbar__inner {
+  width: 100% !important;
+  max-width: none !important;
+  min-height: 6.55rem !important;
+  display: grid !important;
+  grid-template-columns: minmax(15rem, 1fr) minmax(24rem, 29rem) minmax(21rem, auto) !important;
+  align-items: center !important;
+  gap: 1.8rem !important;
+  padding: 0 2.9rem 0 2.65rem !important;
+}
+
+.topbar--reference .topbar__page-title h1 {
+  margin: 0;
+  color: var(--vlv-reference-green);
+  font-size: 1.58rem;
+  line-height: 1.05;
+  font-weight: 930;
+  letter-spacing: -0.055em;
+}
+
+.topbar--reference .topbar__page-title p {
+  margin: 0.44rem 0 0;
+  color: #747b74;
+  font-size: 0.92rem;
+  font-weight: 500;
+  letter-spacing: -0.015em;
+}
+
+.topbar--reference .topbar-search-trigger--wide {
+  width: 100% !important;
+  height: 2.62rem !important;
+  justify-self: center !important;
+  display: grid !important;
+  grid-template-columns: auto 1fr auto !important;
+  align-items: center !important;
+  gap: 0.72rem !important;
+  padding: 0 0.7rem 0 1rem !important;
+  border: 1px solid #dfe2dc !important;
+  border-radius: 0.48rem !important;
+  background: rgba(255, 255, 255, 0.92) !important;
+  color: #9aa09a !important;
+  box-shadow: 0 1px 3px rgba(20, 30, 21, 0.025) !important;
+}
+
+.topbar--reference .topbar-search-trigger--wide span {
+  display: block !important;
+  color: #9da39d !important;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.82rem !important;
+  font-weight: 520 !important;
+}
+
+.topbar--reference .topbar-search-trigger--wide kbd {
+  min-width: 3.25rem;
+  padding: 0.26rem 0.42rem !important;
+  border: 1px solid #dce0dc !important;
+  border-radius: 0.35rem !important;
+  color: #868d87 !important;
+  background: #ffffff !important;
+  box-shadow: none !important;
+  font-size: 0.69rem !important;
+  font-weight: 720 !important;
+}
+
+.topbar--reference .topbar__actions {
+  width: auto !important;
+  display: flex !important;
+  justify-content: flex-end !important;
+  align-items: center !important;
+  gap: 1.24rem !important;
+}
+
+.topbar--reference .topbar-refresh {
+  display: none !important;
+}
+
+.topbar--reference .icon-button.notification-button {
+  width: 2.6rem !important;
+  height: 2.6rem !important;
+  border: 0 !important;
+  border-radius: 50% !important;
+  color: #3f4743 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.topbar--reference .notification-button span {
+  min-width: 1.25rem !important;
+  height: 1.25rem !important;
+  right: -0.1rem !important;
+  top: -0.22rem !important;
+  border: 2px solid #ffffff !important;
+  color: #ffffff !important;
+  background: var(--vlv-reference-purple) !important;
+  font-size: 0.68rem !important;
+  font-weight: 860 !important;
+}
+
+.topbar--reference .topbar-avatar {
+  width: auto !important;
+  height: auto !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.74rem !important;
+  padding: 0 !important;
+  border: 0 !important;
+  border-radius: 0 !important;
+  color: #202720 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+}
+
+.topbar--reference .topbar-avatar__photo {
+  width: 3.02rem;
+  height: 3.02rem;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  color: #ffffff;
+  background:
+    radial-gradient(circle at 50% 28%, rgba(255,255,255,0.26) 0 0.48rem, transparent 0.5rem),
+    linear-gradient(145deg, #536b5e, #0d3921 48%, #c8d0ba 50%, #f5f2e8 100%);
+  box-shadow: 0 0 0 3px #f4f4ef, 0 8px 18px rgba(20, 34, 24, 0.14);
+  font-size: 0.76rem;
+  font-weight: 900;
+  letter-spacing: -0.05em;
+}
+
+.topbar--reference .topbar-avatar__meta {
+  display: grid;
+  gap: 0.16rem;
+  text-align: left;
+}
+
+.topbar--reference .topbar-avatar__meta strong {
+  color: #18211b;
+  font-size: 0.92rem;
+  line-height: 1;
+  font-weight: 820;
+  white-space: nowrap;
+}
+
+.topbar--reference .topbar-avatar__meta small {
+  color: #7b827d;
+  font-size: 0.78rem;
+  line-height: 1;
+  font-weight: 520;
+  white-space: nowrap;
+}
+
+.topbar--reference .topbar-popover {
+  border: 1px solid rgba(25, 40, 28, 0.1) !important;
+  border-radius: 1rem !important;
+  background: rgba(255,255,255,0.98) !important;
+  box-shadow: 0 22px 62px rgba(24, 37, 25, 0.14) !important;
+}
+
+.content-grid {
+  width: 100% !important;
+  max-width: none !important;
+  padding: 1.25rem 2.9rem 2.15rem 2.65rem !important;
+  gap: 1.28rem !important;
+}
+
+.vlv-dashboard-title {
+  display: none !important;
+}
+
+.dashboard-screen--vlv {
+  color: var(--vlv-reference-ink);
+}
+
+.vlv-metric-grid {
+  display: grid !important;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+  gap: 1.04rem !important;
+}
+
+.vlv-metric-card {
+  min-height: 9.55rem !important;
+  grid-template-columns: auto 1fr !important;
+  gap: 1rem !important;
+  padding: 1.45rem 1.35rem !important;
+  border: 1px solid rgba(78, 113, 41, 0.17) !important;
+  border-radius: 0.86rem !important;
+  background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(248, 250, 239, 0.96)) !important;
+  box-shadow: 0 13px 30px rgba(32, 45, 31, 0.045) !important;
+}
+
+.vlv-metric-card--purple {
+  border-color: rgba(111, 43, 130, 0.15) !important;
+  background: linear-gradient(135deg, rgba(255,255,255,0.97), rgba(249, 243, 250, 0.95)) !important;
+}
+
+.vlv-metric-card__icon {
+  width: 4.55rem !important;
+  height: 4.55rem !important;
+  color: #4f8f18 !important;
+  background: rgba(111, 159, 42, 0.13) !important;
+}
+
+.vlv-metric-card--purple .vlv-metric-card__icon {
+  color: var(--vlv-reference-purple) !important;
+  background: rgba(111, 43, 130, 0.09) !important;
+}
+
+.vlv-metric-card__body span {
+  color: #1c211d !important;
+  font-size: 0.93rem !important;
+  font-weight: 820 !important;
+}
+
+.vlv-metric-card__body strong {
+  margin-top: 0.52rem !important;
+  color: #141923 !important;
+  font-size: 2.25rem !important;
+  font-weight: 920 !important;
+  letter-spacing: -0.055em !important;
+}
+
+.vlv-metric-card__body small {
+  margin-top: 1.08rem !important;
+  color: #6f766f !important;
+  font-size: 0.76rem !important;
+  font-weight: 660 !important;
+}
+
+.vlv-metric-card__spark {
+  right: 1.25rem !important;
+  bottom: 1.18rem !important;
+  width: 4.75rem !important;
+  height: 2.4rem !important;
+}
+
+.vlv-dashboard-main-grid {
+  grid-template-columns: minmax(0, 1.16fr) minmax(27rem, 0.86fr) !important;
+  gap: 1.04rem !important;
+}
+
+.vlv-dashboard-bottom-grid {
+  grid-template-columns: 0.89fr 1fr 1fr !important;
+  gap: 1.04rem !important;
+}
+
+.vlv-panel-card {
+  border: 1px solid rgba(23, 34, 24, 0.1) !important;
+  border-radius: 0.86rem !important;
+  background: rgba(255, 255, 255, 0.94) !important;
+  box-shadow: 0 12px 28px rgba(31, 43, 31, 0.045) !important;
+  overflow: hidden;
+}
+
+.vlv-panel-header {
+  min-height: 3.38rem !important;
+  padding: 1rem 1.22rem 0.88rem !important;
+}
+
+.vlv-panel-header h2 {
+  color: #151d17 !important;
+  font-size: 0.96rem !important;
+  font-weight: 870 !important;
+}
+
+.vlv-panel-header button {
+  color: var(--vlv-reference-purple) !important;
+  font-size: 0.76rem !important;
+  font-weight: 840 !important;
+}
+
+.vlv-table {
+  font-size: 0.76rem !important;
+}
+
+.vlv-table th,
+.vlv-table td {
+  padding: 0.81rem 1.18rem !important;
+}
+
+.vlv-table th {
+  color: #424b45 !important;
+  background: rgba(248, 248, 246, 0.96) !important;
+  font-size: 0.72rem !important;
+}
+
+.vlv-table td {
+  color: #252c27 !important;
+  font-weight: 590 !important;
+}
+
+.vlv-status {
+  min-height: 1.48rem !important;
+  padding: 0 0.54rem !important;
+  border-radius: 0.38rem !important;
+  font-size: 0.67rem !important;
+}
+
+.vlv-trace-card__title {
+  padding: 1rem 1.22rem 0.35rem !important;
+}
+
+.vlv-trace-card__title strong {
+  color: #151d17 !important;
+  font-size: 0.96rem !important;
+}
+
+.vlv-trace-line {
+  padding: 1.45rem 1.16rem 1rem !important;
+}
+
+.vlv-trace-line::before {
+  left: 2.9rem !important;
+  right: 2.9rem !important;
+  top: 2.7rem !important;
+  background: linear-gradient(90deg, #5a951c 0%, #5a951c 74%, #d9ded8 74%, #d9ded8 100%) !important;
+}
+
+.vlv-trace-step span {
+  width: 2.48rem !important;
+  height: 2.48rem !important;
+  border-width: 2px !important;
+}
+
+.vlv-trace-step--active span {
+  border-color: #5a951c !important;
+  color: #5a951c !important;
+  background: #f7fbef !important;
+}
+
+.vlv-trace-step strong {
+  color: #424b44 !important;
+  font-size: 0.67rem !important;
+}
+
+.vlv-trace-summary {
+  margin: 0.72rem 1.22rem 0 !important;
+}
+
+.vlv-bars {
+  height: 15.3rem !important;
+  gap: 1.1rem !important;
+  padding: 1.35rem 1.18rem 1.05rem !important;
+}
+
+.vlv-bar span {
+  max-width: 2.4rem !important;
+  border-radius: 0.28rem 0.28rem 0.08rem 0.08rem !important;
+  background: linear-gradient(180deg, #bed184 0%, #78a832 48%, #477b1f 100%) !important;
+}
+
+.vlv-activity-list,
+.vlv-alert-list {
+  padding: 0.72rem 1.08rem 1rem !important;
+}
+
+.vlv-activity-item,
+.vlv-alert-item {
+  padding: 0.82rem 0 !important;
+}
+
+.vlv-activity-item > span,
+.vlv-alert-item > span {
+  width: 2.62rem !important;
+  height: 2.62rem !important;
+}
+
+.vlv-activity-item strong,
+.vlv-alert-item strong {
+  font-size: 0.82rem !important;
+}
+
+.vlv-activity-item small,
+.vlv-alert-item small {
+  font-size: 0.72rem !important;
+}
+
+@media (max-width: 1300px) {
+  .app-shell { --sidebar-width: 16.4rem; }
+  .topbar--reference .topbar__inner {
+    grid-template-columns: minmax(13rem, 1fr) minmax(18rem, 26rem) minmax(17rem, auto) !important;
+    padding-inline: 1.6rem !important;
+  }
+  .content-grid { padding-inline: 1.6rem !important; }
+  .vlv-metric-grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .vlv-dashboard-main-grid,
+  .vlv-dashboard-bottom-grid { grid-template-columns: 1fr !important; }
+}
+
+@media (max-width: 940px) {
+  .vlv-login-shell--reference {
+    grid-template-columns: 1fr;
+  }
+  .vlv-login-shell--reference .vlv-login-hero {
+    min-height: 52vh;
+    padding: 2.8rem 1.6rem;
+    align-items: center;
+    text-align: center;
+  }
+  .vlv-login-shell--reference .vlv-login-form-panel {
+    min-height: auto;
+    margin: 0;
+    border-radius: 1.4rem 1.4rem 0 0;
+    box-shadow: 0 -12px 34px rgba(30, 38, 28, 0.12);
+  }
+  .app-shell { grid-template-columns: 1fr !important; }
+  .sidebar--reference {
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    min-height: 0 !important;
+    padding: 1rem !important;
+  }
+  .sidebar--reference .sidebar__nav--reference {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .topbar--reference .topbar__inner {
+    grid-template-columns: 1fr !important;
+    gap: 0.9rem !important;
+    padding: 1rem !important;
+  }
+  .topbar--reference .topbar__actions {
+    justify-content: space-between !important;
+  }
+  .topbar--reference .topbar-avatar__meta {
+    display: none;
+  }
+}
+
+@media (max-width: 640px) {
+  .vlv-login-shell--reference .vlv-login-brand strong {
+    font-size: 3rem;
+  }
+  .vlv-login-shell--reference .vlv-login-card__heading h2 {
+    font-size: 2.7rem;
+  }
+  .sidebar--reference .sidebar__nav--reference {
+    grid-template-columns: 1fr;
+  }
+  .vlv-metric-grid { grid-template-columns: 1fr !important; }
+  .content-grid { padding: 1rem !important; }
+}
+
+.vlv-metric-card__body small {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.34rem !important;
+}
+
+.vlv-metric-card__body small b {
+  color: #5a951c;
+  font: inherit;
+  font-weight: 890;
+}
+
+.vlv-metric-card--purple .vlv-metric-card__body small b {
+  color: var(--vlv-reference-purple);
+}
+
+.vlv-metric-card__body small em {
+  color: #6f766f;
+  font-style: normal;
+  font-weight: 620;
+}
+
+.vlv-metric-card__body small span {
+  display: none;
+}
+
+/* =========================================================
+   Fase final UI responsive — corrección general de ventana,
+   brillo de imágenes, módulos y comportamiento mobile.
+   ========================================================= */
+:root {
+  --app-bg-final: #f7f6ef;
+  --app-surface-final: rgba(255, 255, 255, 0.94);
+  --app-line-final: rgba(30, 45, 34, 0.10);
+  --app-line-strong-final: rgba(30, 45, 34, 0.16);
+  --app-shadow-final: 0 16px 34px rgba(30, 45, 34, 0.06);
+  --app-shadow-soft-final: 0 8px 22px rgba(30, 45, 34, 0.045);
+  --app-radius-final: 1rem;
+  --app-sidebar-final: 17.85rem;
+  --app-topbar-final: 5.45rem;
+}
+
+html,
+body,
+#root {
+  width: 100%;
+  min-height: 100%;
+  overflow-x: hidden;
+}
+
+body {
+  background:
+    radial-gradient(circle at 12% -8%, rgba(151, 191, 72, 0.16), transparent 28rem),
+    radial-gradient(circle at 95% 2%, rgba(111, 43, 130, 0.075), transparent 24rem),
+    linear-gradient(135deg, #f7f8f0 0%, #fbf8ef 48%, #f7f7f2 100%) !important;
+}
+
+/* Elimina saltos visuales agresivos en tarjetas y tablas. */
+.panel-card:hover,
+.report-card:hover,
+.process-card:hover,
+.quality-card:hover,
+.step-card:hover,
+.stat-card:hover,
+.summary-pill:hover,
+.quick-action:hover,
+.icon-action:hover,
+.icon-button:hover,
+.data-table tbody tr:hover,
+.vlv-panel-card:hover,
+.vlv-metric-card:hover {
+  transform: none !important;
+}
+
+.panel-card,
+.report-card,
+.process-card,
+.quality-card,
+.step-card,
+.stat-card,
+.summary-pill,
+.quick-action,
+.vlv-panel-card,
+.vlv-metric-card {
+  transition: border-color 160ms ease, background 160ms ease, box-shadow 160ms ease, color 160ms ease !important;
+}
+
+/* Login balanceado y con imagen menos brillante. */
+.vlv-login-shell--reference {
+  min-height: 100svh !important;
+  grid-template-columns: minmax(0, 1.16fr) minmax(31rem, 0.84fr) !important;
+  padding: clamp(0.45rem, 0.7vw, 0.8rem) !important;
+  gap: 0 !important;
+  background:
+    radial-gradient(circle at 14% 4%, rgba(151, 191, 72, 0.16), transparent 30rem),
+    linear-gradient(135deg, #f6f5ec, #fbfaf4) !important;
+}
+
+.vlv-login-shell--reference .vlv-login-hero {
+  min-height: calc(100svh - clamp(0.9rem, 1.4vw, 1.6rem)) !important;
+  border-radius: 1.45rem 0 0 1.45rem !important;
+  border: 1px solid rgba(22, 44, 25, 0.08) !important;
+  border-right: 0 !important;
+  padding: clamp(2.4rem, 5.4vw, 5.8rem) clamp(2rem, 8.2vw, 9.5rem) !important;
+  justify-content: center !important;
+  background:
+    linear-gradient(180deg, rgba(250, 246, 232, 0.35) 0%, rgba(232, 238, 205, 0.18) 42%, rgba(26, 64, 32, 0.18) 100%),
+    linear-gradient(90deg, rgba(223, 237, 185, 0.42), rgba(255, 250, 238, 0.18) 44%, rgba(255, 250, 238, 0.02)),
+    url('./assets/brand/blueberry-login-hero.webp') center bottom / cover no-repeat !important;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.7), inset -22px 0 40px rgba(255,255,255,.16) !important;
+}
+
+.vlv-login-shell--reference .vlv-login-hero::before {
+  content: "" !important;
+  display: block !important;
+  position: absolute !important;
+  inset: 0 !important;
+  z-index: -1 !important;
+  border-radius: inherit !important;
+  background:
+    radial-gradient(circle at 20% 14%, rgba(151, 191, 72, 0.18), transparent 24rem),
+    linear-gradient(180deg, rgba(255,255,255,0.10), rgba(18, 58, 29, 0.08) 58%, rgba(18, 58, 29, 0.18));
+  pointer-events: none !important;
+}
+
+.vlv-login-shell--reference .vlv-login-brand {
+  width: min(32rem, 100%) !important;
+  margin: 0 0 2.35rem !important;
+  gap: 0.95rem !important;
+}
+
+.vlv-login-shell--reference .vlv-login-brand img {
+  width: clamp(10.5rem, 15.5vw, 15.25rem) !important;
+  max-height: 11.5rem !important;
+}
+
+.vlv-login-shell--reference .vlv-login-brand strong {
+  font-size: clamp(2.75rem, 4vw, 4.35rem) !important;
+  text-shadow: 0 12px 34px rgba(255, 255, 255, 0.34) !important;
+}
+
+.vlv-login-shell--reference .vlv-login-copy {
+  width: min(33rem, 100%) !important;
+}
+
+.vlv-login-shell--reference .vlv-login-copy h1 {
+  font-size: clamp(1.9rem, 2.85vw, 2.85rem) !important;
+  text-shadow: 0 10px 30px rgba(255,255,255,.32) !important;
+}
+
+.vlv-login-shell--reference .vlv-login-copy p {
+  margin-top: 1.15rem !important;
+  color: #40534a !important;
+  font-size: clamp(0.98rem, 1vw, 1.08rem) !important;
+}
+
+.vlv-login-shell--reference .vlv-login-form-panel {
+  min-height: calc(100svh - clamp(0.9rem, 1.4vw, 1.6rem)) !important;
+  margin: 0 !important;
+  border-radius: 0 1.45rem 1.45rem 0 !important;
+  padding: clamp(2rem, 5vw, 5.2rem) clamp(2rem, 5.2vw, 5.2rem) !important;
+  border: 1px solid rgba(22, 44, 25, 0.08) !important;
+  background:
+    radial-gradient(circle at 95% 8%, rgba(111, 43, 130, 0.055), transparent 18rem),
+    rgba(255, 255, 255, 0.965) !important;
+  box-shadow: -18px 0 48px rgba(30, 38, 28, 0.105) !important;
+}
+
+.vlv-login-shell--reference .vlv-login-card {
+  width: min(31rem, 100%) !important;
+  gap: 1.35rem !important;
+  margin-top: 0 !important;
+}
+
+.vlv-login-shell--reference .vlv-login-card__heading {
+  margin-bottom: 0.55rem !important;
+}
+
+.vlv-login-shell--reference .vlv-login-card__heading h2 {
+  font-size: clamp(2.45rem, 3.4vw, 3.25rem) !important;
+}
+
+.vlv-login-shell--reference .vlv-login-card__heading p {
+  font-size: clamp(1.05rem, 1.2vw, 1.18rem) !important;
+}
+
+.vlv-login-shell--reference .vlv-field__control {
+  height: 3.38rem !important;
+  border-radius: 0.82rem !important;
+}
+
+.vlv-login-shell--reference .vlv-login-submit {
+  height: 3.62rem !important;
+  justify-content: space-between !important;
+  gap: 1rem !important;
+  padding: 0 1.25rem 0 50% !important;
+}
+
+/* Layout general: usa mejor el viewport y mantiene proporciones de dashboard. */
+.app-shell {
+  --sidebar-width: var(--app-sidebar-final) !important;
+  grid-template-columns: var(--sidebar-width) minmax(0, 1fr) !important;
+  min-height: 100dvh !important;
+  background: transparent !important;
+}
+
+.main-shell {
+  min-height: 100dvh !important;
+  display: flex !important;
+  flex-direction: column !important;
+  background: rgba(251, 250, 246, 0.72) !important;
+}
+
+.route-transition {
+  flex: 1 1 auto !important;
+  min-width: 0 !important;
+  animation: routeEnter 240ms cubic-bezier(.22, .61, .36, 1) both !important;
+}
+
+.sidebar__brand-row {
+  position: relative;
+}
+
+.sidebar-close,
+.topbar-menu-trigger,
+.mobile-sidebar-backdrop {
+  display: none !important;
+}
+
+.sidebar--reference {
+  width: var(--app-sidebar-final) !important;
+  padding: 1.75rem 0.9rem 1rem !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.972) 0%, rgba(255,255,255,0.955) 62%, rgba(255,255,255,0.70) 100%),
+    linear-gradient(180deg, rgba(255,255,255,0), rgba(247, 246, 239, .5)),
+    url('./assets/brand/blueberry-sidebar-hero.webp') center bottom / 100% auto no-repeat,
+    #ffffff !important;
+}
+
+.sidebar--reference .brand--sidebar {
+  margin-bottom: 1.45rem !important;
+}
+
+.sidebar--reference .brand--sidebar img {
+  width: 4.85rem !important;
+  height: 3.95rem !important;
+}
+
+.sidebar--reference .sidebar__nav--reference {
+  gap: 0.26rem !important;
+}
+
+.sidebar--reference .sidebar__link {
+  min-height: 2.75rem !important;
+  padding: 0 1rem !important;
+  border-radius: 0.82rem !important;
+  gap: 0.88rem !important;
+  font-size: 0.91rem !important;
+}
+
+.sidebar--reference .sidebar__link:hover {
+  transform: none !important;
+  color: var(--vlv-reference-purple) !important;
+  background: rgba(111, 43, 130, 0.07) !important;
+}
+
+.topbar--reference {
+  min-height: var(--app-topbar-final) !important;
+  height: var(--app-topbar-final) !important;
+  background: rgba(255,255,255,.93) !important;
+  box-shadow: 0 1px 0 rgba(24, 37, 25, 0.06) !important;
+}
+
+.topbar--reference .topbar__inner {
+  min-height: var(--app-topbar-final) !important;
+  grid-template-columns: minmax(13rem, 1fr) minmax(18rem, 32rem) minmax(17rem, auto) !important;
+  gap: clamp(1rem, 2vw, 1.55rem) !important;
+  padding: 0 clamp(1.35rem, 2.6vw, 2.55rem) !important;
+}
+
+.topbar--reference .topbar__page-title h1 {
+  font-size: clamp(1.32rem, 1.55vw, 1.58rem) !important;
+  line-height: 1.08 !important;
+}
+
+.topbar--reference .topbar__page-title p {
+  margin-top: 0.28rem !important;
+  font-size: 0.88rem !important;
+}
+
+.topbar--reference .topbar-search-trigger--wide {
+  height: 2.45rem !important;
+  border-radius: 0.68rem !important;
+}
+
+.topbar--reference .topbar__actions {
+  gap: 0.9rem !important;
+}
+
+.content-grid {
+  flex: 1 1 auto !important;
+  padding: 1.08rem clamp(1.15rem, 2.6vw, 2.55rem) 1.55rem !important;
+  gap: 1rem !important;
+}
+
+/* Dashboard más compacto, estable y completo visualmente. */
+.vlv-metric-grid {
+  grid-template-columns: repeat(4, minmax(12rem, 1fr)) !important;
+  gap: 0.92rem !important;
+}
+
+.vlv-metric-card {
+  min-height: 7.9rem !important;
+  padding: 1.12rem 1.08rem !important;
+  border-radius: var(--app-radius-final) !important;
+  box-shadow: var(--app-shadow-soft-final) !important;
+}
+
+.vlv-metric-card__icon {
+  width: 3.55rem !important;
+  height: 3.55rem !important;
+}
+
+.vlv-metric-card__body span {
+  font-size: 0.83rem !important;
+}
+
+.vlv-metric-card__body strong {
+  margin-top: 0.35rem !important;
+  font-size: clamp(1.72rem, 2vw, 2.08rem) !important;
+}
+
+.vlv-metric-card__body small {
+  margin-top: 0.72rem !important;
+  font-size: 0.72rem !important;
+}
+
+.vlv-metric-card__spark {
+  width: 4.2rem !important;
+  height: 2.1rem !important;
+  right: 1rem !important;
+  bottom: 0.9rem !important;
+}
+
+.vlv-dashboard-main-grid {
+  grid-template-columns: minmax(0, 1.42fr) minmax(24rem, 1fr) !important;
+  gap: 0.92rem !important;
+}
+
+.vlv-dashboard-bottom-grid {
+  grid-template-columns: minmax(18rem, .92fr) minmax(19rem, 1fr) minmax(19rem, 1fr) !important;
+  gap: 0.92rem !important;
+}
+
+.vlv-panel-card {
+  border-radius: var(--app-radius-final) !important;
+  box-shadow: var(--app-shadow-soft-final) !important;
+  background: var(--app-surface-final) !important;
+}
+
+.vlv-panel-header {
+  min-height: 3.05rem !important;
+  padding: 0.86rem 1.05rem 0.74rem !important;
+}
+
+.vlv-table th,
+.vlv-table td {
+  padding: 0.72rem 1rem !important;
+}
+
+.vlv-table tbody tr:hover,
+.data-table tbody tr:hover {
+  background: rgba(232, 244, 235, 0.42) !important;
+}
+
+.vlv-trace-line {
+  padding: 1.22rem 1rem 0.78rem !important;
+}
+
+.vlv-trace-line::before {
+  top: 2.43rem !important;
+}
+
+.vlv-trace-step span {
+  width: 2.24rem !important;
+  height: 2.24rem !important;
+}
+
+.vlv-trace-summary {
+  margin: 0.62rem 1.05rem 0 !important;
+  padding-top: 0.8rem !important;
+}
+
+.vlv-bars {
+  height: 12.8rem !important;
+  padding: 1.05rem 1rem 0.9rem !important;
+}
+
+.vlv-activity-list,
+.vlv-alert-list {
+  padding: 0.5rem 1rem 0.75rem !important;
+}
+
+.vlv-activity-item,
+.vlv-alert-item {
+  padding: 0.66rem 0 !important;
+}
+
+.vlv-activity-item > span,
+.vlv-alert-item > span {
+  width: 2.28rem !important;
+  height: 2.28rem !important;
+}
+
+.vlv-muted {
+  min-height: 8rem;
+  display: grid;
+  place-items: center;
+  margin: 0.75rem 1rem !important;
+  border: 1px dashed rgba(30, 45, 34, 0.14);
+  border-radius: 0.85rem;
+  background: rgba(247, 248, 243, 0.72);
+  color: #6e7b70 !important;
+}
+
+/* Módulos internos: headers, tablas, filtros y formularios con una misma línea visual. */
+.module-header {
+  align-items: center !important;
+  padding: 1.05rem 1.15rem !important;
+  border: 1px solid var(--app-line-final);
+  border-radius: 1.15rem;
+  background:
+    radial-gradient(circle at 98% 0%, rgba(111, 43, 130, 0.07), transparent 18rem),
+    linear-gradient(135deg, rgba(255,255,255,.96), rgba(249,250,244,.92));
+  box-shadow: var(--app-shadow-soft-final);
+}
+
+.module-header__identity {
+  display: flex;
+  align-items: center;
+  gap: 0.92rem;
+  min-width: 0;
+}
+
+.module-header__icon {
+  width: 2.8rem;
+  height: 2.8rem;
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  border-radius: 0.92rem;
+  background: rgba(111, 159, 42, 0.12);
+  color: var(--vlv-reference-green-2);
+}
+
+.module-header__icon--purple { background: rgba(111, 43, 130, 0.10); color: var(--vlv-reference-purple); }
+.module-header__icon--blue { background: rgba(28, 151, 216, 0.10); color: #1c7eb4; }
+.module-header__icon--orange { background: rgba(245, 158, 11, 0.12); color: #b86d03; }
+
+.hero-panel__tag {
+  margin: 0 0 0.2rem !important;
+  color: #6a756d !important;
+  letter-spacing: 0.12em !important;
+  font-size: 0.66rem !important;
+}
+
+.module-header h2 {
+  color: var(--vlv-reference-green) !important;
+  font-size: clamp(1.32rem, 1.8vw, 1.78rem) !important;
+}
+
+.module-header p {
+  max-width: 58rem;
+  font-size: 0.92rem;
+  line-height: 1.42;
+}
+
+.panel-card,
+.summary-pill,
+.quality-card,
+.report-card,
+.process-card,
+.step-card,
+.trace-summary-card {
+  border-color: var(--app-line-final) !important;
+  border-radius: var(--app-radius-final) !important;
+  background: var(--app-surface-final) !important;
+  box-shadow: var(--app-shadow-soft-final) !important;
+}
+
+.panel-card {
+  padding: clamp(0.95rem, 1.6vw, 1.15rem) !important;
+}
+
+.panel-card__header {
+  margin-bottom: 0.82rem !important;
+}
+
+.panel-card__header h2 {
+  color: #18231c !important;
+  letter-spacing: -0.025em !important;
+}
+
+.panel-card__header p {
+  font-size: 0.9rem !important;
+  line-height: 1.42 !important;
+}
+
+.panel-card__count,
+.soft-chip {
+  border-color: var(--app-line-final) !important;
+  background: #f7faf5 !important;
+}
+
+.module-toolbar-card,
+.filter-toolbar {
+  border: 1px solid var(--app-line-final);
+  border-radius: 1rem;
+  background: rgba(255,255,255,.78);
+  padding: 0.72rem;
+  box-shadow: 0 8px 24px rgba(30, 45, 34, 0.035);
+}
+
+.data-table-wrap {
+  border: 1px solid rgba(30, 45, 34, 0.075);
+  border-radius: 0.85rem;
+  overflow: auto;
+  background: white;
+}
+
+.data-table {
+  min-width: 44rem;
+}
+
+.data-table th {
+  background: #f7f8f4 !important;
+  color: #5b675f !important;
+  font-size: 0.72rem !important;
+  letter-spacing: 0.055em !important;
+}
+
+.data-table td {
+  color: #253028 !important;
+}
+
+.empty-state,
+.chart-empty-state,
+.notification-empty {
+  border-radius: 0.95rem;
+  background: linear-gradient(135deg, rgba(247,248,243,.92), rgba(255,255,255,.82));
+}
+
+.action-button {
+  background: linear-gradient(135deg, var(--vlv-reference-green), #14522f) !important;
+  border-color: rgba(10, 58, 32, 0.22) !important;
+  box-shadow: 0 10px 22px rgba(10, 58, 32, 0.11);
+}
+
+.action-button--soft {
+  background: linear-gradient(135deg, var(--vlv-reference-purple), #5b246d) !important;
+}
+
+.ghost-button,
+.table-action,
+.mini-button,
+.segmented-tabs__item,
+.tab-switcher__item {
+  border-color: var(--app-line-strong-final) !important;
+  background: rgba(255,255,255,.92) !important;
+}
+
+.ghost-button:hover,
+.table-action:hover,
+.mini-button:hover,
+.segmented-tabs__item:hover,
+.tab-switcher__item:hover {
+  background: #f3f7f2 !important;
+}
+
+.form-grid input,
+.form-grid select,
+.form-grid textarea,
+.module-toolbar-card select,
+.report-parameters-grid input,
+.report-parameters-grid select,
+.filter-toolbar__search {
+  background: rgba(255,255,255,.96) !important;
+  border-color: var(--app-line-final) !important;
+}
+
+/* Responsive dashboard + módulos */
+@media (min-width: 1500px) {
+  .content-grid {
+    padding-left: 2.85rem !important;
+    padding-right: 2.85rem !important;
+  }
+}
+
+@media (max-width: 1380px) {
+  :root { --app-sidebar-final: 16.2rem; }
+  .topbar--reference .topbar__inner {
+    grid-template-columns: minmax(12rem, 1fr) minmax(16rem, 26rem) minmax(14rem, auto) !important;
+    padding-inline: 1.45rem !important;
+  }
+  .content-grid {
+    padding-inline: 1.45rem !important;
+  }
+  .vlv-metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .vlv-dashboard-main-grid,
+  .vlv-dashboard-bottom-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 1100px) {
+  .summary-strip--four,
+  .summary-strip--five,
+  .summary-strip--three,
+  .quality-card-grid,
+  .report-card-grid,
+  .report-parameters-grid,
+  .quick-actions-grid,
+  .quick-actions-grid--refined {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (max-width: 980px) {
+  .vlv-login-shell--reference {
+    grid-template-columns: 1fr !important;
+    padding: 0 !important;
+    overflow-y: auto !important;
+  }
+  .vlv-login-shell--reference .vlv-login-hero {
+    min-height: 43svh !important;
+    border-radius: 0 !important;
+    border: 0 !important;
+    align-items: center !important;
+    text-align: center !important;
+    padding: 2.25rem 1.2rem !important;
+    background-position: center bottom !important;
+  }
+  .vlv-login-shell--reference .vlv-login-brand {
+    margin-bottom: 1.2rem !important;
+  }
+  .vlv-login-shell--reference .vlv-login-brand img {
+    width: clamp(8rem, 24vw, 11rem) !important;
+  }
+  .vlv-login-shell--reference .vlv-login-brand strong {
+    font-size: clamp(2.1rem, 8vw, 3rem) !important;
+  }
+  .vlv-login-shell--reference .vlv-login-copy h1 {
+    font-size: clamp(1.62rem, 6vw, 2.2rem) !important;
+  }
+  .vlv-login-shell--reference .vlv-login-copy p {
+    display: none !important;
+  }
+  .vlv-login-shell--reference .vlv-login-form-panel {
+    min-height: 57svh !important;
+    border-radius: 1.35rem 1.35rem 0 0 !important;
+    border: 0 !important;
+    padding: 2rem 1.15rem calc(2rem + env(safe-area-inset-bottom)) !important;
+    box-shadow: 0 -18px 44px rgba(30, 38, 28, 0.14) !important;
+  }
+  .vlv-login-shell--reference .vlv-login-submit {
+    padding-left: 1.25rem !important;
+  }
+
+  .app-shell {
+    grid-template-columns: 1fr !important;
+  }
+  .mobile-sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 240;
+    border: 0;
+    background: rgba(8, 24, 16, 0.40);
+    backdrop-filter: blur(7px);
+  }
+  .app-shell--sidebar-open .mobile-sidebar-backdrop {
+    display: block !important;
+  }
+  .sidebar--reference {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 260 !important;
+    width: min(20rem, calc(100vw - 3rem)) !important;
+    height: 100dvh !important;
+    padding: 1rem !important;
+    overflow-y: auto !important;
+    transform: translateX(-105%) !important;
+    transition: transform 220ms cubic-bezier(.22, .61, .36, 1) !important;
+    box-shadow: 30px 0 70px rgba(8, 24, 16, 0.22) !important;
+  }
+  .app-shell--sidebar-open .sidebar--reference {
+    transform: translateX(0) !important;
+  }
+  .sidebar__brand-row {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.65rem;
+  }
+  .sidebar-close {
+    display: grid !important;
+    flex: 0 0 auto;
+    margin-top: 0.25rem;
+  }
+  .sidebar--reference .brand--sidebar {
+    justify-items: start !important;
+    text-align: left !important;
+    margin-bottom: 0 !important;
+  }
+  .sidebar--reference .brand--sidebar img {
+    width: 4.1rem !important;
+    height: 3.3rem !important;
+  }
+  .sidebar--reference .sidebar__nav--reference {
+    grid-template-columns: 1fr !important;
+  }
+  .topbar--reference {
+    height: auto !important;
+    min-height: 4.7rem !important;
+  }
+  .topbar-menu-trigger {
+    display: grid !important;
+  }
+  .topbar--reference .topbar__inner {
+    min-height: 4.7rem !important;
+    grid-template-columns: 2.5rem minmax(0, 1fr) auto !important;
+    grid-template-areas:
+      "menu title actions"
+      "search search search" !important;
+    gap: 0.8rem !important;
+    padding: 0.75rem 1rem !important;
+  }
+  .topbar-menu-trigger { grid-area: menu; }
+  .topbar--reference .topbar__page-title { grid-area: title; min-width: 0; }
+  .topbar--reference .topbar-search-trigger--wide { grid-area: search; width: 100% !important; }
+  .topbar--reference .topbar__actions { grid-area: actions; gap: 0.5rem !important; }
+  .topbar--reference .topbar-avatar__meta,
+  .topbar--reference .topbar-avatar svg:last-child {
+    display: none !important;
+  }
+  .content-grid {
+    padding: 1rem !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .vlv-metric-grid,
+  .summary-strip--four,
+  .summary-strip--five,
+  .summary-strip--three,
+  .quality-card-grid,
+  .report-card-grid,
+  .report-parameters-grid,
+  .quick-actions-grid,
+  .quick-actions-grid--refined,
+  .dashboard-grid--equal,
+  .dashboard-grid--two-thirds,
+  .form-grid,
+  .form-grid--two,
+  .confirmation-grid,
+  .info-grid,
+  .profile-settings-layout {
+    grid-template-columns: 1fr !important;
+  }
+  .module-header {
+    align-items: flex-start !important;
+    flex-direction: column !important;
+  }
+  .module-header__actions,
+  .button-group,
+  .module-utility-row,
+  .form-actions {
+    width: 100%;
+    align-items: stretch !important;
+  }
+  .module-header__actions .action-button,
+  .module-header__actions .ghost-button,
+  .button-group .action-button,
+  .button-group .ghost-button,
+  .form-actions .action-button,
+  .form-actions .ghost-button {
+    width: 100%;
+  }
+  .vlv-dashboard-main-grid,
+  .vlv-dashboard-bottom-grid {
+    gap: 0.8rem !important;
+  }
+  .vlv-trace-line {
+    grid-template-columns: 1fr !important;
+    gap: 0.72rem !important;
+  }
+  .vlv-trace-line::before {
+    display: none !important;
+  }
+  .vlv-trace-summary {
+    grid-template-columns: 1fr !important;
+  }
+  .vlv-bars {
+    overflow-x: auto;
+    justify-content: flex-start;
+  }
+  .vlv-bar {
+    min-width: 4.4rem !important;
+  }
+  .vlv-activity-item,
+  .vlv-alert-item {
+    grid-template-columns: auto minmax(0, 1fr) !important;
+  }
+  .vlv-activity-item time,
+  .vlv-alert-item time {
+    grid-column: 2;
+    justify-self: start;
+  }
+  .data-table-wrap,
+  .vlv-table-wrap {
+    margin: 0 -0.15rem;
+  }
+}
+
+@media (max-width: 430px) {
+  .content-grid {
+    padding: 0.85rem 0.7rem 1.15rem !important;
+  }
+  .topbar--reference .topbar__inner {
+    padding-inline: 0.75rem !important;
+  }
+  .topbar--reference .topbar__page-title h1 {
+    font-size: 1.16rem !important;
+  }
+  .topbar--reference .topbar__page-title p {
+    font-size: 0.76rem !important;
+  }
+  .topbar--reference .topbar-search-trigger--wide span,
+  .topbar--reference .topbar-search-trigger--wide kbd {
+    display: none !important;
+  }
+  .topbar--reference .topbar-search-trigger--wide {
+    justify-content: center !important;
+  }
+  .vlv-login-shell--reference .vlv-login-form-panel {
+    padding-inline: 0.9rem !important;
+  }
+  .vlv-login-shell--reference .vlv-login-card__heading h2 {
+    font-size: 2.28rem !important;
+  }
+  .vlv-login-shell--reference .vlv-login-secure-note {
+    align-items: flex-start !important;
+  }
+  .panel-card,
+  .module-header {
+    border-radius: 0.9rem !important;
+  }
+}
+
+/* =========================================================
+   Corrección 12/06: proporciones reales de ventana, sin datos fake
+   y assets con mejor contraste para exposición.
+   ========================================================= */
+:root {
+  --bt-sidebar-width: clamp(14.75rem, 15.4vw, 17rem);
+  --bt-topbar-height: 4.9rem;
+  --bt-page-x: clamp(1rem, 2.15vw, 2.25rem);
+  --bt-page-y: clamp(0.9rem, 1.45vw, 1.35rem);
+  --bt-card-border: rgba(32, 48, 36, 0.115);
+  --bt-soft-shadow: 0 10px 26px rgba(32, 48, 36, 0.052);
+}
+
+.app-shell {
+  width: 100% !important;
+  min-height: 100dvh !important;
+  grid-template-columns: var(--bt-sidebar-width) minmax(0, 1fr) !important;
+  overflow: clip !important;
+}
+
+.main-shell {
+  min-height: 100dvh !important;
+  max-width: 100% !important;
+  overflow: hidden auto !important;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(117, 167, 44, 0.08), transparent 26rem),
+    linear-gradient(180deg, #fbfaf6 0%, #f8f6ef 100%) !important;
+}
+
+.sidebar--reference {
+  width: var(--bt-sidebar-width) !important;
+  padding: 1.25rem 0.78rem 0.95rem !important;
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.94) 0%, rgba(255,255,255,0.9) 54%, rgba(255,255,255,0.58) 100%),
+    linear-gradient(180deg, rgba(244, 248, 233, 0) 45%, rgba(222, 232, 199, 0.34) 100%),
+    url('./assets/brand/blueberry-sidebar-hero.webp') center bottom / 118% auto no-repeat,
+    #ffffff !important;
+  border-right: 1px solid rgba(32, 48, 36, 0.08) !important;
+}
+
+.sidebar--reference .brand--sidebar {
+  margin-bottom: 1.05rem !important;
+}
+
+.sidebar--reference .brand--sidebar img {
+  width: clamp(4.15rem, 5vw, 4.65rem) !important;
+  height: auto !important;
+  max-height: 3.55rem !important;
+}
+
+.sidebar--reference .brand--sidebar strong {
+  font-size: 0.98rem !important;
+}
+
+.sidebar--reference .sidebar__link {
+  min-height: 2.55rem !important;
+  padding: 0 0.9rem !important;
+  gap: 0.78rem !important;
+  font-size: 0.865rem !important;
+  border-radius: 0.74rem !important;
+}
+
+.topbar--reference {
+  position: sticky !important;
+  top: 0 !important;
+  z-index: 50 !important;
+  height: var(--bt-topbar-height) !important;
+  min-height: var(--bt-topbar-height) !important;
+  overflow: visible !important;
+  background: rgba(255, 255, 255, 0.955) !important;
+  border-bottom: 1px solid rgba(32, 48, 36, 0.085) !important;
+  box-shadow: 0 8px 24px rgba(32, 48, 36, 0.035) !important;
+}
+
+.topbar--reference .topbar__inner {
+  height: var(--bt-topbar-height) !important;
+  min-height: var(--bt-topbar-height) !important;
+  display: grid !important;
+  grid-template-columns: minmax(11.5rem, 1fr) minmax(16rem, 29rem) auto !important;
+  align-items: center !important;
+  gap: clamp(0.8rem, 1.6vw, 1.4rem) !important;
+  padding: 0 var(--bt-page-x) !important;
+  overflow: visible !important;
+}
+
+.topbar--reference .topbar__page-title {
+  min-width: 0 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  gap: 0.18rem !important;
+  line-height: 1 !important;
+  transform: none !important;
+  padding-top: 0 !important;
+}
+
+.topbar--reference .topbar__page-title h1 {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: #0a3a20 !important;
+  font-size: clamp(1.22rem, 1.35vw, 1.48rem) !important;
+  line-height: 1.16 !important;
+  letter-spacing: -0.045em !important;
+  overflow: visible !important;
+}
+
+.topbar--reference .topbar__page-title p {
+  margin: 0 !important;
+  color: #738076 !important;
+  font-size: 0.82rem !important;
+  line-height: 1.2 !important;
+}
+
+.topbar--reference .topbar-search-trigger--wide {
+  height: 2.38rem !important;
+  border-radius: 0.7rem !important;
+}
+
+.topbar--reference .topbar__actions {
+  min-width: 0 !important;
+  gap: 0.65rem !important;
+}
+
+.topbar--reference .topbar-avatar__photo {
+  width: 2.65rem !important;
+  height: 2.65rem !important;
+}
+
+.topbar--reference .topbar-avatar__meta strong {
+  max-width: 12rem !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.content-grid {
+  width: 100% !important;
+  max-width: none !important;
+  padding: var(--bt-page-y) var(--bt-page-x) clamp(1.25rem, 2vw, 2rem) !important;
+  gap: 0.9rem !important;
+}
+
+.dashboard-screen--vlv {
+  min-height: calc(100dvh - var(--bt-topbar-height)) !important;
+  align-content: start !important;
+}
+
+.vlv-metric-grid {
+  grid-template-columns: repeat(4, minmax(10.8rem, 1fr)) !important;
+  gap: 0.82rem !important;
+}
+
+.vlv-metric-card {
+  min-height: 7.35rem !important;
+  padding: 0.98rem 1rem !important;
+  gap: 0.82rem !important;
+  border: 1px solid var(--bt-card-border) !important;
+  box-shadow: var(--bt-soft-shadow) !important;
+}
+
+.vlv-metric-card__icon {
+  width: 3.15rem !important;
+  height: 3.15rem !important;
+}
+
+.vlv-metric-card__body strong {
+  font-size: clamp(1.55rem, 1.8vw, 1.95rem) !important;
+}
+
+.vlv-metric-card__meta {
+  display: block !important;
+  max-width: min(12rem, 100%) !important;
+  margin-top: 0.58rem !important;
+  color: #667469 !important;
+  font-size: 0.71rem !important;
+  line-height: 1.25 !important;
+  font-weight: 680 !important;
+  white-space: normal !important;
+}
+
+.vlv-dashboard-main-grid {
+  grid-template-columns: minmax(0, 1.37fr) minmax(22rem, 0.95fr) !important;
+  gap: 0.82rem !important;
+}
+
+.vlv-dashboard-bottom-grid {
+  grid-template-columns: minmax(18rem, 0.95fr) minmax(18rem, 1fr) minmax(18rem, 1fr) !important;
+  gap: 0.82rem !important;
+}
+
+.vlv-panel-card {
+  min-width: 0 !important;
+  border: 1px solid var(--bt-card-border) !important;
+  border-radius: 0.95rem !important;
+  box-shadow: var(--bt-soft-shadow) !important;
+}
+
+.vlv-panel-card--table,
+.vlv-trace-card {
+  min-height: clamp(14rem, 28vh, 18rem) !important;
+}
+
+.vlv-bars-card,
+.vlv-activity-card,
+.vlv-alert-card {
+  min-height: clamp(12.5rem, 23vh, 16rem) !important;
+}
+
+.vlv-panel-header {
+  min-height: 2.85rem !important;
+  padding: 0.78rem 0.95rem 0.68rem !important;
+}
+
+.vlv-table th,
+.vlv-table td {
+  padding: 0.64rem 0.92rem !important;
+}
+
+.vlv-table-empty {
+  height: 6.5rem !important;
+  color: #6e7b70 !important;
+  font-weight: 650 !important;
+  text-align: left !important;
+}
+
+.vlv-trace-line {
+  --trace-progress: 0%;
+  padding: 1.12rem 0.95rem 0.75rem !important;
+}
+
+.vlv-trace-line::before {
+  left: 2.7rem !important;
+  right: 2.7rem !important;
+  top: 2.32rem !important;
+  background: linear-gradient(90deg, #5a951c 0%, #5a951c var(--trace-progress), #d8dfd7 var(--trace-progress), #d8dfd7 100%) !important;
+}
+
+.vlv-trace-line--empty::before {
+  background: #d8dfd7 !important;
+}
+
+.vlv-trace-step span {
+  width: 2.1rem !important;
+  height: 2.1rem !important;
+  background: #ffffff !important;
+}
+
+.vlv-trace-step--active span {
+  background: #f7fbef !important;
+}
+
+.vlv-trace-summary {
+  margin: 0.52rem 0.95rem 0 !important;
+  padding-top: 0.68rem !important;
+}
+
+.vlv-bars {
+  height: 11.6rem !important;
+  min-height: 11.6rem !important;
+  padding: 0.85rem 0.9rem 0.82rem !important;
+}
+
+.vlv-bars > .vlv-muted,
+.vlv-activity-list > .vlv-muted {
+  width: 100% !important;
+  min-height: 8.2rem !important;
+  margin: 0 !important;
+  grid-column: 1 / -1 !important;
+}
+
+.vlv-bars > .vlv-muted {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+.vlv-activity-list,
+.vlv-alert-list {
+  padding: 0.44rem 0.9rem 0.72rem !important;
+}
+
+.vlv-activity-item,
+.vlv-alert-item {
+  padding: 0.57rem 0 !important;
+}
+
+.vlv-activity-item > span,
+.vlv-alert-item > span {
+  width: 2.05rem !important;
+  height: 2.05rem !important;
+}
+
+.vlv-alert-item time,
+.vlv-activity-item time {
+  font-size: 0.65rem !important;
+}
+
+/* Login con contraste más estable y menos brillo lavado. */
+.vlv-login-shell--reference .vlv-login-hero {
+  background:
+    linear-gradient(180deg, rgba(245, 241, 222, 0.14) 0%, rgba(223, 232, 197, 0.18) 42%, rgba(13, 58, 28, 0.24) 100%),
+    linear-gradient(90deg, rgba(213, 233, 165, 0.34), rgba(255, 250, 238, 0.10) 44%, rgba(255, 250, 238, 0.00)),
+    url('./assets/brand/blueberry-login-hero.webp') center bottom / cover no-repeat !important;
+}
+
+.vlv-login-shell--reference .vlv-login-hero::before {
+  background:
+    radial-gradient(circle at 18% 14%, rgba(151, 191, 72, 0.12), transparent 24rem),
+    linear-gradient(180deg, rgba(255,255,255,0.05), rgba(18, 58, 29, 0.10) 60%, rgba(18, 58, 29, 0.22)) !important;
+}
+
+.vlv-login-shell--reference .vlv-login-brand,
+.vlv-login-shell--reference .vlv-login-copy {
+  filter: drop-shadow(0 10px 22px rgba(255,255,255,0.26));
+}
+
+.vlv-login-shell--reference .vlv-login-card {
+  transform: translateY(-0.2rem) !important;
+}
+
+@media (max-width: 1540px) {
+  :root {
+    --bt-sidebar-width: 15rem;
+    --bt-page-x: 1.55rem;
+  }
+  .topbar--reference .topbar__inner {
+    grid-template-columns: minmax(10rem, 1fr) minmax(15rem, 27rem) auto !important;
+  }
+  .vlv-metric-grid {
+    grid-template-columns: repeat(4, minmax(9.8rem, 1fr)) !important;
+  }
+  .vlv-metric-card__spark {
+    display: none !important;
+  }
+}
+
+@media (max-width: 1280px) {
+  :root {
+    --bt-sidebar-width: 14.2rem;
+    --bt-page-x: 1.15rem;
+  }
+  .sidebar--reference .sidebar__link {
+    font-size: 0.82rem !important;
+    padding-inline: 0.75rem !important;
+  }
+  .topbar--reference .topbar__inner {
+    grid-template-columns: minmax(9rem, 1fr) minmax(14rem, 24rem) auto !important;
+  }
+  .topbar--reference .topbar-avatar__meta strong {
+    max-width: 8.5rem !important;
+  }
+  .vlv-metric-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+  .vlv-dashboard-main-grid,
+  .vlv-dashboard-bottom-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+@media (max-width: 980px) {
+  :root {
+    --bt-topbar-height: auto;
+  }
+  .app-shell {
+    grid-template-columns: 1fr !important;
+    overflow: visible !important;
+  }
+  .main-shell {
+    overflow: visible !important;
+  }
+  .topbar--reference {
+    height: auto !important;
+    min-height: 4.8rem !important;
+  }
+  .topbar--reference .topbar__inner {
+    height: auto !important;
+    min-height: 4.8rem !important;
+    grid-template-columns: 2.5rem minmax(0, 1fr) auto !important;
+    grid-template-areas:
+      "menu title actions"
+      "search search search" !important;
+    padding: 0.75rem 1rem !important;
+  }
+  .dashboard-screen--vlv {
+    min-height: auto !important;
+  }
+  .sidebar--reference {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.965) 0%, rgba(255,255,255,0.92) 62%, rgba(255,255,255,0.62) 100%),
+      url('./assets/brand/blueberry-sidebar-hero.webp') center bottom / 120% auto no-repeat,
+      #ffffff !important;
+  }
+}
+
+@media (max-width: 760px) {
+  .vlv-metric-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .vlv-table {
+    min-width: 42rem !important;
+  }
+  .vlv-login-shell--reference .vlv-login-hero {
+    min-height: 38svh !important;
+    background-position: center bottom !important;
+  }
+  .vlv-login-shell--reference .vlv-login-card {
+    transform: none !important;
+  }
+}
