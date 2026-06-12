@@ -40,8 +40,8 @@ export function LoginPage({ onAuthenticated }: LoginPageProps) {
             <div className="vlv-login-copy">
                 <h1>Control agrícola inteligente</h1>
                 <p>
-                    Gestione lotes, camas, siembras, clasificaciones y despachos desde una
-                    plataforma segura, moderna y conectada al backend.
+                    Administre y supervise la información agrícola del vivero de forma ordenada,
+                    segura y eficiente desde una plataforma moderna y fácil de usar.
                 </p>
             </div>
 
