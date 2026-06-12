@@ -3,7 +3,7 @@ package com.keraune.vlvblueberrysystem.service;
 import com.keraune.vlvblueberrysystem.api.dto.ApiPayloads.TrazabilidadResponse;
 import com.keraune.vlvblueberrysystem.api.mapper.ApiRecordMapper;
 import com.keraune.vlvblueberrysystem.dto.TrazabilidadRow;
-import com.keraune.vlvblueberrysystem.entity.Lote;
+import com.keraune.vlvblueberrysystem.entity.*;
 import com.keraune.vlvblueberrysystem.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -11,6 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
@@ -38,21 +41,41 @@ public class TrazabilidadQueryService {
     }
 
     public List<TrazabilidadResponse> list() {
-        return loteRepository.findAllByOrderByFechaRegistroDescIdDesc().stream()
-                .map(this::rowFor)
+        List<Lote> lotes = loteRepository.findAllByOrderByFechaRegistroDescIdDesc();
+        Map<Long, List<Cama>> camas = groupByLote(camaRepository.findAll(), cama -> cama.getLote() == null ? null : cama.getLote().getId());
+        Map<Long, List<Siembra>> siembras = groupByLote(siembraRepository.findAll(), siembra -> siembra.getLote() == null ? null : siembra.getLote().getId());
+        Map<Long, List<Uniformizacion>> uniformizaciones = groupByLote(uniformizacionRepository.findAll(), item -> item.getLote() == null ? null : item.getLote().getId());
+        Map<Long, List<Formalizacion>> formalizaciones = groupByLote(formalizacionRepository.findAll(), item -> item.getLote() == null ? null : item.getLote().getId());
+        Map<Long, List<Clasificacion>> clasificaciones = groupByLote(clasificacionRepository.findAll(), item -> item.getLote() == null ? null : item.getLote().getId());
+        Map<Long, List<Despacho>> despachos = groupByLote(despachoRepository.findAll(), item -> item.getLote() == null ? null : item.getLote().getId());
+
+        return lotes.stream()
+                .map(lote -> rowFor(
+                        lote,
+                        valueOf(camas, lote.getId()),
+                        valueOf(siembras, lote.getId()),
+                        valueOf(uniformizaciones, lote.getId()),
+                        valueOf(formalizaciones, lote.getId()),
+                        valueOf(clasificaciones, lote.getId()),
+                        valueOf(despachos, lote.getId())
+                ))
                 .map(mapper::trazabilidad)
                 .toList();
     }
 
-    private TrazabilidadRow rowFor(Lote lote) {
-        Long loteId = lote.getId();
-        long camas = camaRepository.findAll().stream().filter(c -> c.getLote() != null && loteId.equals(c.getLote().getId())).count();
-        var siembras = siembraRepository.findAll().stream().filter(s -> s.getLote() != null && loteId.equals(s.getLote().getId())).toList();
-        var uniformizaciones = uniformizacionRepository.findAll().stream().filter(u -> u.getLote() != null && loteId.equals(u.getLote().getId())).toList();
-        var formalizaciones = formalizacionRepository.findAll().stream().filter(f -> f.getLote() != null && loteId.equals(f.getLote().getId())).toList();
-        var clasificaciones = clasificacionRepository.findAll().stream().filter(c -> c.getLote() != null && loteId.equals(c.getLote().getId())).toList();
-        var despachos = despachoRepository.findAll().stream().filter(d -> d.getLote() != null && loteId.equals(d.getLote().getId())).toList();
+    private <T> Map<Long, List<T>> groupByLote(List<T> items, Function<T, Long> loteIdOf) {
+        return items.stream()
+                .filter(item -> loteIdOf.apply(item) != null)
+                .collect(Collectors.groupingBy(loteIdOf));
+    }
 
+    private <T> List<T> valueOf(Map<Long, List<T>> grouped, Long loteId) {
+        return grouped.getOrDefault(loteId, List.of());
+    }
+
+    private TrazabilidadRow rowFor(Lote lote, List<Cama> camas, List<Siembra> siembras,
+                                   List<Uniformizacion> uniformizaciones, List<Formalizacion> formalizaciones,
+                                   List<Clasificacion> clasificaciones, List<Despacho> despachos) {
         long plantasSembradas = siembras.stream().mapToLong(s -> s.getCantidadRegistrada() == null ? 0 : s.getCantidadRegistrada()).sum();
         long plantasDespachadas = despachos.stream().mapToLong(d -> d.getCantidadDespachada() == null ? 0 : d.getCantidadDespachada()).sum();
         String ultimoEvento = latestEvent(
@@ -62,7 +85,7 @@ public class TrazabilidadQueryService {
                 clasificaciones.stream().map(c -> event(c.getFechaClasificacion(), "Clasificación " + c.getEstado())).toList(),
                 despachos.stream().map(d -> event(d.getFechaDespacho(), "Despacho " + d.getEstado())).toList()
         );
-        return new TrazabilidadRow(lote.getId(), lote.getId(), lote.getCodigo(), lote.getDescripcion(), camas, siembras.size(), plantasSembradas,
+        return new TrazabilidadRow(lote.getId(), lote.getId(), lote.getCodigo(), lote.getDescripcion(), camas.size(), siembras.size(), plantasSembradas,
                 uniformizaciones.size(), formalizaciones.size(), clasificaciones.size(), despachos.size(), plantasDespachadas, ultimoEvento);
     }
 

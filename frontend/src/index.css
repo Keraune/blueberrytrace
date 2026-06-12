@@ -11621,3 +11621,81 @@ body {
     flex-direction: column !important;
   }
 }
+
+/* Fase funcional APF3: reportes exportables y acciones operativas */
+.report-screen--apf3 .button-group {
+  flex-wrap: wrap;
+  gap: 0.65rem;
+}
+
+.report-screen--apf3 .button-group .action-button,
+.report-screen--apf3 .button-group .ghost-button {
+  min-height: 2.55rem;
+  white-space: nowrap;
+}
+
+.report-preview-panel {
+  overflow: hidden;
+}
+
+.report-preview-table-wrap {
+  max-height: 29rem;
+  border-top: 1px solid var(--line-soft, rgba(15, 74, 44, 0.10));
+}
+
+.report-preview-table th {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: color-mix(in srgb, var(--surface, #fffdf7) 92%, var(--green-100, #eaf6dc));
+  box-shadow: 0 1px 0 rgba(15, 74, 44, 0.08);
+}
+
+.report-preview-table td,
+.report-preview-table th {
+  min-width: 8.5rem;
+  max-width: 16rem;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+.report-preview-table td:first-child,
+.report-preview-table th:first-child {
+  min-width: 7rem;
+  font-weight: 800;
+  color: var(--green-900, #0f3f27);
+}
+
+.process-module-screen .icon-actions {
+  justify-content: flex-start;
+  gap: 0.45rem;
+}
+
+.process-module-screen .data-table td:last-child {
+  min-width: 9rem;
+}
+
+.process-module-screen .icon-action--danger {
+  color: #b42318;
+  background: rgba(180, 35, 24, 0.06);
+  border-color: rgba(180, 35, 24, 0.12);
+}
+
+.process-module-screen .icon-action--danger:hover {
+  color: #8f1d14;
+  background: rgba(180, 35, 24, 0.10);
+  border-color: rgba(180, 35, 24, 0.20);
+}
+
+@media (max-width: 900px) {
+  .report-screen--apf3 .button-group .action-button,
+  .report-screen--apf3 .button-group .ghost-button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .report-preview-table-wrap {
+    max-height: 24rem;
+  }
+}

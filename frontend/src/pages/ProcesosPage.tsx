@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { CheckCircle2, ClipboardCheck, Download, GitBranch, Leaf, Pencil, Plus, RotateCcw } from 'lucide-react';
+import { CheckCircle2, ClipboardCheck, Download, GitBranch, Leaf, Pencil, Plus, RotateCcw, Trash2 } from 'lucide-react';
 import { ConfirmDialog } from '../components/ConfirmDialog';
 import { DataTable } from '../components/DataTable';
 import { EmptyState } from '../components/EmptyState';
@@ -36,6 +36,7 @@ export function ProcesosPage({ mode, procesos, lotes, camas, siembras, onProceso
   const [editingUniformizacion, setEditingUniformizacion] = useState<UniformizacionResponse | null>(null);
   const [editingFormalizacion, setEditingFormalizacion] = useState<FormalizacionResponse | null>(null);
   const [pendingStatus, setPendingStatus] = useState<{ type: 'uniformizacion' | 'formalizacion'; id: number; code: string } | null>(null);
+  const [pendingDelete, setPendingDelete] = useState<{ type: 'uniformizacion' | 'formalizacion'; id: number; code: string } | null>(null);
   const [confirming, setConfirming] = useState(false);
 
   const uniformizaciones = procesos?.uniformizaciones.items || [];
@@ -159,6 +160,24 @@ export function ProcesosPage({ mode, procesos, lotes, camas, siembras, onProceso
     }
   }
 
+  async function confirmDeleteProcess() {
+    if (!pendingDelete) return;
+    try {
+      setConfirming(true);
+      if (pendingDelete.type === 'uniformizacion') {
+        onProcesosChange(await blueberryApi.deleteUniformizacion(pendingDelete.id));
+      } else {
+        onProcesosChange(await blueberryApi.deleteFormalizacion(pendingDelete.id));
+      }
+      emitToast('success', 'Registro eliminado', `El proceso ${pendingDelete.code} fue eliminado correctamente.`);
+      setPendingDelete(null);
+    } catch (exception) {
+      emitToast('error', 'No se pudo eliminar el proceso', exception instanceof Error ? exception.message : 'Ocurrió un error inesperado.');
+    } finally {
+      setConfirming(false);
+    }
+  }
+
   return (
     <main className="content-grid process-module-screen">
       <ModuleHeader
@@ -236,8 +255,9 @@ export function ProcesosPage({ mode, procesos, lotes, camas, siembras, onProceso
               { key: 'estado', label: 'Estado', render: (item) => <StatusBadge value={item.estado} /> },
               { key: 'acciones', label: 'Acciones', render: (item) => (
                 <div className="icon-actions">
-                  <button type="button" className="icon-action" onClick={() => setEditingUniformizacion(item)}><Pencil size={15} /></button>
-                  <button type="button" className="icon-action" onClick={() => setPendingStatus({ type: 'uniformizacion', id: item.id, code: item.lote?.codigo || `UNI-${item.id}` })}><RotateCcw size={15} /></button>
+                  <button type="button" className="icon-action" title="Editar uniformización" onClick={() => setEditingUniformizacion(item)}><Pencil size={15} /></button>
+                  <button type="button" className="icon-action" title="Cambiar estado" onClick={() => setPendingStatus({ type: 'uniformizacion', id: item.id, code: item.lote?.codigo || `UNI-${item.id}` })}><RotateCcw size={15} /></button>
+                  <button type="button" className="icon-action icon-action--danger" title="Eliminar uniformización" onClick={() => setPendingDelete({ type: 'uniformizacion', id: item.id, code: item.lote?.codigo || `UNI-${item.id}` })}><Trash2 size={15} /></button>
                 </div>
               ) }
             ]}
@@ -259,8 +279,9 @@ export function ProcesosPage({ mode, procesos, lotes, camas, siembras, onProceso
               { key: 'estado', label: 'Estado', render: (item) => <StatusBadge value={item.estado} /> },
               { key: 'acciones', label: 'Acciones', render: (item) => (
                 <div className="icon-actions">
-                  <button type="button" className="icon-action" onClick={() => setEditingFormalizacion(item)}><Pencil size={15} /></button>
-                  <button type="button" className="icon-action" onClick={() => setPendingStatus({ type: 'formalizacion', id: item.id, code: item.lote?.codigo || `FOR-${item.id}` })}><RotateCcw size={15} /></button>
+                  <button type="button" className="icon-action" title="Editar formalización" onClick={() => setEditingFormalizacion(item)}><Pencil size={15} /></button>
+                  <button type="button" className="icon-action" title="Cambiar estado" onClick={() => setPendingStatus({ type: 'formalizacion', id: item.id, code: item.lote?.codigo || `FOR-${item.id}` })}><RotateCcw size={15} /></button>
+                  <button type="button" className="icon-action icon-action--danger" title="Eliminar formalización" onClick={() => setPendingDelete({ type: 'formalizacion', id: item.id, code: item.lote?.codigo || `FOR-${item.id}` })}><Trash2 size={15} /></button>
                 </div>
               ) }
             ]}
@@ -290,6 +311,17 @@ export function ProcesosPage({ mode, procesos, lotes, camas, siembras, onProceso
         loading={confirming}
         onCancel={() => setPendingStatus(null)}
         onConfirm={confirmToggleStatus}
+      />
+
+      <ConfirmDialog
+        open={Boolean(pendingDelete)}
+        tone="danger"
+        title="Eliminar proceso operativo"
+        description="Esta acción eliminará el registro seleccionado. La trazabilidad se recalculará con la información restante."
+        confirmLabel="Eliminar registro"
+        loading={confirming}
+        onCancel={() => setPendingDelete(null)}
+        onConfirm={confirmDeleteProcess}
       />
     </main>
   );

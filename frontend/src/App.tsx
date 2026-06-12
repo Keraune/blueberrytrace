@@ -459,7 +459,7 @@ export default function App() {
           {activeKey === 'clasificacion' && <ClasificacionPage clasificaciones={clasificaciones} lotes={loteReferences} camas={camas} onClasificacionesChange={setClasificaciones} />}
           {activeKey === 'despacho' && <DespachoPage despachos={despachos} lotes={loteReferences} modalidades={catalogs?.modalidadesDespacho || []} validaciones={catalogs?.validacionesCalidad || []} onDespachosChange={setDespachos} />}
           {activeKey === 'trazabilidad' && <TrazabilidadPage lotes={lotes} camas={camas} siembras={siembras} procesos={procesos} clasificaciones={clasificaciones} despachos={despachos} trazabilidad={trazabilidad} />}
-          {activeKey === 'reportes' && <ReportesPage trazabilidad={trazabilidad} />}
+          {activeKey === 'reportes' && <ReportesPage lotes={lotes} camas={camas} siembras={siembras} procesos={procesos} clasificaciones={clasificaciones} despachos={despachos} trazabilidad={trazabilidad} />}
           {activeKey === 'usuarios' && <UsuariosPage usuarios={usuarios} roles={catalogs?.roles || []} onUsuariosChange={setUsuarios} />}
         </div>
       </section>

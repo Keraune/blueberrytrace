@@ -100,12 +100,16 @@ public class ApiOperationsController {
     public ApiResponse<ProcesoOperativoResponse> updateUniformizacion(@PathVariable Long id, @Valid @RequestBody UniformizacionForm form) { return ApiResponse.ok("Uniformización actualizada", procesoService.updateUniformizacion(id, form)); }
     @PatchMapping("/procesos/uniformizaciones/{id}/estado")
     public ApiResponse<ProcesoOperativoResponse> toggleUniformizacion(@PathVariable Long id) { return ApiResponse.ok("Estado de uniformización actualizado", procesoService.toggleUniformizacionStatus(id)); }
+    @DeleteMapping("/procesos/uniformizaciones/{id}")
+    public ApiResponse<ProcesoOperativoResponse> deleteUniformizacion(@PathVariable Long id) { return ApiResponse.ok("Uniformización eliminada", procesoService.deleteUniformizacion(id)); }
     @PostMapping("/procesos/formalizaciones")
     public ApiResponse<ProcesoOperativoResponse> createFormalizacion(@Valid @RequestBody FormalizacionForm form) { return ApiResponse.ok("Formalización registrada", procesoService.createFormalizacion(form)); }
     @PutMapping("/procesos/formalizaciones/{id}")
     public ApiResponse<ProcesoOperativoResponse> updateFormalizacion(@PathVariable Long id, @Valid @RequestBody FormalizacionForm form) { return ApiResponse.ok("Formalización actualizada", procesoService.updateFormalizacion(id, form)); }
     @PatchMapping("/procesos/formalizaciones/{id}/estado")
     public ApiResponse<ProcesoOperativoResponse> toggleFormalizacion(@PathVariable Long id) { return ApiResponse.ok("Estado de formalización actualizado", procesoService.toggleFormalizacionStatus(id)); }
+    @DeleteMapping("/procesos/formalizaciones/{id}")
+    public ApiResponse<ProcesoOperativoResponse> deleteFormalizacion(@PathVariable Long id) { return ApiResponse.ok("Formalización eliminada", procesoService.deleteFormalizacion(id)); }
 
     @GetMapping("/clasificaciones")
     public ApiResponse<ListResponse<ClasificacionResponse>> clasificaciones() { return ApiResponse.ok("Clasificaciones cargadas", mapper.list(clasificacionService.list())); }

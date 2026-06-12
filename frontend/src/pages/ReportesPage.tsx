@@ -1,72 +1,238 @@
 import { useMemo, useState } from 'react';
-import { BarChart3, Download, Eye, FileText, Leaf, Printer, Tags, Truck } from 'lucide-react';
+import { BarChart3, Download, FileText, Leaf, Printer, Tags, Truck, type LucideIcon } from 'lucide-react';
 import { EmptyState } from '../components/EmptyState';
 import { ModuleHeader } from '../components/ModuleHeader';
-import { downloadCsv, printCurrentView } from '../lib/export';
-import { numberCompact } from '../lib/format';
-import type { TrazabilidadResponse } from '../types/api';
+import { downloadCsv, downloadExcel, printCurrentView, type CsvRow } from '../lib/export';
+import { dateShort, numberCompact } from '../lib/format';
+import type {
+  ClasificacionResponse,
+  DespachoResponse,
+  LoteResponse,
+  ProcesoOperativoResponse,
+  ReferenceResponse,
+  SiembraResponse,
+  TrazabilidadResponse,
+  CamaResponse
+} from '../types/api';
 
 interface ReportesPageProps {
+  lotes: LoteResponse[];
+  camas: CamaResponse[];
+  siembras: SiembraResponse[];
+  procesos: ProcesoOperativoResponse | null;
+  clasificaciones: ClasificacionResponse[];
+  despachos: DespachoResponse[];
   trazabilidad: TrazabilidadResponse[];
 }
 
-const reportTypes = ['Trazabilidad por lote', 'Clasificación', 'Despachos'];
+type ReportType = 'trazabilidad' | 'produccion' | 'clasificacion' | 'despachos';
+
+type ReportRow = Record<string, string | number | null | undefined> & {
+  _loteId?: number | null;
+};
+
+interface ReportDefinition {
+  key: ReportType;
+  label: string;
+  description: string;
+  filename: string;
+  icon: LucideIcon;
+  headers: string[];
+  rows: ReportRow[];
+}
+
+const reportOptions: Array<{ key: ReportType; label: string }> = [
+  { key: 'trazabilidad', label: 'Trazabilidad por lote' },
+  { key: 'produccion', label: 'Producción por lote' },
+  { key: 'clasificacion', label: 'Clasificación' },
+  { key: 'despachos', label: 'Despachos' }
+];
+
 const allLots = 'TODOS';
 
 function traceId(item: TrazabilidadResponse, index: number) {
   return item.lote?.id || item.id || index + 1;
 }
 
-export function ReportesPage({ trazabilidad }: ReportesPageProps) {
-  const [reportType, setReportType] = useState(reportTypes[0]);
+function uniqueLots(...groups: Array<Array<ReferenceResponse | LoteResponse | null | undefined>>) {
+  const map = new Map<number, ReferenceResponse>();
+  groups.flat().forEach((item) => {
+    if (!item?.id) return;
+    map.set(item.id, {
+      id: item.id,
+      codigo: item.codigo,
+      descripcion: item.descripcion || null
+    });
+  });
+  return Array.from(map.values()).sort((left, right) => left.codigo.localeCompare(right.codigo));
+}
+
+function lotId(item: { lote?: ReferenceResponse | null }) {
+  return item.lote?.id || null;
+}
+
+function rowValues(headers: string[], row: ReportRow): CsvRow {
+  return headers.map((header) => row[header]);
+}
+
+function fileSuffix(reportType: ReportType, selectedLote: string, lotOptions: ReferenceResponse[]) {
+  const lot = selectedLote === allLots ? 'todos-los-lotes' : lotOptions.find((item) => String(item.id) === selectedLote)?.codigo || 'lote';
+  return `${reportType}-${lot}`.toLowerCase().replace(/\s+/g, '-');
+}
+
+export function ReportesPage({ lotes, camas, siembras, procesos, clasificaciones, despachos, trazabilidad }: ReportesPageProps) {
+  const [reportType, setReportType] = useState<ReportType>('trazabilidad');
   const [selectedLote, setSelectedLote] = useState(allLots);
 
-  const rows = useMemo(() => trazabilidad.map((item, index) => ({ ...item, id: traceId(item, index) })), [trazabilidad]);
-  const filteredRows = useMemo(() => rows.filter((item) => selectedLote === allLots || String(item.lote?.id || '') === selectedLote), [rows, selectedLote]);
-  const lotOptions = useMemo(() => rows.filter((item) => item.lote).map((item) => item.lote!), [rows]);
+  const uniformizaciones = procesos?.uniformizaciones.items || [];
+  const formalizaciones = procesos?.formalizaciones.items || [];
 
-  const production = filteredRows.reduce((total, item) => total + item.plantasSembradas, 0);
-  const classifications = filteredRows.reduce((total, item) => total + item.clasificaciones, 0);
-  const shipments = filteredRows.reduce((total, item) => total + item.despachos, 0);
-  const shippedPlants = filteredRows.reduce((total, item) => total + item.plantasDespachadas, 0);
-  const uniformizations = filteredRows.reduce((total, item) => total + item.uniformizaciones, 0);
-  const formalizations = filteredRows.reduce((total, item) => total + item.formalizaciones, 0);
+  const lotOptions = useMemo(() => uniqueLots(
+    lotes,
+    trazabilidad.map((item) => item.lote),
+    clasificaciones.map((item) => item.lote),
+    despachos.map((item) => item.lote),
+    siembras.map((item) => item.lote),
+    uniformizaciones.map((item) => item.lote),
+    formalizaciones.map((item) => item.lote)
+  ), [clasificaciones, despachos, formalizaciones, lotes, siembras, trazabilidad, uniformizaciones]);
+
+  const reportDefinitions = useMemo<Record<ReportType, ReportDefinition>>(() => {
+    const trazabilidadRows = trazabilidad.map((item, index) => ({
+      _loteId: item.lote?.id || null,
+      Lote: item.lote?.codigo || `TRZ-${traceId(item, index)}`,
+      Descripción: item.lote?.descripcion || 'Sin descripción',
+      Camas: item.camas,
+      Siembras: item.siembras,
+      'Plantas sembradas': item.plantasSembradas,
+      Uniformizaciones: item.uniformizaciones,
+      Formalizaciones: item.formalizaciones,
+      Clasificaciones: item.clasificaciones,
+      Despachos: item.despachos,
+      'Plantas despachadas': item.plantasDespachadas,
+      'Último evento': item.ultimoEvento || 'Sin eventos operativos'
+    }));
+
+    const produccionRows = lotes.map((lote) => {
+      const camasLote = camas.filter((cama) => cama.lote?.id === lote.id);
+      const siembrasLote = siembras.filter((siembra) => siembra.lote?.id === lote.id);
+      const uniformizacionesLote = uniformizaciones.filter((item) => item.lote?.id === lote.id);
+      const formalizacionesLote = formalizaciones.filter((item) => item.lote?.id === lote.id);
+      const planted = siembrasLote.reduce((total, item) => total + (item.cantidadRegistrada || 0), 0);
+      const uniformized = uniformizacionesLote.reduce((total, item) => total + (item.cantidadUniformizada || 0), 0);
+      const formalized = formalizacionesLote.reduce((total, item) => total + (item.cantidadPlantas || 0), 0);
+      const capacity = camasLote.reduce((total, item) => total + (item.capacidadReferencial || 0), 0);
+      return {
+        _loteId: lote.id,
+        Lote: lote.codigo,
+        Descripción: lote.descripcion || 'Sin descripción',
+        Variedad: lote.variedad || lote.cultivo || 'Sin variedad',
+        Estado: lote.estado || 'Sin estado',
+        Camas: camasLote.length,
+        'Capacidad referencial': capacity,
+        Siembras: siembrasLote.length,
+        'Plantas sembradas': planted,
+        'Plantas uniformizadas': uniformized,
+        'Plantas formalizadas': formalized,
+        'Avance productivo': planted > 0 ? `${Math.min(100, Math.round((formalized / planted) * 100))}%` : '0%'
+      };
+    });
+
+    const clasificacionRows = clasificaciones.map((item) => ({
+      _loteId: lotId(item),
+      Lote: item.lote?.codigo || 'Sin lote',
+      Cama: item.cama?.codigo || 'Sin cama',
+      Fecha: dateShort(item.fechaClasificacion),
+      'Estado de planta': item.estadoPlanta || 'No definido',
+      Tamaño: item.tamano || 'No definido',
+      Condición: item.condicion || 'No definida',
+      Cantidad: item.cantidad || 0,
+      Estado: item.estado || 'Sin estado',
+      Responsable: item.usuarioRegistro?.nombreCompleto || 'Sin responsable'
+    }));
+
+    const despachoRows = despachos.map((item) => ({
+      _loteId: lotId(item),
+      Lote: item.lote?.codigo || 'Sin lote',
+      Fecha: dateShort(item.fechaDespacho),
+      Modalidad: item.modalidad || 'No definida',
+      'Cantidad despachada': item.cantidadDespachada || 0,
+      Destino: item.destino || 'Sin destino',
+      'Guía de remisión': item.guiaRemision || 'Sin guía',
+      'Validación de calidad': item.validacionCalidad || 'Sin validación',
+      Estado: item.estado || 'Sin estado',
+      Responsable: item.usuarioRegistro?.nombreCompleto || 'Sin responsable'
+    }));
+
+    return {
+      trazabilidad: {
+        key: 'trazabilidad',
+        label: 'Trazabilidad por lote',
+        description: 'Consolidado de etapas operativas por lote productivo.',
+        filename: 'blueberrytrace-trazabilidad',
+        icon: BarChart3,
+        headers: ['Lote', 'Descripción', 'Camas', 'Siembras', 'Plantas sembradas', 'Uniformizaciones', 'Formalizaciones', 'Clasificaciones', 'Despachos', 'Plantas despachadas', 'Último evento'],
+        rows: trazabilidadRows
+      },
+      produccion: {
+        key: 'produccion',
+        label: 'Producción por lote',
+        description: 'Resumen de camas, capacidad, siembras, uniformizaciones y formalizaciones.',
+        filename: 'blueberrytrace-produccion',
+        icon: Leaf,
+        headers: ['Lote', 'Descripción', 'Variedad', 'Estado', 'Camas', 'Capacidad referencial', 'Siembras', 'Plantas sembradas', 'Plantas uniformizadas', 'Plantas formalizadas', 'Avance productivo'],
+        rows: produccionRows
+      },
+      clasificacion: {
+        key: 'clasificacion',
+        label: 'Clasificación',
+        description: 'Registros de calidad, condición, tamaño y cantidad clasificada.',
+        filename: 'blueberrytrace-clasificacion',
+        icon: Tags,
+        headers: ['Lote', 'Cama', 'Fecha', 'Estado de planta', 'Tamaño', 'Condición', 'Cantidad', 'Estado', 'Responsable'],
+        rows: clasificacionRows
+      },
+      despachos: {
+        key: 'despachos',
+        label: 'Despachos',
+        description: 'Historial de salidas, destinos, guías y validaciones de calidad.',
+        filename: 'blueberrytrace-despachos',
+        icon: Truck,
+        headers: ['Lote', 'Fecha', 'Modalidad', 'Cantidad despachada', 'Destino', 'Guía de remisión', 'Validación de calidad', 'Estado', 'Responsable'],
+        rows: despachoRows
+      }
+    };
+  }, [camas, clasificaciones, despachos, formalizaciones, lotes, siembras, trazabilidad, uniformizaciones]);
+
+  const currentReport = reportDefinitions[reportType];
+  const filteredRows = useMemo(() => currentReport.rows.filter((item) => selectedLote === allLots || String(item._loteId || '') === selectedLote), [currentReport.rows, selectedLote]);
+  const previewRows = filteredRows.slice(0, 8);
+  const exportRows = filteredRows.map((row) => rowValues(currentReport.headers, row));
+
+  const production = filteredRows.reduce((total, item) => total + (Number(item['Plantas sembradas']) || 0), 0);
+  const shippedPlants = filteredRows.reduce((total, item) => total + (Number(item['Plantas despachadas'] || item['Cantidad despachada']) || 0), 0);
+  const classifications = filteredRows.reduce((total, item) => total + (Number(item.Clasificaciones || item.Cantidad) || 0), 0);
+  const shipments = filteredRows.reduce((total, item) => total + (Number(item.Despachos) || (item['Cantidad despachada'] !== undefined ? 1 : 0)), 0);
+  const processTotal = filteredRows.reduce((total, item) => total + (Number(item.Uniformizaciones || 0) + Number(item.Formalizaciones || 0)), 0);
 
   function exportCsv() {
-    const suffix = selectedLote === allLots ? 'todos-los-lotes' : (lotOptions.find((lote) => String(lote.id) === selectedLote)?.codigo || 'lote');
-    downloadCsv(`blueberrytrace-reportes-${suffix}.csv`, [
-      'Lote',
-      'Descripción',
-      'Camas',
-      'Siembras',
-      'Plantas sembradas',
-      'Uniformizaciones',
-      'Formalizaciones',
-      'Clasificaciones',
-      'Despachos',
-      'Plantas despachadas',
-      'Último evento'
-    ], filteredRows.map((item) => [
-      item.lote?.codigo || '',
-      item.lote?.descripcion || '',
-      item.camas,
-      item.siembras,
-      item.plantasSembradas,
-      item.uniformizaciones,
-      item.formalizaciones,
-      item.clasificaciones,
-      item.despachos,
-      item.plantasDespachadas,
-      item.ultimoEvento || ''
-    ]));
+    const suffix = fileSuffix(reportType, selectedLote, lotOptions);
+    downloadCsv(`${currentReport.filename}-${suffix}.csv`, currentReport.headers, exportRows);
   }
 
+  function exportExcel() {
+    const suffix = fileSuffix(reportType, selectedLote, lotOptions);
+    downloadExcel(`${currentReport.filename}-${suffix}.xls`, currentReport.label, currentReport.headers, exportRows);
+  }
+
+  const ReportIcon = currentReport.icon;
+
   return (
-    <main className="content-grid report-screen">
+    <main className="content-grid report-screen report-screen--apf3">
       <ModuleHeader
         eyebrow="Análisis operativo"
         title="Reportes operativos"
-        description="Consulta de trazabilidad, clasificación y despacho basada en registros reales del vivero."
+        description="Exporta reportes reales de trazabilidad, producción, clasificación y despachos para sustentación y control interno."
         icon={<BarChart3 size={21} />}
         tone="blue"
       />
@@ -75,14 +241,14 @@ export function ReportesPage({ trazabilidad }: ReportesPageProps) {
         <div className="panel-card__header">
           <div>
             <h2>Parámetros del reporte</h2>
-            <p>Filtra la información por tipo de consulta y lote productivo.</p>
+            <p>Selecciona el tipo de reporte y filtra por lote cuando necesites una vista específica.</p>
           </div>
         </div>
         <div className="report-parameters-grid report-parameters-grid--compact">
           <label>
             Tipo de reporte
-            <select value={reportType} onChange={(event) => setReportType(event.target.value)}>
-              {reportTypes.map((type) => <option key={type} value={type}>{type}</option>)}
+            <select value={reportType} onChange={(event) => setReportType(event.target.value as ReportType)}>
+              {reportOptions.map((type) => <option key={type.key} value={type.key}>{type.label}</option>)}
             </select>
           </label>
           <label>
@@ -94,73 +260,67 @@ export function ReportesPage({ trazabilidad }: ReportesPageProps) {
           </label>
           <label>
             Registros disponibles
-            <input value={`${filteredRows.length} lote(s) encontrados`} readOnly />
+            <input value={`${filteredRows.length} registro(s) encontrados`} readOnly />
           </label>
         </div>
         <div className="button-group">
-          <button type="button" className="action-button" onClick={() => document.querySelector('.report-summary-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' })} disabled={filteredRows.length === 0}><BarChart3 size={15} /> Ver consolidado</button>
+          <button type="button" className="action-button" onClick={() => document.querySelector('.report-preview-panel')?.scrollIntoView({ behavior: 'smooth', block: 'start' })} disabled={filteredRows.length === 0}><ReportIcon size={15} /> Ver vista previa</button>
           <button type="button" className="ghost-button" onClick={exportCsv} disabled={filteredRows.length === 0}><Download size={15} /> Exportar CSV</button>
-          <button type="button" className="ghost-button" onClick={printCurrentView}><Printer size={15} /> Imprimir o guardar PDF</button>
+          <button type="button" className="ghost-button" onClick={exportExcel} disabled={filteredRows.length === 0}><FileText size={15} /> Exportar Excel</button>
+          <button type="button" className="ghost-button" onClick={printCurrentView}><Printer size={15} /> Imprimir/PDF</button>
         </div>
       </section>
 
       <section className="report-card-grid report-card-grid--real">
         <article className="report-card">
           <span className="report-card__icon"><Leaf size={18} /></span>
-          <h3>Producción por lote</h3>
-          <p>Consolidado de camas, siembras y plantas sembradas por lote registrado.</p>
-          <div className="report-card__footer"><span>{filteredRows.length} lotes · {numberCompact(production)} plantas</span><div><button type="button" className="icon-action" onClick={exportCsv} disabled={filteredRows.length === 0}><Download size={14} /></button><button type="button" className="icon-action" disabled={filteredRows.length === 0}><Eye size={14} /></button></div></div>
+          <h3>Producción</h3>
+          <p>Plantas sembradas y avance productivo calculado con registros reales.</p>
+          <div className="report-card__footer"><span>{filteredRows.length} registros · {numberCompact(production)} plantas</span></div>
         </article>
         <article className="report-card">
           <span className="report-card__icon"><Tags size={18} /></span>
-          <h3>Control de clasificación</h3>
-          <p>Seguimiento de registros de calidad vinculados a la trazabilidad del lote.</p>
-          <div className="report-card__footer"><span>{numberCompact(classifications)} clasificaciones · {numberCompact(uniformizations + formalizations)} procesos</span><div><button type="button" className="icon-action" onClick={exportCsv} disabled={filteredRows.length === 0}><Download size={14} /></button><button type="button" className="icon-action" disabled={filteredRows.length === 0}><Eye size={14} /></button></div></div>
+          <h3>Calidad y procesos</h3>
+          <p>Clasificaciones, uniformizaciones y formalizaciones vinculadas al lote.</p>
+          <div className="report-card__footer"><span>{numberCompact(classifications)} clasificaciones · {numberCompact(processTotal)} procesos</span></div>
         </article>
         <article className="report-card">
           <span className="report-card__icon"><Truck size={18} /></span>
-          <h3>Seguimiento de despacho</h3>
-          <p>Historial consolidado de salidas y plantas despachadas por lote.</p>
-          <div className="report-card__footer"><span>{numberCompact(shipments)} despachos · {numberCompact(shippedPlants)} plantas</span><div><button type="button" className="icon-action" onClick={exportCsv} disabled={filteredRows.length === 0}><Download size={14} /></button><button type="button" className="icon-action" disabled={filteredRows.length === 0}><Eye size={14} /></button></div></div>
+          <h3>Despachos</h3>
+          <p>Salidas registradas, plantas despachadas y validación de calidad.</p>
+          <div className="report-card__footer"><span>{numberCompact(shipments)} despachos · {numberCompact(shippedPlants)} plantas</span></div>
         </article>
       </section>
 
-      <section className="dashboard-grid dashboard-grid--equal">
-        <article className="panel-card report-summary-panel">
-          <div className="panel-card__header"><div><h2>Resumen consolidado</h2><p>Indicadores calculados con la información filtrada.</p></div></div>
-          {filteredRows.length > 0 ? (
-            <div className="report-summary-grid">
-              <div><span>Plantas sembradas</span><strong>{numberCompact(production)}</strong></div>
-              <div><span>Plantas despachadas</span><strong>{numberCompact(shippedPlants)}</strong></div>
-              <div><span>Uniformizaciones</span><strong>{numberCompact(uniformizations)}</strong></div>
-              <div><span>Formalizaciones</span><strong>{numberCompact(formalizations)}</strong></div>
-              <div><span>Clasificaciones</span><strong>{numberCompact(classifications)}</strong></div>
-              <div><span>Despachos</span><strong>{numberCompact(shipments)}</strong></div>
-            </div>
-          ) : (
-            <EmptyState compact title="Sin información para consolidar" description="Registra lotes y movimientos operativos para habilitar el reporte." />
-          )}
-        </article>
+      <section className="panel-card report-preview-panel">
+        <div className="panel-card__header">
+          <div>
+            <h2>{currentReport.label}</h2>
+            <p>{currentReport.description}</p>
+          </div>
+          <span className="panel-card__count">{filteredRows.length} registros</span>
+        </div>
 
-        <article className="panel-card">
-          <div className="panel-card__header"><div><h2>Trazabilidad por lote</h2><p>Relación entre plantas sembradas y despachadas.</p></div></div>
-          {filteredRows.length > 0 ? (
-            <div className="trace-bars">
-              {filteredRows.slice(0, 8).map((row) => {
-                const progress = row.plantasSembradas === 0 ? 0 : Math.min(100, Math.round((row.plantasDespachadas / row.plantasSembradas) * 100));
-                return (
-                  <div key={row.id} className="trace-bars__row">
-                    <div className="trace-bars__meta"><strong>{row.lote?.codigo || 'Lote sin código'}</strong><span>{row.lote?.descripcion || row.ultimoEvento || 'Sin detalle adicional'}</span></div>
-                    <div className="progress-track progress-track--wide"><span style={{ width: `${progress}%` }} /></div>
-                    <div className="trace-bars__summary"><strong>{numberCompact(row.plantasSembradas)}</strong><span>{progress}%</span></div>
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <EmptyState compact title="Sin trazabilidad registrada" description="Los lotes aparecerán cuando exista información operativa vinculada." />
-          )}
-        </article>
+        {previewRows.length > 0 ? (
+          <div className="data-table-wrap report-preview-table-wrap">
+            <table className="data-table report-preview-table">
+              <thead>
+                <tr>
+                  {currentReport.headers.map((header) => <th key={header}>{header}</th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {previewRows.map((row, index) => (
+                  <tr key={`${reportType}-${index}`}>
+                    {currentReport.headers.map((header) => <td key={header}>{String(row[header] ?? '')}</td>)}
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        ) : (
+          <EmptyState compact title="Sin información para este reporte" description="Registra operaciones o ajusta los filtros para generar una vista previa exportable." />
+        )}
       </section>
     </main>
   );

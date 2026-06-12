@@ -105,11 +105,11 @@ function dashboardMeta(total: number, label: string, percent?: number | null) {
 
 export function DashboardPage({ dashboard, lotes, camas, siembras, procesos, clasificaciones, despachos, trazabilidad }: DashboardPageProps) {
   const summary = dashboard?.summary;
-  const activeLots = summary?.lotesActivos || lotes.filter((lote) => (lote.estado || '').toUpperCase() === 'ACTIVO').length;
-  const activeBeds = summary?.camasActivas || camas.filter((cama) => (cama.estado || '').toUpperCase() === 'ACTIVA').length;
-  const planted = summary?.plantasSembradas || siembras.reduce((total, item) => total + valueOf(item.cantidadRegistrada), 0);
-  const dispatches = summary?.despachosRegistrados || despachos.length;
-  const shipped = summary?.plantasDespachadas || despachos.reduce((total, item) => total + valueOf(item.cantidadDespachada), 0);
+  const activeLots = summary?.lotesActivos ?? lotes.filter((lote) => (lote.estado || '').toUpperCase() === 'ACTIVO').length;
+  const activeBeds = summary?.camasActivas ?? camas.filter((cama) => (cama.estado || '').toUpperCase() === 'ACTIVA').length;
+  const planted = summary?.plantasSembradas ?? siembras.reduce((total, item) => total + valueOf(item.cantidadRegistrada), 0);
+  const dispatches = summary?.despachosRegistrados ?? despachos.length;
+  const shipped = summary?.plantasDespachadas ?? despachos.reduce((total, item) => total + valueOf(item.cantidadDespachada), 0);
   const selectedTrace = byLatestDate(trazabilidad, (item) => item.ultimoEvento)[0];
   const recentLots = byLatestDate(lotes, (item) => recordDate(item.fechaActualizacion, item.fechaCreacion, item.fechaRegistro)).slice(0, 5);
   const rendimiento = buildRendimiento(lotes, siembras);
@@ -205,7 +205,7 @@ export function DashboardPage({ dashboard, lotes, camas, siembras, procesos, cla
     {
       label: 'Lotes activos',
       value: activeLots,
-      meta: dashboardMeta(summary?.lotesRegistrados || lotes.length, 'lotes registrados', summary?.porcentajeLotesActivos),
+      meta: dashboardMeta(summary?.lotesRegistrados ?? lotes.length, 'lotes registrados', summary?.porcentajeLotesActivos),
       icon: Leaf,
       tone: 'green',
       spark: 'M2 28 C14 24 18 32 30 18 S52 22 62 9'
@@ -213,14 +213,14 @@ export function DashboardPage({ dashboard, lotes, camas, siembras, procesos, cla
     {
       label: 'Camas operativas',
       value: activeBeds,
-      meta: dashboardMeta(summary?.camasRegistradas || camas.length, 'camas registradas', summary?.porcentajeCamasActivas),
+      meta: dashboardMeta(summary?.camasRegistradas ?? camas.length, 'camas registradas', summary?.porcentajeCamasActivas),
       icon: Sprout,
       tone: 'green',
       spark: 'M2 30 C12 26 18 30 26 18 S42 8 62 15'
     },
     {
       label: 'Siembras registradas',
-      value: summary?.siembrasRegistradas || siembras.length,
+      value: summary?.siembrasRegistradas ?? siembras.length,
       meta: `${numberCompact(planted)} plantas registradas`,
       icon: Factory,
       tone: 'purple',

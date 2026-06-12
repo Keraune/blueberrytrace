@@ -60,6 +60,12 @@ public class ProcesoOperativoService {
         return list();
     }
 
+    public ProcesoOperativoResponse deleteUniformizacion(Long id) {
+        Uniformizacion entity = uniformizacionRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Uniformización no encontrada"));
+        uniformizacionRepository.delete(entity);
+        return list();
+    }
+
     public ProcesoOperativoResponse createFormalizacion(FormalizacionForm form) {
         Formalizacion entity = new Formalizacion();
         entity.setUsuarioRegistro(accountService.currentUser());
@@ -77,6 +83,12 @@ public class ProcesoOperativoService {
     public ProcesoOperativoResponse toggleFormalizacionStatus(Long id) {
         Formalizacion entity = formalizacionRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Formalización no encontrada"));
         entity.setEstado("REGISTRADA".equalsIgnoreCase(entity.getEstado()) ? "ANULADA" : "REGISTRADA");
+        return list();
+    }
+
+    public ProcesoOperativoResponse deleteFormalizacion(Long id) {
+        Formalizacion entity = formalizacionRepository.findById(id).orElseThrow(() -> new IllegalArgumentException("Formalización no encontrada"));
+        formalizacionRepository.delete(entity);
         return list();
     }
 
